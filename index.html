@@ -226,6 +226,170 @@
             
               
                 
+                <a class="post-title-link" href="/valotile和Java内存模型/" itemprop="url">
+                  volatile��Java�ڴ�ģ��
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-04-10T13:37:23+08:00" content="2016-04-10">
+              2016-04-10
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/valotile和Java内存模型/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="valotile和Java内存模型/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p><em>�������ڶ�����־����ʦ�ġ���������Java��������֮��д�ã����Ƕ����ʼǰɣ����ֽ���˼·��ͼ�����Դ��飬��Ϊ���벻�������ֽ���˼·�����������Ľ�����</em><br>�ڽӴ�volatile֮ǰ������ֻ֪����ԭ���ԡ���ԭ���Ժܺ����⣬����Ҳ���ن��¡�����volatile�������ɼ��ԡ���ʱ�򣬾Ͳ���ԭ������������һ����˵����˵�����ˡ�����һ�黹������������ѧһ��Java���ڴ�ģ�ͣ��ѵ��Ͳ�����ԭ������������ֱ�׵�˵����������ʵ���ǿ��Ի���һ�µ�һ�νӴ���ԭ���ԡ���ʱ������ôȥ�����ģ�ԭ���Ծ�������������˼��һ��������ԭ��(��Ȼ�����ϵ�ԭ�ӻ��ǿɷֵģ����ö����Ļ�˵����Ҫ������Щϸ��)������ϸ���ɷֵģ���С�Ĳ�������������������������ԭ���ԣ���ͨ��֪���˻������Ժͻ�������֮�����¡���Ϊ�������ڸ߼�����Ҫ�����ɻ������ԣ�������Ӧ�ڻ������Բ���ִ�е��������̣������˸߼����Դ��ڷ�ԭ���Բ��������⡣ͬ���ģ�����˵��Java���ڴ�ģ�������˿ɼ����������⣬������������ԭ���ϣ�����ֻ��������ȥ���⡰�ɼ��ԡ���ȷʵ��Ҫ��ѧһ��Java���ڴ�ģ�ͣ���ʵ�Ǻܼ򵥵�һ��������</p>
+<h2 id="Java�ڴ�g��"><a href="#Java�ڴ�g��" class="headerlink" title="Java�ڴ�ģ��"></a>Java�ڴ�ģ��</h2><p>Ϊ�˸����׵�����Java�ڴ�ģ�ͣ����ǿ��Բο�һ�±���ѧ����Ӳ���ϵĻ������ơ�Ϊ��Э���洢�豸�ʹ�����֮�����ٶȲ��࣬���������˸��ٻ���Cache����������Ҫʹ�õ������ݸ��Ƶ�Cache�У�������������CPUֻ��Cache�Ͻ��д�ȡ�������������Ժ��ٰ�Cache�е�����ͬ��д�ص��ڴ��У�����������CPU�ȴ����Ի������ڴ���д��������ϵ����ͼ��<br><img src="http://cevxd.img47.wal8.com/img47/542077_20160404152451/146027091076.png" alt="�����������ٻ��桢���ڴ����Ľ�����ϵ"><br><em>��ͼ�еĻ���һ����Э�鲻���ص㣬�ص������ֽṹ���ơ�</em><br>���Ƶģ�Java�ڴ�ģ�͹涨�����еı���(�������ֲ������ͷ������������߳�˽�еģ����ᱻ�����ı���)���洢�����ڴ���(�˴������ڴ����������ڴ���һ����)��ÿ���̻߳����Լ��Ĺ����ڴ�(�����ϱߵ�Cache����)���̵߳Ĺ����ڴ��б����˸��߳�ʹ�õ��ı��������ڴ渱���������̶߳Ա��������в����������ڹ����ڴ��н��У�������ֱ�Ӷ�д���ڴ��еı�������ͬ�߳�֮��Ҳ�޷�ֱ�ӷ��ʶԷ��Ĺ����ڴ棬�̼߳��ı������ݾ�ͨ�����ڴ����ɣ�������ϵ����ͼ��<br><img src="http://cevxd.img47.wal8.com/img47/542077_20160404152451/14602709108.png" alt="�̡߳������ڴ桢���ڴ����Ľ�����ϵ"><br><em>ͬ���ģ���ͼ�еĽ������������ص㣬�ص������ֽṹ���ơ�</em><br><strong>��Ҫע�����ǣ��������������ڴ桢�����ڴ棬�����������ڴ���һ���֣����Ǻ�JVM�ڴ������е�Java�ѡ�ջ���������Ȳ���ͬһ�����ε��ڴ滮�֣�ǰ�߸�ƫ���߼��ϵĻ��֣����߸�ƫ�������ϵĻ��֣�����Ҫǿ�ж�Ӧ�Ļ������ڴ���Ҫ��Ӧ��Java���еĶ���ʵ�����ݲ��֣������ڴ���Ҫ��Ӧ��ջ�еĲ���������</strong></p>
+<h2 id="�ɼ���"><a href="#�ɼ���" class="headerlink" title="�ɼ���"></a>�ɼ���</h2><p>���˽���Java�ڴ�ģ���Ժ���������ȥ���⡰�ɼ��ԡ�ʱ�����������׶��ˡ�����Ϊ�����ڴ��Ĵ��ڣ�����ĳЩ�߳����ڲ����Ĺ����������ܲ�������ֵ�����������ˡ����ɼ��ԡ����⡣����</p>
+<blockquote>
+<p>�ɼ�����ָ��һ���߳��޸��˹���������ֵ�������߳��ܹ�������֪�����޸ġ�<br>��Ҫ��ô��֤�ɼ����أ��ܼ򵥣�ֻҪ�������ɡ����ɼ��ԡ���ԭ�򡪡����������ڴ��ͺ��ˣ��ǵģ������ܹ����������ڴ棬ֱ�Ӳ������ڴ棬�Ǿ�һ���ǿɼ��ģ����������ƻ������ֽṹ���ơ����������ģ�Ҳ��Java volatile�ؼ��ֲ��õģ�����������������֤�ɼ��ԣ�</p>
+<ol>
+<li>��ÿ���޸ĸñ�������<strong>����</strong>�ӹ����ڴ�ͬ��д�ص����ڴ��У�</li>
+<li>��ÿ��ʹ�øñ���ǰ��<strong>����</strong>�����ڴ����ٶ�ȡ�������ڴ��У�<br><strong>Ҫע�����ǣ�volatile����Ҳ���й����ڴ渱���ģ�����û���ƻ����ֽṹ���ƣ�������ͨ���������������������������򣬼���ȡ��д�صļ�ʱ�ԡ�</strong></li>
+</ol>
+</blockquote>
+<h3 id="Java�б�֤�ɼ��ԵLؼ���"><a href="#Java�б�֤�ɼ��ԵLؼ���" class="headerlink" title="Java�б�֤�ɼ��ԵĹؼ���"></a>Java�б�֤�ɼ��ԵĹؼ���</h3><p>��Java�У�һ���������ؼ��ֿ��Ա�֤�ɼ��ԣ�</p>
+<ol>
+<li>volatile��ͨ���ϱ�����������֤��</li>
+<li>final����ʼ���󲻿ɱ䣬�������޸ĵ�������</li>
+<li>synchronized��ͨ���ڴ潻������֮һ��֤������һ������ִ��unlock����֮ǰ�������ȰѴ˱���ͬ�������ڴ��С���ע���˴�˵�Ĳ�����ͬ�����еĲ�������������ָ��synchronized���εı���������</li>
+</ol>
+<h2 id="volatile"><a href="#volatile" class="headerlink" title="volatile"></a>volatile</h2><h3 id="��volatile������"><a href="#��volatile������" class="headerlink" title="��volatile������"></a>��volatile������</h3><p>���ھ�����������ʲô���ҾͲ�˵�ˣ���Ϊ�������Ͼ������������ǵúܶԵĸ������һ�۷�������Ҳ�ֲ����˵Ĵ��¡���������ֻ�ѽ��۷ų�����������Ϊʲô��������</p>
+<blockquote>
+<p>volatileֻ�ܱ�֤�����α����Ŀɼ��ԣ�����֤����������ԭ���ԣ��������еĲ���������ͨ����һ���Ƿ��̰߳�ȫ�ġ�<br>volatile�Ա�����Ӱ������ֻ�ǿɼ��ԣ���������һֱǿ����һ�㣬�������Ѿ�������ʲô�ǿɼ��ԣ������ɼ��Ժ�ԭ������������������һ��ʱ�е��εĻ��������±ߵ����ӿ��ܾ��������ˡ�<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">volatile</span> <span class="keyword">int</span> num;</span><br><span class="line">num++;</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<p>����volatile�ܱ�֤����������ԭ���ԣ����ϱ�num++��������Ӧ����ԭ�Ӳ���������Ӧ����һ��ϸ���ɷֵġ����ᱻ����;���ϡ��Ĳ���������΢����һ������Ҳ����ʶ�����ǲ����ܵġ���������������Ҫ�ֳ�����ԭ�Ӳ����������ɣ�</p>
+<ol>
+<li>��ȡnum��ǰֵ��</li>
+<li>��num��ǰֵ���м�1���㣻</li>
+<li>��д��������numֵ��<br>�ڶ��̻߳����£���һ�����ڽ���num++�������̣߳����п������ϱ�����ԭ�Ӳ���֮������һ�㱻�л������ġ���Ҳ�ǿ���ͨ��Javap������ӡ֤�ģ��±���num++��������Ӧ���ֽ���ָ�<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">getstatic</span><br><span class="line">iconst_1</span><br><span class="line">iadd</span><br><span class="line">pustatic</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>���������Ŀ���num++�������������������ֽ���ָ����Կɼ��Ժ�ԭ����֮�䲢û��ʲô��Ȼ��ϵ����volatileֻ��֤�����Ŀɼ��ԣ�����num++�����������ԣ�volatile��Ψһ�����ǣ����ҽ���putstaticָ��ִ�����Ժ�����һ�߳�ͨ��getstaticָ����ȡ����numֵ�������µġ�(�������ֽ�����˵��ԭ���Բ��Ǻ��Ͻ�����Ϊ��ʹ��������ֻ��һ���ֽ���ָ�Ҳ������ζ��ִ������ָ������һ��ԭ�Ӳ�������Ϊһ���ֽ���ָ����������ִ��ʱ���ܻ�ת��Ϊ�������ػ�����ָ�����ͨ���������������ֽ���ָ�������Ͻ�һЩ�����˴�ʹ���ֽ������Ѿ���˵��������)��</p>
+<h3 id="volatile����������"><a href="#volatile����������" class="headerlink" title="volatile����������"></a>volatile����������</h3><p>ǰ������һֱ�ڽ�volatile�ܱ�֤�ɼ��ԣ���ʵ��ֻ����������֮һ������������һ�����þ��ǽ�ָֹ���������Ż���</p>
+<blockquote>
+<p>��Ӳ���ܹ��Ͻ���ָ����������ָCPU����������������ָ��������涨��˳���ֿ����͸�����Ӧ��·��Ԫ��������������˵ָ���������ţ�CPU��Ҫ����ȷ����ָ�����������Ա��ϳ����ܵó���ȷ��ִ�н�����<br>���Խ���CPU��ˮ�������ϱߵĸ����ָ���������Գ����Ĳ���ִ������ʲôӰ���أ�ΪʲôvolatileҪ��ָֹ���������أ��±�ͨ��DCL����ģʽ�Ĵ�����˵����<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Singleton</span> </span>&#123;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">static</span> Singleton instance;</span><br><span class="line">	</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Singleton <span class="title">getInstance</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span>(instance == <span class="keyword">null</span>) &#123;</span><br><span class="line">			<span class="keyword">synchronized</span> (Singleton.class) &#123;</span><br><span class="line">				<span class="keyword">if</span>(instance == <span class="keyword">null</span>)</span><br><span class="line">					instance = <span class="keyword">new</span> Singleton();</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> instance;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="title">Singleton</span><span class="params">()</span></span>&#123;&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doSomething</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="comment">//do something</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<p>����instanceû��ʹ��volatile���Σ���ôinstance = new Singleton()��Ӧ��ָ�����п��ܱ������򡣸��д�������������������Ҫ���ɣ�</p>
+<ol>
+<li>��Java���з���һ���ڴ������洢Singletonʵ����</li>
+<li>�ڸ��ڴ����ϳ�ʼ��Singletonʵ����</li>
+<li>�����ڴ�����Ӧ�ĵ�ַ���ø�ֵ��instance��<br>���ڼ������߳�A������Singleton.getInstance()����ִ�е�instance = new Singleton()���д���ʱ������ָ�����������ϱߵ�3�����豻�����򵽵�2������֮ǰ������ִ���˵�3�������Ժ󣬽�Ҫִ�е�2������֮ǰ�������������л����߳�B���߳�B�ٵ���Singleton.getInstance()����ʱ��instance�Ѿ�������null�ˣ���ʱ�ټ�������doSomething()����ʱ�����ڻ�û�г�ʼ�������Ի������쳣����Ȼ���������ǳ����ˣ�������û�п��ܣ�����ֻ��ʹ��volatile����instance��DCL����ģʽ�����̰߳�ȫ��(��JDK1.5֮ǰvolatile��������ȫ����ָ�������������Լ�ʹʹ��volatileҲ���ܱ�֤DCL����ģʽ���̰߳�ȫ������JDK1.5�޸�������֮����ȫ���̰߳�ȫ��)��<h3 id="volatile�jײ�ʵ��ԭ��"><a href="#volatile�jײ�ʵ��ԭ��" class="headerlink" title="volatile�ĵײ�ʵ��ԭ��"></a>volatile�ĵײ�ʵ��ԭ��</h3>������˵��ʵ��ԭ������JVM����ôʵ��volatile�Ŀɼ��Ժͽ�ָֹ�����������������Եġ���ʱ���ǿ��ԶԱȹ۲�ʹ��volatile�Ͳ�ʹ��volatile�ؼ���ʱ�����ɻ��������Ĳ��𣬾����Ĵ��벻������������Ȥ��������ʵ�顣����һ�����ԵĲ����ǣ���volatile����ÿ�θ�ֵָ��֮�󣬶�������һ����lock add1 $0x0,(%esp)��ָ��(��һ����ESP�Ĵ�����Ҳ�����������Ĵ�����ȡ����ջָ����ָ��)�������������൱�ڴ�˵�е�<strong>�ڴ�����</strong>���������á���������Java���������е�ԭ����˵����ָ�������α�֤�ɼ��Եģ�<blockquote>
+<p>��ֻ��һ��CPU�����ڴ�ʱ��������Ҫ�ڴ����ϣ�������������������CPU����ͬһ���ڴ棬��������һ���ڹ۲���һ��������Ҫ�ڴ���������֤һ�����ˡ�����ָ���еġ�add1 $0x0,(%esp)��(��ESP�Ĵ�����ֵ��0)��Ȼ��һ���ղ���(���������ղ��������ǿղ���ָ��nop����ΪIA32�ֲ��涨lockǰ׺����������nopָ��ʹ��)���ؼ�����lockǰ׺����ѯIA32�ֲᣬ����������<strong>ʹ�ñ�CPU��Cacheд�����ڴ棬��д�붯��Ҳ����������CPU���߱����ں���Ч����Cache</strong>������ͨ������һ���ղ���������ǰ��volatile�������޸Ķ�����CPU�����ɼ���<br>�������õ��ص����ں����䣬����lockǰ׺�Ľ��ͣ�Ҳ����volatile��ʹ��Ӳ��ָ������֤�ɼ��Եġ���lockǰ׺������ô��֤��ָֹ���������أ���Ȼͨ�����á���������Java���������е�ԭ����˵����<br>��Ӳ���ܹ��Ͻ���ָ����������ָCPU����������������ָ��������涨��˳���ֿ����͸�����Ӧ��·��Ԫ��������������˵ָ���������ţ�CPU��Ҫ����ȷ����ָ�����������Ա��ϳ����ܵó���ȷ��ִ�н�����Ʃ��ָ��1�ѵ�ַA�е�ֵ��10��ָ��2�ѵ�ַA�е�ֵ����2��ָ��3�ѵ�ַB�е�ֵ��ȥ3����ʱָ��1��ָ��2���������ģ�����֮����˳���������š�������(A+10)<em>2��A</em>2+10��Ȼ�����ȣ���ָ��3�������ŵ�ָ��1��2֮ǰ�����м䣬ֻҪ��֤CPUִ�к���������A��Bֵ�Ĳ���ʱ�ܻ�ȡ����ȷ��A��Bֵ���ɡ������ڱ���CPU�У���������������Ȼ�������ġ����ˣ�lock add1 $0x0,(%esp)ָ�����޸�ͬ�����ڴ�ʱ����ζ������֮ǰ�Ĳ������Ѿ�ִ�����ɣ��������γ��ˡ�ָ���������޷�Խ���ڴ����ϡ���Ч����<br>�����ϱߵ����ã������ܻ���һͷ��ˮ���������͸��˵ĸо�����ֻ�����᲻���Դ�һ�������ҹ����ڴ����ϣ�����������Java��������һ�鲢û�й������ܣ�ֻ˵��������ʱ���ܰѺ�����ָ�����������ڴ�����֮ǰ��λ�á���������������Ȼ�ǲ����ģ��ѵ�����֮ǰ�Ĵ����Ϳ����������ˣ���DCL����ģʽ��Ȼ���������ġ�Ӧ���и��ϸ������ƲŶԣ��������Խ�ֹ����ǰ���Ĵ��������򡣾�����һ��google��Ҳ�ҵ�һЩ˵����������̫ƫ���ײ㣬��Ҳû��̫�������һƪ<a href="http://jpbempel.blogspot.com/2013/05/volatile-and-memory-barriers.html" target="_blank" rel="external">����</a>�еĻ�����˵��һ���ڴ����ϣ�<br>with lock prefix, memory related instructions are processed specially to act as a memory barrier, similar to mfence instruction. Dave Dice explains in his blog that they benchmarked the 2 kinds of barrier, and the lock add seems the most efficient one on today’s architecture. So this barrier ensures that there is no reordering before and after this instruction and also drains all instructions pending into Store Buffer. After executing these instructions, all writes are visible to all other threads through cache subsystem or main memory. This costs some latency to wait for this drain.</p>
+</blockquote>
+</li>
+</ol>
+<h3 id="����"><a href="#����" class="headerlink" title="����"></a>����</h3><p>֮ǰ�սӴ�volatileʱ��������һ��˵����volatileֻ�ʺϼ򵥵�get��set��������ʱ��̫���������ڲ��ڴ�����ʱ����֪�����Ŀ���һ�仰����˼�Ƕ���volatile�����������Ķ������͵�����д������ԭ�Ӳ������������Ķ�д���������ϲ�����ԭ�Ӳ��������仰���Ǵ���������һ��ֽһ����һ�仰����������֮ǰnum++����ԭ�Ӳ�����ԭ�򣬲��������Լ������Ľ��ۡ���ʱ�ٻ�ͷȥ��֮ǰ�Ǹ�˵��ʱ�Ż�Ȼ���򣬿��������룺<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">int</span> i = <span class="number">0</span>;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">get</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> i;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">set</span><span class="params">(<span class="keyword">int</span> i)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">this</span>.i = i;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>������˵���ϱߵ�get��set�������ڱ���i�Ĳ�����������ԭ�Ӳ�����������������֮�仹��ͬ���ģ����˴�volatile��������ȫ��ͬ��synchronized�����ã����ǲ�����Ҫ˼��һ�᣿��ô��������<br>��������Ϊʲô��ͬ���ģ����ǿ���������Ϥ��synchronized��һ��ͬ��Ч����ʲô������������������synchronized���εģ��Ƕ��̻߳����£���һʱ��ֻ��һ���߳���ִ��get��set�����������̶߳����������Ŷ�״̬��������һʱ�̣���һ�߳�ͨ��get�����õ��ģ�һ���Ǳ���i�˿̵�����ֵ��������synchronized�ڴ˴��ﵽ��ͬ��Ч�����ǲ��Ǻ���Ϥ���ⲻ���Ǳ�֤�˱���i�Ŀɼ����<br>�������˴�volatile�ﵽ��ͬ��Ч��������volatile����ʹȻ��ͬ���ģ���һʱ�̣���һ�߳�ͨ��get�����õ��ģ�һ���Ǳ���i�˿̵�����ֵ��<br>��������ԭ���ԣ���ʱ���ǿ��Կ���һ����������iû��ʹ��volatile���Σ����������ϱ�˵���ڴ�ģ�ͣ���һ���߳�Aִ��this.i=iʱ����ʵ�������������ģ�1.�Թ����ڴ��е�i����д������2.�ѹ����ڴ��е�iͬ����д�����ڴ��У���ô����������֮�������������л��������߳�ʱ��ͨ��get������������i������ֵ����volatile���Ա�֤this.i=i���д�����ԭ���ԡ��˴���ԭ���Կ��ܺ�����ͨ��������ԭ���Բ�̫һ������Ϊ����֮ǰ������ԭ���Զ����ڻ������Ĳ����ϣ�������������JAVA���ڴ�ģ�͵��µġ�<br>��ʱ���ǲ�����ͷ��һ�µ���������������֮�仹��ͬ���ģ����˴�volatile��������ȫ��ͬ��synchronized�����á����仰ʱΪʲô���е������أ�<br>��Ϊ����ͨ�������ġ�ͬ�����������Ĺ�ע�����ڡ�ԭ���ԡ��ϣ���Ϊ����ͨ����Ҫͬ���Ĳ��������ϱߵĴ���ֻ��һ�У�����һϵ�����صĲ��������˴��ġ�ͬ�����������Ĺ�ע�����ڡ��ɼ��ԡ��ϣ�����ֻ��˵���Ƕ��ڡ�ͬ��������ʶ�������<br><em>����volatile����ȷ�÷������кܶ���Ҫѧϰ�������Ƽ�һƪ�ܺõĲ���<a href="http://www.ibm.com/developerworks/cn/java/j-jtp06197.html" target="_blank" rel="external">����ȷʹ�� Volatile ������</a>��ֵ��һ����</em><br>����ͨ�����á���������Java�����������еĻ����������ģ�����Ϊ���ڴ�ģ�͵��ܽᣬ����Ϊ�ԡ�ͬ��������ȷ��ʶ�����⡣</p>
+<blockquote>
+<p>Java�ڴ�ģ����Χ���Ų������������δ���ԭ���ԡ��ɼ��Ժ���������3�������������ġ�<br>�����ԣ�Java��������Ȼ�������Կ����ܽ�Ϊһ�仰���������߳��ڹ۲죬���еĲ������������ģ�������һ���߳��й۲���һ���̣߳����еĲ������������ġ�ǰ������ָ���߳��ڱ���Ϊ���е����塱����������ָ��ָ���������������͡������ڴ������ڴ�ͬ���ӳ١�������</p>
+</blockquote>
+
+          
+        
+      
+    </div>
+    
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/线程池全面解析/" itemprop="url">
                   线程池全面解析
                 </a>
@@ -254,8 +418,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/JAVA/" itemprop="url" rel="index">
-                    <span itemprop="name">JAVA</span>
+                  <a href="/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
                   </a>
                 </span>
 
@@ -598,7 +762,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">2</span>
+              <span class="site-state-item-count">3</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -615,7 +779,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-count">6</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
