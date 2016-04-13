@@ -41,7 +41,7 @@
 <link href="/css/main.css?v=0.5.0" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="volatile,Java,�ڴ�ģ��,����������Java�������������ʼ�," />
+  <meta name="keywords" content="volatile,Java,内存模型,《深入理解Java虚拟机》读书笔记," />
 
 
 
@@ -57,18 +57,21 @@
 
 
 
-<meta name="description" content="�������ڶ�����־����ʦ�ġ���������Java��������֮��д�ã����Ƕ����ʼǰɣ����ֽ���˼·��ͼ�����Դ��飬��Ϊ���벻�������ֽ���˼·�����������Ľ������ڽӴ�volatile֮ǰ������ֻ֪����ԭ���ԡ���ԭ���Ժܺ����⣬����Ҳ���ن��¡�����volatile�������ɼ��ԡ">
+<meta name="description" content="本文是在读了周志明老师的《深入理解Java虚拟机》之后写得，算是读书笔记吧，部分讲解思路和图均出自此书，因为我想不出比这种讲解思路更容易理解的讲法。
+在接触volatile之前，我们只知道“原子性”，原子性很好理解，这里也不再啰嗦。但当volatile引出“可见性”的时候，就不像原子性那样可以一两句说清楚说明白了。上网一查还总是让我们先学一下Java的内存模型，难道就不能像原子性那样简单直白的说明">
 <meta property="og:type" content="article">
-<meta property="og:title" content="volatile��Java�ڴ�ģ��">
+<meta property="og:title" content="volatile和Java内存模型">
 <meta property="og:url" content="http://ksni88.github.io/valotile和Java内存模型/index.html">
 <meta property="og:site_name" content="栖静林">
-<meta property="og:description" content="�������ڶ�����־����ʦ�ġ���������Java��������֮��д�ã����Ƕ����ʼǰɣ����ֽ���˼·��ͼ�����Դ��飬��Ϊ���벻�������ֽ���˼·�����������Ľ������ڽӴ�volatile֮ǰ������ֻ֪����ԭ���ԡ���ԭ���Ժܺ����⣬����Ҳ���ن��¡�����volatile�������ɼ��ԡ">
+<meta property="og:description" content="本文是在读了周志明老师的《深入理解Java虚拟机》之后写得，算是读书笔记吧，部分讲解思路和图均出自此书，因为我想不出比这种讲解思路更容易理解的讲法。
+在接触volatile之前，我们只知道“原子性”，原子性很好理解，这里也不再啰嗦。但当volatile引出“可见性”的时候，就不像原子性那样可以一两句说清楚说明白了。上网一查还总是让我们先学一下Java的内存模型，难道就不能像原子性那样简单直白的说明">
 <meta property="og:image" content="http://cevxd.img47.wal8.com/img47/542077_20160404152451/146027091076.png">
 <meta property="og:image" content="http://cevxd.img47.wal8.com/img47/542077_20160404152451/14602709108.png">
-<meta property="og:updated_time" content="2016-04-13T13:30:30.056Z">
+<meta property="og:updated_time" content="2016-04-13T13:48:27.512Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="volatile��Java�ڴ�ģ��">
-<meta name="twitter:description" content="�������ڶ�����־����ʦ�ġ���������Java��������֮��д�ã����Ƕ����ʼǰɣ����ֽ���˼·��ͼ�����Դ��飬��Ϊ���벻�������ֽ���˼·�����������Ľ������ڽӴ�volatile֮ǰ������ֻ֪����ԭ���ԡ���ԭ���Ժܺ����⣬����Ҳ���ن��¡�����volatile�������ɼ��ԡ">
+<meta name="twitter:title" content="volatile和Java内存模型">
+<meta name="twitter:description" content="本文是在读了周志明老师的《深入理解Java虚拟机》之后写得，算是读书笔记吧，部分讲解思路和图均出自此书，因为我想不出比这种讲解思路更容易理解的讲法。
+在接触volatile之前，我们只知道“原子性”，原子性很好理解，这里也不再啰嗦。但当volatile引出“可见性”的时候，就不像原子性那样可以一两句说清楚说明白了。上网一查还总是让我们先学一下Java的内存模型，难道就不能像原子性那样简单直白的说明">
 <meta name="twitter:image" content="http://cevxd.img47.wal8.com/img47/542077_20160404152451/146027091076.png">
 
 
@@ -87,7 +90,7 @@
   };
 </script>
 
-  <title> volatile��Java�ڴ�ģ�� | 栖静林 </title>
+  <title> volatile和Java内存模型 | 栖静林 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -227,7 +230,7 @@
             
             
               
-                volatile��Java�ڴ�ģ��
+                volatile和Java内存模型
               
             
           </h1>
@@ -292,51 +295,70 @@
       
 
       
-        <p><em>�������ڶ�����־����ʦ�ġ���������Java��������֮��д�ã����Ƕ����ʼǰɣ����ֽ���˼·��ͼ�����Դ��飬��Ϊ���벻�������ֽ���˼·�����������Ľ�����</em><br>�ڽӴ�volatile֮ǰ������ֻ֪����ԭ���ԡ���ԭ���Ժܺ����⣬����Ҳ���ن��¡�����volatile�������ɼ��ԡ���ʱ�򣬾Ͳ���ԭ������������һ����˵����˵�����ˡ�����һ�黹������������ѧһ��Java���ڴ�ģ�ͣ��ѵ��Ͳ�����ԭ������������ֱ�׵�˵����������ʵ���ǿ��Ի���һ�µ�һ�νӴ���ԭ���ԡ���ʱ������ôȥ�����ģ�ԭ���Ծ�������������˼��һ��������ԭ��(��Ȼ�����ϵ�ԭ�ӻ��ǿɷֵģ����ö����Ļ�˵����Ҫ������Щϸ��)������ϸ���ɷֵģ���С�Ĳ�������������������������ԭ���ԣ���ͨ��֪���˻������Ժͻ�������֮�����¡���Ϊ�������ڸ߼�����Ҫ�����ɻ������ԣ�������Ӧ�ڻ������Բ���ִ�е��������̣������˸߼����Դ��ڷ�ԭ���Բ��������⡣ͬ���ģ�����˵��Java���ڴ�ģ�������˿ɼ����������⣬������������ԭ���ϣ�����ֻ��������ȥ���⡰�ɼ��ԡ���ȷʵ��Ҫ��ѧһ��Java���ڴ�ģ�ͣ���ʵ�Ǻܼ򵥵�һ��������</p>
-<h2 id="Java�ڴ�g��"><a href="#Java�ڴ�g��" class="headerlink" title="Java�ڴ�ģ��"></a>Java�ڴ�ģ��</h2><p>Ϊ�˸����׵�����Java�ڴ�ģ�ͣ����ǿ��Բο�һ�±���ѧ����Ӳ���ϵĻ������ơ�Ϊ��Э���洢�豸�ʹ�����֮�����ٶȲ��࣬���������˸��ٻ���Cache����������Ҫʹ�õ������ݸ��Ƶ�Cache�У�������������CPUֻ��Cache�Ͻ��д�ȡ�������������Ժ��ٰ�Cache�е�����ͬ��д�ص��ڴ��У�����������CPU�ȴ����Ի������ڴ���д��������ϵ����ͼ��<br><img src="http://cevxd.img47.wal8.com/img47/542077_20160404152451/146027091076.png" alt="�����������ٻ��桢���ڴ����Ľ�����ϵ"><br><em>��ͼ�еĻ���һ����Э�鲻���ص㣬�ص������ֽṹ���ơ�</em><br>���Ƶģ�Java�ڴ�ģ�͹涨�����еı���(�������ֲ������ͷ������������߳�˽�еģ����ᱻ�����ı���)���洢�����ڴ���(�˴������ڴ����������ڴ���һ����)��ÿ���̻߳����Լ��Ĺ����ڴ�(�����ϱߵ�Cache����)���̵߳Ĺ����ڴ��б����˸��߳�ʹ�õ��ı��������ڴ渱���������̶߳Ա��������в����������ڹ����ڴ��н��У�������ֱ�Ӷ�д���ڴ��еı�������ͬ�߳�֮��Ҳ�޷�ֱ�ӷ��ʶԷ��Ĺ����ڴ棬�̼߳��ı������ݾ�ͨ�����ڴ����ɣ�������ϵ����ͼ��<br><img src="http://cevxd.img47.wal8.com/img47/542077_20160404152451/14602709108.png" alt="�̡߳������ڴ桢���ڴ����Ľ�����ϵ"><br><em>ͬ���ģ���ͼ�еĽ������������ص㣬�ص������ֽṹ���ơ�</em><br><strong>��Ҫע�����ǣ��������������ڴ桢�����ڴ棬�����������ڴ���һ���֣����Ǻ�JVM�ڴ������е�Java�ѡ�ջ���������Ȳ���ͬһ�����ε��ڴ滮�֣�ǰ�߸�ƫ���߼��ϵĻ��֣����߸�ƫ�������ϵĻ��֣�����Ҫǿ�ж�Ӧ�Ļ������ڴ���Ҫ��Ӧ��Java���еĶ���ʵ�����ݲ��֣������ڴ���Ҫ��Ӧ��ջ�еĲ���������</strong></p>
-<h2 id="�ɼ���"><a href="#�ɼ���" class="headerlink" title="�ɼ���"></a>�ɼ���</h2><p>���˽���Java�ڴ�ģ���Ժ���������ȥ���⡰�ɼ��ԡ�ʱ�����������׶��ˡ�����Ϊ�����ڴ��Ĵ��ڣ�����ĳЩ�߳����ڲ����Ĺ����������ܲ�������ֵ�����������ˡ����ɼ��ԡ����⡣����</p>
+        <p><em>本文是在读了周志明老师的《深入理解Java虚拟机》之后写得，算是读书笔记吧，部分讲解思路和图均出自此书，因为我想不出比这种讲解思路更容易理解的讲法。</em></p>
+<p>在接触volatile之前，我们只知道“原子性”，原子性很好理解，这里也不再啰嗦。但当volatile引出“可见性”的时候，就不像原子性那样可以一两句说清楚说明白了。上网一查还总是让我们先学一下Java的内存模型，难道就不能像原子性那样简单直白的说明白吗？其实我们可以回想一下第一次接触“原子性”的时候是怎么去理解的，原子性就是它的字面意思，一个操作像原子(虽然物理上的原子还是可分的，引用东哥的话说，不要在意这些细节)那样是细不可分的，最小的操作。但我们真正理解和明白原子性，是通过知道了汇编语言和机器语言之后的事。因为正是由于高级语言要编译成汇编语言，最后对应于机器语言才能执行的这个过程，造成了高级语言存在非原子性操作的问题。同样的，可以说是Java的内存模型造成了可见性这个问题，所以如果想从原理上，而不只是字面上去理解“可见性”，确实需要先学一下Java的内存模型，其实是很简单的一个东西。</p>
+<h2 id="Java内存模型"><a href="#Java内存模型" class="headerlink" title="Java内存模型"></a>Java内存模型</h2><p>为了更容易地理解Java内存模型，我们可以参考一下本科学过的硬件上的缓存设计。为了协调存储设备和处理器之间的速度差距，所以引入了高速缓存Cache：将运算需要使用到的数据复制到Cache中，在运算过程中CPU只在Cache上进行存取，在运算结束以后再把Cache中的数据同步写回到内存中，这样避免了CPU等待相对缓慢的内存读写，交互关系如下图：<br><img src="http://cevxd.img47.wal8.com/img47/542077_20160404152451/146027091076.png" alt="处理器、高速缓存、主内存间的交互关系"><br><em>上图中的缓存一致性协议不是重点，重点是这种结构设计。</em><br>类似的，Java内存模型规定，所有的变量(不包括局部变量和方法参数这种线程私有的，不会被共享的变量)都存储在主内存中(此处的主内存是虚拟机内存的一部分)，每条线程还有自己的工作内存(可与上边的Cache类比)，线程的工作内存中保存了该线程使用到的变量的主内存副本拷贝，线程对变量的所有操作都必须在工作内存中进行，而不能直接读写主内存中的变量。不同线程之间也无法直接访问对方的工作内存，线程间的变量传递均通过主内存完成，交互关系如下图：<br><img src="http://cevxd.img47.wal8.com/img47/542077_20160404152451/14602709108.png" alt="线程、工作内存、主内存间的交互关系"><br><em>同样的，上图中的交互操作不是重点，重点是这种结构设计。</em><br><strong>需要注意的是，这里所讲的主内存、工作内存，均是虚拟机内存的一部分，它们和JVM内存区域中的Java堆、栈、方法区等不是同一个层次的内存划分，前者更偏向逻辑上的划分，后者更偏向物理上的划分，如果要强行对应的话，主内存主要对应于Java堆中的对象实例数据部分，工作内存主要对应于栈中的部分区域。</strong></p>
+<h2 id="可见性"><a href="#可见性" class="headerlink" title="可见性"></a>可见性</h2><p>在了解了Java内存模型以后，我们再去理解“可见性”时，就清楚明白多了。正因为工作内存的存在，所以某些线程正在操作的共享变量可能不是最新值，这就造成了“不可见性”问题。所以</p>
 <blockquote>
-<p>�ɼ�����ָ��һ���߳��޸��˹���������ֵ�������߳��ܹ�������֪�����޸ġ�<br>��Ҫ��ô��֤�ɼ����أ��ܼ򵥣�ֻҪ�������ɡ����ɼ��ԡ���ԭ�򡪡����������ڴ��ͺ��ˣ��ǵģ������ܹ����������ڴ棬ֱ�Ӳ������ڴ棬�Ǿ�һ���ǿɼ��ģ����������ƻ������ֽṹ���ơ����������ģ�Ҳ��Java volatile�ؼ��ֲ��õģ�����������������֤�ɼ��ԣ�</p>
-<ol>
-<li>��ÿ���޸ĸñ�������<strong>����</strong>�ӹ����ڴ�ͬ��д�ص����ڴ��У�</li>
-<li>��ÿ��ʹ�øñ���ǰ��<strong>����</strong>�����ڴ����ٶ�ȡ�������ڴ��У�<br><strong>Ҫע�����ǣ�volatile����Ҳ���й����ڴ渱���ģ�����û���ƻ����ֽṹ���ƣ�������ͨ���������������������������򣬼���ȡ��д�صļ�ʱ�ԡ�</strong></li>
-</ol>
+<p>可见性是指当一个线程修改了共享变量的值，其他线程能够立即得知这个修改。  </p>
 </blockquote>
-<h3 id="Java�б�֤�ɼ��ԵLؼ���"><a href="#Java�б�֤�ɼ��ԵLؼ���" class="headerlink" title="Java�б�֤�ɼ��ԵĹؼ���"></a>Java�б�֤�ɼ��ԵĹؼ���</h3><p>��Java�У�һ���������ؼ��ֿ��Ա�֤�ɼ��ԣ�</p>
+<p>那要怎么保证可见性呢？很简单，只要消除造成“不可见性”的原因————工作内存就好了，是的，如果能够跳过工作内存，直接操作主内存，那就一定是可见的，但这样就破坏了这种结构设计。所以正常的，也是Java volatile关键字采用的，用以下两条规则保证可见性：</p>
 <ol>
-<li>volatile��ͨ���ϱ�����������֤��</li>
-<li>final����ʼ���󲻿ɱ䣬�������޸ĵ�������</li>
-<li>synchronized��ͨ���ڴ潻������֮һ��֤������һ������ִ��unlock����֮ǰ�������ȰѴ˱���ͬ�������ڴ��С���ע���˴�˵�Ĳ�����ͬ�����еĲ�������������ָ��synchronized���εı���������</li>
+<li>在每次修改该变量后，<strong>立即</strong>从工作内存同步写回到主内存中；</li>
+<li>在每次使用该变量前，<strong>立即</strong>从主内存中再读取到工作内存中；  </li>
 </ol>
-<h2 id="volatile"><a href="#volatile" class="headerlink" title="volatile"></a>volatile</h2><h3 id="��volatile������"><a href="#��volatile������" class="headerlink" title="��volatile������"></a>��volatile������</h3><p>���ھ�����������ʲô���ҾͲ�˵�ˣ���Ϊ�������Ͼ������������ǵúܶԵĸ������һ�۷�������Ҳ�ֲ����˵Ĵ��¡���������ֻ�ѽ��۷ų�����������Ϊʲô��������</p>
+<p><strong>要注意的是，volatile变量也是有工作内存副本的，它并没有破环这种结构设计，它与普通变量的区别仅仅是以上两条规则，即读取和写回的及时性。</strong></p>
+<h3 id="Java中保证可见性的关键字"><a href="#Java中保证可见性的关键字" class="headerlink" title="Java中保证可见性的关键字"></a>Java中保证可见性的关键字</h3><p>在Java中，一共有三个关键字可以保证可见性：</p>
+<ol>
+<li>volatile：通过上边两条规则保证；</li>
+<li>final：初始化后不可变，不存在修改的情况；</li>
+<li>synchronized：通过内存交互规则之一保证，“对一个变量执行unlock操作之前，必须先把此变量同步回主内存中”，注意此处说的并不是同步块中的操作，而单单是指被synchronized修饰的变量本身。</li>
+</ol>
+<h2 id="volatile"><a href="#volatile" class="headerlink" title="volatile"></a>volatile</h2><h3 id="对volatile的误解"><a href="#对volatile的误解" class="headerlink" title="对volatile的误解"></a>对volatile的误解</h3><p>至于具体的误解是什么，我就不说了，因为在我身上经常发生本来记得很对的概念，看了一眼反例就再也分不清了的蠢事。所以这里只把结论放出来，并解释为什么会这样。</p>
 <blockquote>
-<p>volatileֻ�ܱ�֤�����α����Ŀɼ��ԣ�����֤����������ԭ���ԣ��������еĲ���������ͨ����һ���Ƿ��̰߳�ȫ�ġ�<br>volatile�Ա�����Ӱ������ֻ�ǿɼ��ԣ���������һֱǿ����һ�㣬�������Ѿ�������ʲô�ǿɼ��ԣ������ɼ��Ժ�ԭ������������������һ��ʱ�е��εĻ��������±ߵ����ӿ��ܾ��������ˡ�<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">volatile</span> <span class="keyword">int</span> num;</span><br><span class="line">num++;</span><br></pre></td></tr></table></figure></p>
+<p>volatile只能保证被修饰变量的可见性，不保证对其操作的原子性，对其所有的操作都和普通变量一样是非线程安全的。  </p>
 </blockquote>
-<p>����volatile�ܱ�֤����������ԭ���ԣ����ϱ�num++��������Ӧ����ԭ�Ӳ���������Ӧ����һ��ϸ���ɷֵġ����ᱻ����;���ϡ��Ĳ���������΢����һ������Ҳ����ʶ�����ǲ����ܵġ���������������Ҫ�ֳ�����ԭ�Ӳ����������ɣ�</p>
+<p>volatile对变量的影响仅仅只是可见性，这是我们一直强调的一点，如果你已经理解了什么是可见性，但当可见性和原子性这两个概念放在一起时有点晕的话，看了下边的例子可能就清楚多了。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">volatile</span> <span class="keyword">int</span> num;</span><br><span class="line">num++;</span><br></pre></td></tr></table></figure></p>
+<p>如果volatile能保证变量操作的原子性，那上边num++这个操作应该是原子操作，即它应该是一个细不可分的、不会被“中途打断”的操作，但稍微清醒一点的你也会意识到这是不可能的。这个操作最起码要分成三个原子操作才能完成：</p>
 <ol>
-<li>��ȡnum��ǰֵ��</li>
-<li>��num��ǰֵ���м�1���㣻</li>
-<li>��д��������numֵ��<br>�ڶ��̻߳����£���һ�����ڽ���num++�������̣߳����п������ϱ�����ԭ�Ӳ���֮������һ�㱻�л������ġ���Ҳ�ǿ���ͨ��Javap������ӡ֤�ģ��±���num++��������Ӧ���ֽ���ָ�<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">getstatic</span><br><span class="line">iconst_1</span><br><span class="line">iadd</span><br><span class="line">pustatic</span><br></pre></td></tr></table></figure>
-</li>
+<li>读取num当前值；</li>
+<li>对num当前值进行加1运算；</li>
+<li>回写运算后的num值；  </li>
 </ol>
-<p>���������Ŀ���num++�������������������ֽ���ָ����Կɼ��Ժ�ԭ����֮�䲢û��ʲô��Ȼ��ϵ����volatileֻ��֤�����Ŀɼ��ԣ�����num++�����������ԣ�volatile��Ψһ�����ǣ����ҽ���putstaticָ��ִ�����Ժ�����һ�߳�ͨ��getstaticָ����ȡ����numֵ�������µġ�(�������ֽ�����˵��ԭ���Բ��Ǻ��Ͻ�����Ϊ��ʹ��������ֻ��һ���ֽ���ָ�Ҳ������ζ��ִ������ָ������һ��ԭ�Ӳ�������Ϊһ���ֽ���ָ����������ִ��ʱ���ܻ�ת��Ϊ�������ػ�����ָ�����ͨ���������������ֽ���ָ�������Ͻ�һЩ�����˴�ʹ���ֽ������Ѿ���˵��������)��</p>
-<h3 id="volatile����������"><a href="#volatile����������" class="headerlink" title="volatile����������"></a>volatile����������</h3><p>ǰ������һֱ�ڽ�volatile�ܱ�֤�ɼ��ԣ���ʵ��ֻ����������֮һ������������һ�����þ��ǽ�ָֹ���������Ż���</p>
+<p>在多线程环境下，任一个正在进行num++操作的线程，都有可能在上边三个原子操作之间的任一点被切换上下文。这也是可以通过Javap反汇编印证的，下边是num++反汇编对应的字节码指令：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">getstatic</span><br><span class="line">iconst_1</span><br><span class="line">iadd</span><br><span class="line">pustatic</span><br></pre></td></tr></table></figure></p>
+<p>可以清楚的看到num++操作被编译成了四条字节码指令，所以可见性和原子性之间并没有什么必然联系，而volatile只保证变量的可见性，对于num++这个操作而言，volatile的唯一作用是，当且仅当putstatic指令执行完以后，任一线程通过getstatic指令读取到的num值都是最新的。(这里用字节码来说明原子性不是很严谨，因为即使编译出来只有一条字节码指令，也并不意味着执行这条指令就是一个原子操作，因为一条字节码指令在真正被执行时可能会转化为多条本地机器码指令，所以通过汇编代码而非字节码指令会更严谨一些，但此处使用字节码就已经能说明问题了)。</p>
+<h3 id="volatile的两个作用"><a href="#volatile的两个作用" class="headerlink" title="volatile的两个作用"></a>volatile的两个作用</h3><p>前边我们一直在讲volatile能保证可见性，其实这只是它的作用之一，它还有另外一个作用就是禁止指令重排序优化。</p>
 <blockquote>
-<p>��Ӳ���ܹ��Ͻ���ָ����������ָCPU����������������ָ��������涨��˳���ֿ����͸�����Ӧ��·��Ԫ��������������˵ָ���������ţ�CPU��Ҫ����ȷ����ָ�����������Ա��ϳ����ܵó���ȷ��ִ�н�����<br>���Խ���CPU��ˮ�������ϱߵĸ����ָ���������Գ����Ĳ���ִ������ʲôӰ���أ�ΪʲôvolatileҪ��ָֹ���������أ��±�ͨ��DCL����ģʽ�Ĵ�����˵����<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Singleton</span> </span>&#123;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">static</span> Singleton instance;</span><br><span class="line">	</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Singleton <span class="title">getInstance</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span>(instance == <span class="keyword">null</span>) &#123;</span><br><span class="line">			<span class="keyword">synchronized</span> (Singleton.class) &#123;</span><br><span class="line">				<span class="keyword">if</span>(instance == <span class="keyword">null</span>)</span><br><span class="line">					instance = <span class="keyword">new</span> Singleton();</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> instance;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="title">Singleton</span><span class="params">()</span></span>&#123;&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doSomething</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="comment">//do something</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>从硬件架构上讲，指令重排序是指CPU采用了允许将多条指令不按程序规定的顺序分开发送给各相应电路单元处理。但并不是说指令任意重排，CPU需要能正确处理指令依赖情况以保障程序能得出正确的执行结果。 </p>
 </blockquote>
-<p>����instanceû��ʹ��volatile���Σ���ôinstance = new Singleton()��Ӧ��ָ�����п��ܱ������򡣸��д�������������������Ҫ���ɣ�</p>
+<p>可以结合CPU流水线理解上边的概念。那指令重排序对程序的并发执行又有什么影响呢？为什么volatile要禁止指令重排序呢？下边通过DCL单例模式的代码来说明。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Singleton</span> </span>&#123;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">static</span> Singleton instance;</span><br><span class="line">	</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Singleton <span class="title">getInstance</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span>(instance == <span class="keyword">null</span>) &#123;</span><br><span class="line">			<span class="keyword">synchronized</span> (Singleton.class) &#123;</span><br><span class="line">				<span class="keyword">if</span>(instance == <span class="keyword">null</span>)</span><br><span class="line">					instance = <span class="keyword">new</span> Singleton();</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> instance;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="title">Singleton</span><span class="params">()</span></span>&#123;&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doSomething</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="comment">//do something</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>如果instance没有使用volatile修饰，那么instance = new Singleton()对应的指令就有可能被重排序。该行代码起码有三个步骤需要完成：</p>
 <ol>
-<li>��Java���з���һ���ڴ������洢Singletonʵ����</li>
-<li>�ڸ��ڴ����ϳ�ʼ��Singletonʵ����</li>
-<li>�����ڴ�����Ӧ�ĵ�ַ���ø�ֵ��instance��<br>���ڼ������߳�A������Singleton.getInstance()����ִ�е�instance = new Singleton()���д���ʱ������ָ�����������ϱߵ�3�����豻�����򵽵�2������֮ǰ������ִ���˵�3�������Ժ󣬽�Ҫִ�е�2������֮ǰ�������������л����߳�B���߳�B�ٵ���Singleton.getInstance()����ʱ��instance�Ѿ�������null�ˣ���ʱ�ټ�������doSomething()����ʱ�����ڻ�û�г�ʼ�������Ի������쳣����Ȼ���������ǳ����ˣ�������û�п��ܣ�����ֻ��ʹ��volatile����instance��DCL����ģʽ�����̰߳�ȫ��(��JDK1.5֮ǰvolatile��������ȫ����ָ�������������Լ�ʹʹ��volatileҲ���ܱ�֤DCL����ģʽ���̰߳�ȫ������JDK1.5�޸�������֮����ȫ���̰߳�ȫ��)��<h3 id="volatile�jײ�ʵ��ԭ��"><a href="#volatile�jײ�ʵ��ԭ��" class="headerlink" title="volatile�ĵײ�ʵ��ԭ��"></a>volatile�ĵײ�ʵ��ԭ��</h3>������˵��ʵ��ԭ������JVM����ôʵ��volatile�Ŀɼ��Ժͽ�ָֹ�����������������Եġ���ʱ���ǿ��ԶԱȹ۲�ʹ��volatile�Ͳ�ʹ��volatile�ؼ���ʱ�����ɻ��������Ĳ��𣬾����Ĵ��벻������������Ȥ��������ʵ�顣����һ�����ԵĲ����ǣ���volatile����ÿ�θ�ֵָ��֮�󣬶�������һ����lock add1 $0x0,(%esp)��ָ��(��һ����ESP�Ĵ�����Ҳ�����������Ĵ�����ȡ����ջָ����ָ��)�������������൱�ڴ�˵�е�<strong>�ڴ�����</strong>���������á���������Java���������е�ԭ����˵����ָ�������α�֤�ɼ��Եģ�<blockquote>
-<p>��ֻ��һ��CPU�����ڴ�ʱ��������Ҫ�ڴ����ϣ�������������������CPU����ͬһ���ڴ棬��������һ���ڹ۲���һ��������Ҫ�ڴ���������֤һ�����ˡ�����ָ���еġ�add1 $0x0,(%esp)��(��ESP�Ĵ�����ֵ��0)��Ȼ��һ���ղ���(���������ղ��������ǿղ���ָ��nop����ΪIA32�ֲ��涨lockǰ׺����������nopָ��ʹ��)���ؼ�����lockǰ׺����ѯIA32�ֲᣬ����������<strong>ʹ�ñ�CPU��Cacheд�����ڴ棬��д�붯��Ҳ����������CPU���߱����ں���Ч����Cache</strong>������ͨ������һ���ղ���������ǰ��volatile�������޸Ķ�����CPU�����ɼ���<br>�������õ��ص����ں����䣬����lockǰ׺�Ľ��ͣ�Ҳ����volatile��ʹ��Ӳ��ָ������֤�ɼ��Եġ���lockǰ׺������ô��֤��ָֹ���������أ���Ȼͨ�����á���������Java���������е�ԭ����˵����<br>��Ӳ���ܹ��Ͻ���ָ����������ָCPU����������������ָ��������涨��˳���ֿ����͸�����Ӧ��·��Ԫ��������������˵ָ���������ţ�CPU��Ҫ����ȷ����ָ�����������Ա��ϳ����ܵó���ȷ��ִ�н�����Ʃ��ָ��1�ѵ�ַA�е�ֵ��10��ָ��2�ѵ�ַA�е�ֵ����2��ָ��3�ѵ�ַB�е�ֵ��ȥ3����ʱָ��1��ָ��2���������ģ�����֮����˳���������š�������(A+10)<em>2��A</em>2+10��Ȼ�����ȣ���ָ��3�������ŵ�ָ��1��2֮ǰ�����м䣬ֻҪ��֤CPUִ�к���������A��Bֵ�Ĳ���ʱ�ܻ�ȡ����ȷ��A��Bֵ���ɡ������ڱ���CPU�У���������������Ȼ�������ġ����ˣ�lock add1 $0x0,(%esp)ָ�����޸�ͬ�����ڴ�ʱ����ζ������֮ǰ�Ĳ������Ѿ�ִ�����ɣ��������γ��ˡ�ָ���������޷�Խ���ڴ����ϡ���Ч����<br>�����ϱߵ����ã������ܻ���һͷ��ˮ���������͸��˵ĸо�����ֻ�����᲻���Դ�һ�������ҹ����ڴ����ϣ�����������Java��������һ�鲢û�й������ܣ�ֻ˵��������ʱ���ܰѺ�����ָ�����������ڴ�����֮ǰ��λ�á���������������Ȼ�ǲ����ģ��ѵ�����֮ǰ�Ĵ����Ϳ����������ˣ���DCL����ģʽ��Ȼ���������ġ�Ӧ���и��ϸ������ƲŶԣ��������Խ�ֹ����ǰ���Ĵ��������򡣾�����һ��google��Ҳ�ҵ�һЩ˵����������̫ƫ���ײ㣬��Ҳû��̫�������һƪ<a href="http://jpbempel.blogspot.com/2013/05/volatile-and-memory-barriers.html" target="_blank" rel="external">����</a>�еĻ�����˵��һ���ڴ����ϣ�<br>with lock prefix, memory related instructions are processed specially to act as a memory barrier, similar to mfence instruction. Dave Dice explains in his blog that they benchmarked the 2 kinds of barrier, and the lock add seems the most efficient one on today’s architecture. So this barrier ensures that there is no reordering before and after this instruction and also drains all instructions pending into Store Buffer. After executing these instructions, all writes are visible to all other threads through cache subsystem or main memory. This costs some latency to wait for this drain.</p>
-</blockquote>
-</li>
+<li>在Java堆中分配一块内存用来存储Singleton实例；</li>
+<li>在该内存块上初始化Singleton实例；</li>
+<li>将该内存块对应的地址引用赋值给instance；</li>
 </ol>
-<h3 id="����"><a href="#����" class="headerlink" title="����"></a>����</h3><p>֮ǰ�սӴ�volatileʱ��������һ��˵����volatileֻ�ʺϼ򵥵�get��set��������ʱ��̫���������ڲ��ڴ�����ʱ����֪�����Ŀ���һ�仰����˼�Ƕ���volatile�����������Ķ������͵�����д������ԭ�Ӳ������������Ķ�д���������ϲ�����ԭ�Ӳ��������仰���Ǵ���������һ��ֽһ����һ�仰����������֮ǰnum++����ԭ�Ӳ�����ԭ�򣬲��������Լ������Ľ��ۡ���ʱ�ٻ�ͷȥ��֮ǰ�Ǹ�˵��ʱ�Ż�Ȼ���򣬿��������룺<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">int</span> i = <span class="number">0</span>;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">get</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> i;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">set</span><span class="params">(<span class="keyword">int</span> i)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">this</span>.i = i;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>������˵���ϱߵ�get��set�������ڱ���i�Ĳ�����������ԭ�Ӳ�����������������֮�仹��ͬ���ģ����˴�volatile��������ȫ��ͬ��synchronized�����ã����ǲ�����Ҫ˼��һ�᣿��ô��������<br>��������Ϊʲô��ͬ���ģ����ǿ���������Ϥ��synchronized��һ��ͬ��Ч����ʲô������������������synchronized���εģ��Ƕ��̻߳����£���һʱ��ֻ��һ���߳���ִ��get��set�����������̶߳����������Ŷ�״̬��������һʱ�̣���һ�߳�ͨ��get�����õ��ģ�һ���Ǳ���i�˿̵�����ֵ��������synchronized�ڴ˴��ﵽ��ͬ��Ч�����ǲ��Ǻ���Ϥ���ⲻ���Ǳ�֤�˱���i�Ŀɼ����<br>�������˴�volatile�ﵽ��ͬ��Ч��������volatile����ʹȻ��ͬ���ģ���һʱ�̣���һ�߳�ͨ��get�����õ��ģ�һ���Ǳ���i�˿̵�����ֵ��<br>��������ԭ���ԣ���ʱ���ǿ��Կ���һ����������iû��ʹ��volatile���Σ����������ϱ�˵���ڴ�ģ�ͣ���һ���߳�Aִ��this.i=iʱ����ʵ�������������ģ�1.�Թ����ڴ��е�i����д������2.�ѹ����ڴ��е�iͬ����д�����ڴ��У���ô����������֮�������������л��������߳�ʱ��ͨ��get������������i������ֵ����volatile���Ա�֤this.i=i���д�����ԭ���ԡ��˴���ԭ���Կ��ܺ�����ͨ��������ԭ���Բ�̫һ������Ϊ����֮ǰ������ԭ���Զ����ڻ������Ĳ����ϣ�������������JAVA���ڴ�ģ�͵��µġ�<br>��ʱ���ǲ�����ͷ��һ�µ���������������֮�仹��ͬ���ģ����˴�volatile��������ȫ��ͬ��synchronized�����á����仰ʱΪʲô���е������أ�<br>��Ϊ����ͨ�������ġ�ͬ�����������Ĺ�ע�����ڡ�ԭ���ԡ��ϣ���Ϊ����ͨ����Ҫͬ���Ĳ��������ϱߵĴ���ֻ��һ�У�����һϵ�����صĲ��������˴��ġ�ͬ�����������Ĺ�ע�����ڡ��ɼ��ԡ��ϣ�����ֻ��˵���Ƕ��ڡ�ͬ��������ʶ�������<br><em>����volatile����ȷ�÷������кܶ���Ҫѧϰ�������Ƽ�һƪ�ܺõĲ���<a href="http://www.ibm.com/developerworks/cn/java/j-jtp06197.html" target="_blank" rel="external">����ȷʹ�� Volatile ������</a>��ֵ��һ����</em><br>����ͨ�����á���������Java�����������еĻ����������ģ�����Ϊ���ڴ�ģ�͵��ܽᣬ����Ϊ�ԡ�ͬ��������ȷ��ʶ�����⡣</p>
+<p>现在假设有线程A调用了Singleton.getInstance()，当执行到instance = new Singleton()这行代码时，经过指令重排序，上边第3个步骤被重排序到第2个步骤之前，并在执行了第3个步骤以后，将要执行第2个步骤之前，进行上下文切换至线程B，线程B再调用Singleton.getInstance()方法时，instance已经不等于null了，这时再继续调用doSomething()方法时，由于还没有初始化，所以会出现异常。虽然这种情况非常极端，但不是没有可能，所以只有使用volatile修饰instance的DCL单例模式才是线程安全的(在JDK1.5之前volatile还不能完全屏蔽指令重排序，所以即使使用volatile也不能保证DCL单例模式的线程安全，但在JDK1.5修复此问题之后完全是线程安全的)。</p>
+<h3 id="volatile的底层实现原理"><a href="#volatile的底层实现原理" class="headerlink" title="volatile的底层实现原理"></a>volatile的底层实现原理</h3><p>这里所说的实现原理，即JVM是怎么实现volatile的可见性和禁止指令重排序这两个特性的。这时我们可以对比观察使用volatile和不使用volatile关键字时所生成汇编代码的差别，具体的代码不再贴出，感兴趣可以自行实验。其中一个明显的差别是，在volatile变量每次赋值指令之后，都会紧随一条“lock add1 $0x0,(%esp)”指令(不一定是ESP寄存器，也可能是其他寄存器，取决于栈指针的指向)。这个操作就相当于传说中的<strong>内存屏障</strong>，以下引用《深入理解Java虚拟机》中的原话来说明该指令是如何保证可见性的：</p>
 <blockquote>
-<p>Java�ڴ�ģ����Χ���Ų������������δ���ԭ���ԡ��ɼ��Ժ���������3�������������ġ�<br>�����ԣ�Java��������Ȼ�������Կ����ܽ�Ϊһ�仰���������߳��ڹ۲죬���еĲ������������ģ�������һ���߳��й۲���һ���̣߳����еĲ������������ġ�ǰ������ָ���߳��ڱ���Ϊ���е����塱����������ָ��ָ���������������͡������ڴ������ڴ�ͬ���ӳ١�������</p>
+<p>当只有一个CPU访问内存时，并不需要内存屏障，但如果有两个或更多CPU访问同一块内存，且其中有一个在观测另一个，就需要内存屏障来保证一致性了。这条指令中的“add1 $0x0,(%esp)”(把ESP寄存器的值加0)显然是一个空操作(采用这个空操作而不是空操作指令nop是因为IA32手册规定lock前缀不允许配合nop指令使用)，关键在于lock前缀，查询IA32手册，它的作用是<strong>使得本CPU的Cache写入了内存，该写入动作也会引起别的CPU或者别的内核无效化其Cache</strong>，所以通过这样一个空操作，可让前面volatile变量的修改对其他CPU立即可见。  </p>
+</blockquote>
+<p>这段引用的重点在于后半句，关于lock前缀的解释，也就是volatile是使用硬件指令来保证可见性的。那lock前缀又是怎么保证禁止指令重排序呢？依然通过引用《深入理解Java虚拟机》中的原话来说明：</p>
+<blockquote>
+<p>从硬件架构上讲，指令重排序是指CPU采用了允许将多条指令不按程序规定的顺序分开发送给各相应电路单元处理。但并不是说指令任意重排，CPU需要能正确处理指令依赖情况以保障程序能得出正确的执行结果。譬如指令1把地址A中的值加10，指令2把地址A中的值乘以2，指令3把地址B中的值减去3，这时指令1和指令2是有依赖的，它们之间的顺序不能重排————(A+10)<em>2与A</em>2+10显然不相等，但指令3可以重排到指令1、2之前或者中间，只要保证CPU执行后面依赖到A、B值的操作时能获取到正确的A和B值即可。所以在本内CPU中，重排序看起来依然是有序的。因此，lock add1 $0x0,(%esp)指令把修改同步到内存时，意味着所有之前的操作都已经执行完成，这样便形成了“指令重排序无法越过内存屏障”的效果。  </p>
+</blockquote>
+<p>看了上边的引用，你可能还是一头雾水，这个解释给人的感觉像是只可意会不可言传一样，而且关于内存屏障，《深入理解Java虚拟机》一书并没有过多介绍，只说“重排序时不能把后面的指令重排序到内存屏障之前的位置”，但这个限制显然是不够的，难道屏障之前的代码就可以重排序了？那DCL单例模式依然是有问题的。应该有更严格的限制才对，比如绝对禁止屏障前后的代码重排序。经过进一步google，也找到一些说明，但由于太偏向底层，我也没有太深究，引用一篇<em><a href="http://jpbempel.blogspot.com/2013/05/volatile-and-memory-barriers.html" target="_blank" rel="external">博文</a></em>中的话简单说明一下内存屏障：</p>
+<blockquote>
+<p>with lock prefix, memory related instructions are processed specially to act as a memory barrier, similar to mfence instruction. Dave Dice explains in his blog that they benchmarked the 2 kinds of barrier, and the lock add seems the most efficient one on today’s architecture. So this barrier ensures that there is no reordering before and after this instruction and also drains all instructions pending into Store Buffer. After executing these instructions, all writes are visible to all other threads through cache subsystem or main memory. This costs some latency to wait for this drain.  </p>
+</blockquote>
+<h3 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h3><p>之前刚接触volatile时，看到过一个说法，volatile只适合简单的get和set方法，当时不太懂。这次在查内存屏障时，不知道在哪看到一句话，意思是对于volatile变量，单独的读操作和单独的写操作是原子操作，但任意的读写操作的组合不再是原子操作，这句话像是戳破了最后一张纸一样，一句话解释清楚了之前num++不是原子操作的原因，并给出了言简意赅的结论。这时再回头去查之前那个说法时才恍然大悟，看<em><a href="http://www.blogjava.net/bolo/archive/2014/06/20/414971.html" target="_blank" rel="external">下面代码</a></em>：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">int</span> i = <span class="number">0</span>;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">get</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> i;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">set</span><span class="params">(<span class="keyword">int</span> i)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">this</span>.i = i;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>如果我说，上边的get和set方法对于变量i的操作，不但是原子操作，而且两个方法之间还是同步的，即此处volatile的作用完全等同于synchronized的作用，你是不是需要思考一会？这么神奇吗？</p>
+<p>先来解释为什么是同步的，我们可以先用熟悉的synchronized想一下同步效果是什么样。如果两个方法是synchronized修饰的，那多线程环境下，任一时刻只有一个线程在执行get和set方法，其他线程都处于阻塞排队状态，则，任一时刻，任一线程通过get方法得到的，一定是变量i此刻的最新值。这就是synchronized在此处达到的同步效果，是不是很熟悉？这不就是保证了变量i的可见性嘛。再来看此处volatile达到的同步效果，由于volatile语义使然，同样的，任一时刻，任一线程通过get方法得到的，一定是变量i此刻的最新值。</p>
+<p>再来解释原子性，这时我们可以考虑一下如果变量i没有使用volatile修饰，结合我们上边说的内存模型，当一个线程A执行this.i=i时，其实至少是有两步的：1.对工作内存中的i进行写操作；2.把工作内存中的i同步回写到主内存中；那么当在这两步之间进行上下文切换至其他线程时，通过get方法将看不到i的最新值。而volatile可以保证this.i=i这行代码的原子性。此处的原子性可能和我们通常理解的原子性不太一样，因为我们之前遇到的原子性都是在机器码的层面上，而这里是由于JAVA的内存模型导致的。</p>
+<p>这时我们不妨回头想一下当看到“两个方法之间还是同步的，即此处volatile的作用完全等同于synchronized的作用”这句话时为什么会有点诧异呢？因为我们通常理解的“同步”，更多的关注点在于“原子性”上，因为我们通常需要同步的操作不像上边的代码只有一行，而是一系列相关的操作。而此处的“同步”，更多的关注点在于“可见性”上，所以只能说我们对于“同步”的认识还不够深。</p>
+<p>关于volatile的正确用法，还有很多需要学习，这里推荐一篇很好的博文<em><a href="http://www.ibm.com/developerworks/cn/java/j-jtp06197.html" target="_blank" rel="external">《正确使用 Volatile 变量》</a></em>，值得一看。最后通过引用《深入理解Java虚拟机》书中的话来结束此文，既作为对内存模型的总结，更作为对“同步”的正确认识和理解。</p>
+<blockquote>
+<p>Java内存模型是围绕着并发过程中如何处理原子性、可见性和有序性这3个特征来建立的。<br>有序性：Java程序中天然的有序性可以总结为一句话：如果在线程内观察，所有的操作都是有序的；如果在一个线程中观察另一个线程，所有的操作都是无序的。前半句是指“线程内表现为串行的语义”，后半句是指“指令重排序”现象和“工作内存与主内存同步延迟”现象。</p>
 </blockquote>
 
       
@@ -362,9 +384,9 @@
           
             <a href="/tags/Java/" rel="tag">#Java</a>
           
-            <a href="/tags/�ڴ�g��/" rel="tag">#�ڴ�ģ��</a>
+            <a href="/tags/内存模型/" rel="tag">#内存模型</a>
           
-            <a href="/tags/����������Java�������������ʼ�/" rel="tag">#����������Java�������������ʼ�</a>
+            <a href="/tags/《深入理解Java虚拟机》读书笔记/" rel="tag">#《深入理解Java虚拟机》读书笔记</a>
           
         </div>
       
@@ -406,7 +428,7 @@
   <div class="comments" id="comments">
     
       <div class="ds-thread" data-thread-key="valotile和Java内存模型/"
-           data-title="volatile��Java�ڴ�ģ��" data-url="http://ksni88.github.io/valotile和Java内存模型/">
+           data-title="volatile和Java内存模型" data-url="http://ksni88.github.io/valotile和Java内存模型/">
       </div>
     
   </div>
@@ -508,7 +530,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Java�ڴ�g��"><span class="nav-number">1.</span> <span class="nav-text">Java�ڴ�ģ��</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#�ɼ���"><span class="nav-number">2.</span> <span class="nav-text">�ɼ���</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Java�б�֤�ɼ��ԵLؼ���"><span class="nav-number">2.1.</span> <span class="nav-text">Java�б�֤�ɼ��ԵĹؼ���</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#volatile"><span class="nav-number">3.</span> <span class="nav-text">volatile</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#��volatile������"><span class="nav-number">3.1.</span> <span class="nav-text">��volatile������</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#volatile����������"><span class="nav-number">3.2.</span> <span class="nav-text">volatile����������</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#volatile�jײ�ʵ��ԭ��"><span class="nav-number">3.3.</span> <span class="nav-text">volatile�ĵײ�ʵ��ԭ��</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#����"><span class="nav-number">3.4.</span> <span class="nav-text">����</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Java内存模型"><span class="nav-number">1.</span> <span class="nav-text">Java内存模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#可见性"><span class="nav-number">2.</span> <span class="nav-text">可见性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Java中保证可见性的关键字"><span class="nav-number">2.1.</span> <span class="nav-text">Java中保证可见性的关键字</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#volatile"><span class="nav-number">3.</span> <span class="nav-text">volatile</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#对volatile的误解"><span class="nav-number">3.1.</span> <span class="nav-text">对volatile的误解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#volatile的两个作用"><span class="nav-number">3.2.</span> <span class="nav-text">volatile的两个作用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#volatile的底层实现原理"><span class="nav-number">3.3.</span> <span class="nav-text">volatile的底层实现原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#后记"><span class="nav-number">3.4.</span> <span class="nav-text">后记</span></a></li></ol></li></ol></div>
             
           </div>
         </section>
