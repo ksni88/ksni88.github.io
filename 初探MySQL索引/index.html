@@ -70,7 +70,7 @@
 <meta property="og:image" content="http://cevxd.img47.wal8.com/img47/542077_20160404152451/146139847016.jpg">
 <meta property="og:image" content="http://cevxd.img47.wal8.com/img47/542077_20160404152451/146139846823.jpg">
 <meta property="og:image" content="http://cevxd.img47.wal8.com/img47/542077_20160404152451/146139846775.jpg">
-<meta property="og:updated_time" content="2016-04-23T08:06:23.435Z">
+<meta property="og:updated_time" content="2016-04-23T08:20:41.397Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="初探MySQL索引">
 <meta name="twitter:description" content="在上个月搜狐面试中，面试官看我有很多项目都用到了MySQL，于是问我有没有用过索引，我说没有，然后他诧异地问我遇到过的最大的单表数据量有多大，我赶紧掩饰说没多大也就上万吧，然后就没有然后了。。想来也是羞愧万分，用了这么久的MySQL竟然没有接触过索引，这几天正好需要维护一个去年暑假的项目，跑了大半年数据量已经很大了，借此机会学习实践一下索引。先把最大的体会放出来：对于索引，只能说，不用不知道，用了">
@@ -306,29 +306,34 @@
 <blockquote>
 <p>如果对于有where条件，又想走索引用limit的，必须设计一个索引，将where放第一位，limit用到的主键放第2位，而且只能select主键。</p>
 </blockquote>
-<p>我在该表上建立了联合索引category_id_date=(category_id, date)，这句话是相当精简正确的，但我当时注意力全放在怎么建索引了，没有在意最后一句话，这也造成了后面一些问题，先且接着往下看。</p>
+<p>我在该表上建立了联合索引category_id_date=(category_id, date)，这句话是相当精简正确的，但我当时注意力全放在怎么建索引了，没有在意最后一句话，这也造成了后面一些困惑，先且接着往下看。</p>
 <h3 id="造大量假数据"><a href="#造大量假数据" class="headerlink" title="造大量假数据"></a>造大量假数据</h3><p>建立完索引，就需要造大量假数据进行测试了，我找到去年开发时的news表，里边存有5000多条数据，然后通过存储过程把该表数据循环添加到另一张结构一样的news_copy表中，循环100次，下图是添加后的数据量。<br><img src="http://cevxd.img47.wal8.com/img47/542077_20160404152451/146139846866.jpg" alt="数据量"><br>可以看到有近60W条数据，下边分别是建索引前后的效果图：<br><img src="http://cevxd.img47.wal8.com/img47/542077_20160404152451/146139847119.jpg" alt="建索引前"><br><img src="http://cevxd.img47.wal8.com/img47/542077_20160404152451/146139847069.jpg" alt="建索引后"><br>可以看到效率相差10倍，而且这个差距肯定会随着数据量的增加而变大。然而，虽然建立索引大大增加了查询效率，但建索引后的查询效率还是不能让我们满意。这时我们就该回头关注SQL本身了，能不能进行优化呢？</p>
 <h3 id="SQL优化"><a href="#SQL优化" class="headerlink" title="SQL优化"></a>SQL优化</h3><p>依然是病急乱投医(不过通过实践遇到问题就解决是最快的学习途径，只是不够系统全面)，查了一通SQL优化以后，在繁杂的搜索结果里有一篇<em><a href="http://www.111cn.net/database/mysql/46425.htm" target="_blank" rel="external">博文</a></em>让我相见恨晚，像是捡了宝一样赶紧按照他说的改了一下SQL：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> n.<span class="keyword">id</span>, title <span class="keyword">from</span> news_copy n</span><br><span class="line"><span class="keyword">inner</span> <span class="keyword">join</span></span><br><span class="line">(<span class="keyword">select</span> <span class="keyword">id</span> <span class="keyword">from</span> news_copy </span><br><span class="line"><span class="keyword">where</span> category_id=<span class="number">1</span></span><br><span class="line"><span class="keyword">order</span> <span class="keyword">by</span> <span class="built_in">date</span> <span class="keyword">desc</span></span><br><span class="line"><span class="keyword">limit</span> <span class="number">1000</span>,<span class="number">10</span>) t</span><br><span class="line"><span class="keyword">on</span> n.<span class="keyword">id</span>=t.<span class="keyword">id</span></span><br></pre></td></tr></table></figure></p>
 <p>执行结果如下：<br><img src="http://cevxd.img47.wal8.com/img47/542077_20160404152451/146139847016.jpg" alt="SQL优化后"><br>是不是惊到了？竟然相差近百倍。这又是为什么呢？这里就要引出另外一个概念了：覆盖索引。</p>
 <h3 id="覆盖索引"><a href="#覆盖索引" class="headerlink" title="覆盖索引"></a>覆盖索引</h3><p>索引一般用来快速定位想要查询的数据的位置，然后据此精确读取，所以有两步读取操作，第一步读索引，第二步根据索引读数据并返回。换句话说，索引只是用来定位数据，而不是直接返回数据。然而覆盖索引就是一个特例，下面是覆盖索引的概念：</p>
 <blockquote>
-<p>A covering index is a special case where the index itself contains the required data field(s) and can return the data.<br>其实覆盖索引并不是一个“强概念”，而更像一个简单的名称：当索引字段包含所有需要查询的字段时，可以只读取一次索引就能返回查询结果，这种特例使用到的索引叫做覆盖索引。显而易见，当使用覆盖索引时查询是飞快的（因为不用回表查询）。<br>读到这里你应该还是不太明白优化后的SQL它具体因为什么变快了，它的执行过程和优化前有什么区别啊？对！你需要了解整个的执行过程才能彻底明白，但在解释两者的执行过程之前，你还需要了解一下SQL语句一般情况下的执行过程和先后顺序（你是不是发现预备知识有点多呢？不要骂娘，谁让我们是半路出家，确实需要一些上下文信息才能理解得清楚明白，我也是顺藤摸瓜，需要什么学什么）。</p>
+<p>A covering index is a special case where the index itself contains the required data field(s) and can return the data.  </p>
+</blockquote>
+<p>其实覆盖索引并不是一个“强概念”，而更像一个简单的名称：当索引字段包含所有需要查询的字段时，可以只读取一次索引就能返回查询结果，这种特例使用到的索引叫做覆盖索引。显而易见，当使用覆盖索引时查询是飞快的（因为不用回表查询）。</p>
+<p>读到这里你应该还是不太明白优化后的SQL它具体因为什么变快了，它的执行过程和优化前有什么区别啊？对！你需要了解具体的执行过程才能彻底明白，但在解释两者的执行过程之前，你还需要了解一下SQL语句一般情况下的执行过程和先后顺序（你是不是发现预备知识有点多呢？不要骂娘，谁让我们是半路出家，确实需要一些上下文信息才能理解得清楚明白，我也是顺藤摸瓜，需要什么学什么）。</p>
 <h4 id="SQL的整体执行过程"><a href="#SQL的整体执行过程" class="headerlink" title="SQL的整体执行过程"></a>SQL的整体执行过程</h4><p>这里说的执行过程是一个宏观上的，把整个SQL语句当作一个整体，看一下这个整体从执行开始到返回结果都经历了哪些过程（参考：<em><a href="http://www.2cto.com/database/201310/249273.html" target="_blank" rel="external">博文</a></em>）：</p>
 <ol>
 <li>应用通过MySQL API把查询命令发送给MySQL服务器，然后被解析;</li>
 <li>检查权限、MySQL optimizer进行优化，经过解析和优化后的查询命令被编译为CPU可运行的二进制形式的查询计划（query plan），并可以被缓存;</li>
 <li>如果存在索引，那么先扫描索引，如果数据被索引覆盖，那么不需要额外的查找，如果不是，根据索引查找和读取对应的记录;</li>
 <li>如果有关联查询，查询次序是扫描第一张表找到满足条件的记录，按照第一张表和第二张表的关联键值，扫描第二张表查找满足条件的记录，按此顺序循环;</li>
-<li>输出查询结果;<br>这里需要注意的是第3步，这一步是SQL语句真正开始执行的开始，如果没有可用索引，就会进行全表扫描，读取所有记录的<strong>所有字段</strong>；而如果有可用索引，会先扫描索引，然后根据索引读取对应记录的<strong>所有字段</strong>。注意我说的是<strong>所有字段</strong>，而不只是select的字段，至于具体的过程，继续往下看。<h4 id="SQL的具体先后顺序"><a href="#SQL的具体先后顺序" class="headerlink" title="SQL的具体先后顺序"></a>SQL的具体先后顺序</h4>上边讲得是把SQL语句作为一个整体看，这里是深入SQL语句内部，讨论各个SQL关键字的执行先后顺序（参考：<em><a href="http://www.jellythink.com/archives/924" target="_blank" rel="external">博文</a></em>）：<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">(7)     <span class="keyword">SELECT</span> </span><br><span class="line">(<span class="number">8</span>)     <span class="keyword">DISTINCT</span> &lt;select_list&gt;</span><br><span class="line">(<span class="number">1</span>)     <span class="keyword">FROM</span> &lt;left_table&gt;</span><br><span class="line">(<span class="number">3</span>)     &lt;join_type&gt; <span class="keyword">JOIN</span> &lt;right_table&gt;</span><br><span class="line">(<span class="number">2</span>)     <span class="keyword">ON</span> &lt;join_condition&gt;</span><br><span class="line">(<span class="number">4</span>)     <span class="keyword">WHERE</span> &lt;where_condition&gt;</span><br><span class="line">(<span class="number">5</span>)     <span class="keyword">GROUP</span> <span class="keyword">BY</span> &lt;group_by_list&gt;</span><br><span class="line">(<span class="number">6</span>)     <span class="keyword">HAVING</span> &lt;having_condition&gt;</span><br><span class="line">(<span class="number">9</span>)     <span class="keyword">ORDER</span> <span class="keyword">BY</span> &lt;order_by_condition&gt;</span><br><span class="line">(<span class="number">10</span>)    <span class="keyword">LIMIT</span> &lt;limit_number&gt;</span><br></pre></td></tr></table></figure>
-</li>
+<li>输出查询结果;</li>
 </ol>
-</blockquote>
-<p>前边的数字表示该行SQL被执行的次序。<br>SQL执行的开始是FROM语句，查看目标表是否有可用索引（见上），然后取<strong>所有字段</strong>，然后根据WHERE查询条件<strong>选取</strong>满足条件的记录，然后根据SELECT语句<strong>选取</strong>需要的字段，最后根据LIMIT语句<strong>选取</strong>并返回需要的数据结果。所以不要天真地认为每次查询只会读取SELECT指定的字段，查询不是一个从<em>零</em>挑选增加成结果的过程，而是从<em>满</em>筛选去除成结果的过程（其实道理很简单，因为我们需要把所有数据读到内存中进行处理，而不能在文件层面有选择的读取）。</p>
+<p>这里需要注意的是第3步，这一步是SQL语句真正开始执行的开始，如果没有可用索引，就会进行全表扫描，读取所有记录的<strong>所有字段</strong>；而如果有可用索引，会先扫描索引，然后根据索引读取对应记录的<strong>所有字段</strong>。注意我说的是<strong>所有字段</strong>，而不只是select的字段，至于具体的过程，继续往下看。</p>
+<h4 id="SQL的具体先后顺序"><a href="#SQL的具体先后顺序" class="headerlink" title="SQL的具体先后顺序"></a>SQL的具体先后顺序</h4><p>上边讲得是把SQL语句作为一个整体看，这里是深入SQL语句内部，讨论各个SQL关键字的执行先后顺序（参考：<em><a href="http://www.jellythink.com/archives/924" target="_blank" rel="external">博文</a></em>）：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">(7)     <span class="keyword">SELECT</span> </span><br><span class="line">(<span class="number">8</span>)     <span class="keyword">DISTINCT</span> &lt;select_list&gt;</span><br><span class="line">(<span class="number">1</span>)     <span class="keyword">FROM</span> &lt;left_table&gt;</span><br><span class="line">(<span class="number">3</span>)     &lt;join_type&gt; <span class="keyword">JOIN</span> &lt;right_table&gt;</span><br><span class="line">(<span class="number">2</span>)     <span class="keyword">ON</span> &lt;join_condition&gt;</span><br><span class="line">(<span class="number">4</span>)     <span class="keyword">WHERE</span> &lt;where_condition&gt;</span><br><span class="line">(<span class="number">5</span>)     <span class="keyword">GROUP</span> <span class="keyword">BY</span> &lt;group_by_list&gt;</span><br><span class="line">(<span class="number">6</span>)     <span class="keyword">HAVING</span> &lt;having_condition&gt;</span><br><span class="line">(<span class="number">9</span>)     <span class="keyword">ORDER</span> <span class="keyword">BY</span> &lt;order_by_condition&gt;</span><br><span class="line">(<span class="number">10</span>)    <span class="keyword">LIMIT</span> &lt;limit_number&gt;</span><br></pre></td></tr></table></figure></p>
+<p><em>前边的数字表示该行SQL被执行的次序。</em></p>
+<p>SQL执行的开始是FROM语句，查看目标表是否有可用索引（见上），然后取<strong>所有字段</strong>，然后根据WHERE查询条件<strong>选取</strong>满足条件的记录，然后根据SELECT语句<strong>选取</strong>需要的字段，最后根据LIMIT语句<strong>选取</strong>并返回需要的数据结果。所以不要天真地认为每次查询只会读取SELECT指定的字段，查询不是一个从<em>零</em>挑选增加成结果的过程，而是从<em>满</em>筛选去除成结果的过程（其实道理很简单，因为我们需要把所有数据读到内存中进行处理，而不能在文件层面有选择的读取）。</p>
 <h4 id="优化后的SQL为什么快"><a href="#优化后的SQL为什么快" class="headerlink" title="优化后的SQL为什么快"></a>优化后的SQL为什么快</h4><p>现在我们终于可以分析一下我们的SQL优化前后具体有什么区别了，先记住一个数据再继续看：表news_copy中category_id=1的记录共5W多条。</p>
 <ol>
-<li>优化前的执行过程：根据where语句从表news_copy中选出所有category_id=1的记录：这一步因为where字段category_id满足使用索引的最左前缀条件，所以这里是先利用索引读取所有category_id=1的5W多条记录的id（为什么索引里存有主键呢？不明白的可以再仔细看看这篇<em><a href="http://www.cnblogs.com/hustcat/archive/2009/10/28/1591648.html" target="_blank" rel="external">博文</a></em>里的聚簇索引了，前边推荐过），然后根据这5W多个id<strong>回表查询5W多条记录的所有字段</strong>，然后根据order by对这些记录排序（这里可以利用索引），然后根据limit选取从第1000条记录开始的10条记录，然后根据select筛选字段id和title并返回。<br>说明：上边排序时利用到的了<em><a href="http://dev.mysql.com/doc/refman/5.6/en/limit-optimization.html" target="_blank" rel="external">limit和order by组合使用时的优化</a></em>，所以上边排序时并不是对5W多条记录全排序，而是在前1010条记录排好序后就停止了排序。</li>
-<li>现在再来看优化后的执行过程：先执行子查询t，同样利用索引读取5W多个id，但注意这里select只有id字段，所以利用到了覆盖索引，所以这里<strong>不再回表查询5W多条记录的所有字段</strong>，而是直接在索引中完成剩下的order by和limit语句，然后子查询返回了1010条id，这时外查询进行连接查询，<strong>只用根据这1010个id读取1010条记录的所有字段</strong>，然后筛选id和title字段并返回。<br>所以两者的主要差别在于IO读取的数据量，前者高达5W多条，后者只有1010条。<br>对于上边的解释，你可能还会疑问，我怎么知道SQL有没有利用覆盖索引呢？对于平常的SQL，怎么查看SQL的执行效率呢？这就需要神命令EXPLAIN来帮忙了。</li>
+<li>优化前的执行过程：根据where语句从表news_copy中选出所有category_id=1的记录：这一步因为where字段category_id满足使用索引的最左前缀条件，所以这里是先利用索引读取所有category_id=1的5W多条记录的id（为什么索引里存有主键呢？不明白的可以再仔细看看这篇<em><a href="http://www.cnblogs.com/hustcat/archive/2009/10/28/1591648.html" target="_blank" rel="external">博文</a></em>里的聚簇索引了，前边推荐过），然后根据这5W多个id<strong>回表查询5W多条记录的所有字段</strong>，然后根据order by对这些记录排序（这里可以利用索引），然后根据limit选取从第1000条记录开始的10条记录，然后根据select筛选字段id和title并返回。<br><strong>说明</strong>：上边排序时利用到的了<em><a href="http://dev.mysql.com/doc/refman/5.6/en/limit-optimization.html" target="_blank" rel="external">limit和order by组合使用时的优化</a></em>，所以上边排序时并不是对5W多条记录全排序，而是在前1010条记录排好序后就停止了排序。</li>
+<li>现在再来看优化后的执行过程：先执行子查询t，同样利用索引读取5W多个id，但注意这里select只有id字段，所以利用到了覆盖索引，所以这里<strong>不再回表查询5W多条记录的所有字段</strong>，而是直接在索引中完成剩下的order by和limit语句，然后子查询返回了1010条id，这时外查询进行连接查询，<strong>只用根据这1010个id读取1010条记录的所有字段</strong>，然后筛选id和title字段并返回。</li>
 </ol>
+<p>所以两者的主要差别在于IO读取的数据量，前者高达5W多条，后者只有1010条。<br>对于上边的解释，你可能还会疑问，我怎么知道SQL有没有利用覆盖索引呢？对于平常的SQL，怎么查看SQL的执行效率呢？这就需要神命令EXPLAIN来帮忙了。</p>
 <h3 id="explain-amp-show-profile"><a href="#explain-amp-show-profile" class="headerlink" title="explain &amp; show profile"></a>explain &amp; show profile</h3><p>在写这篇博文时，我也想知道我的SQL到底有没有用覆盖索引，网上查了一下发现可以使用explain命令来查看，使用简单方便，可以看下图：<br><img src="http://cevxd.img47.wal8.com/img47/542077_20160404152451/146139846823.jpg" alt="explain优化前"><br><img src="http://cevxd.img47.wal8.com/img47/542077_20160404152451/146139846775.jpg" alt="explain优化后"><br>可以看到输出有很多参数列，其中如果使用了覆盖索引，在最后的Extra列中就会显示“Using index”，否则不会。这里可以清楚的看到优化后的子查询使用到了覆盖索引。其中rows列表示查询可能读取的记录行数，也可以清楚的看到，优化后的SQL在子查询中有5W多行，即5W多个id，然后外查询只有1020行。而优化前的SQL涉及5W多行，不止id，而是所有字段。所以通过explain命令，我们可以大概知道我们的SQL会涉及多大的数据量，会不会使用覆盖索引等信息，其实explain还可以提供给我们更多的信息，前提是你对explain命令的输出足够熟悉，这里不再过多介绍，感兴趣可以看<em><a href="http://dev.mysql.com/doc/refman/5.6/en/explain.html" target="_blank" rel="external">explain命令说明</a></em>和<em><a href="http://dev.mysql.com/doc/refman/5.6/en/explain-output.html" target="_blank" rel="external">explain命令输出参数说明</a></em>。</p>
 <p>另外，如果你还想知道SQL在执行的各个阶段的耗时，比如CPU、IO等详细信息，可以看一下<em><a href="http://dev.mysql.com/doc/refman/5.6/en/show-profile.html" target="_blank" rel="external">show profile</a></em>命令，但该命令在版本5.6.7中被弃用了，转而被<em><a href="http://dev.mysql.com/doc/refman/5.6/en/performance-schema-query-profiling.html" target="_blank" rel="external">Performance Schema</a></em>替代。</p>
 <h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>对于这个项目的维护，梦非早就催我让我改善一下，但我总是推脱，既不想费心维护一个已经交付的项目，也不想费力去学习索引，而一直拖到该项目又有改动时才动手学习。平时我们可能有很多这种情况，给自己找各种不动手学习的借口：索引？哪来那么多数据让我测啊？分布式？哪来那么多机器让我试啊？而又总是在关键时刻方恨少。其实只要我们下定决心，稍微推动自己一下下，就能获益匪浅，而对于学习掌握的知识，一定是有用的，只是时间早晚而已。这篇博文我是14号开始着手整理写得，写一半的时候，17号腾讯面试就又问了索引，基本把博文讲了一遍，当时简直庆幸自己刚学过索引。另外关于写博客本身，也是获益匪浅，写的过程就是把自己的理解和思路表达出来的过程，不仅能加深自己的理解，发现盲点，还能锻炼自己的表达沟通能力，现在我写一篇博文大概要一周时间，举步维艰，相信坚持下去会有提高。</p>
@@ -374,6 +379,10 @@
           </div>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/动态代理/" rel="prev" title="��̬����">
+                ��̬���� <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -445,7 +454,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">4</span>
+              <span class="site-state-item-count">5</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -453,7 +462,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-count">3</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -462,7 +471,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-count">13</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
