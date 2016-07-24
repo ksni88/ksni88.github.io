@@ -1,0 +1,803 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.5.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hadoop,大数据,读书笔记," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/uploads/head.png?v=0.5.0" />
+
+
+
+
+
+
+<meta name="description" content="NM剖析NM是YARN中单个节点上的代理，负责管理Hadoop集群中单个计算节点。和RM剖析一样，我们可以先从最开始的YARN的工作流程中观察，NM都需要和哪些组件进行交互，分别需要完成什么功能，则在NM内部，便会细分出来各个功能类别的模块，在每个模块内部，还可以继续按照功能细分，落实到各个组成的类或接口。
+NM基本职能
+NM作为RPC的client端，周期性的主动向RM发起请求，这些请求包括向R">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从零爬Hadoop系列_4-《Hadoop技术内幕2》NodeManager">
+<meta property="og:url" content="http://ksni88.github.io/从零爬Hadoop系列_4-《Hadoop技术内幕2》NodeManager/index.html">
+<meta property="og:site_name" content="栖静林">
+<meta property="og:description" content="NM剖析NM是YARN中单个节点上的代理，负责管理Hadoop集群中单个计算节点。和RM剖析一样，我们可以先从最开始的YARN的工作流程中观察，NM都需要和哪些组件进行交互，分别需要完成什么功能，则在NM内部，便会细分出来各个功能类别的模块，在每个模块内部，还可以继续按照功能细分，落实到各个组成的类或接口。
+NM基本职能
+NM作为RPC的client端，周期性的主动向RM发起请求，这些请求包括向R">
+<meta property="og:image" content="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936491468.png">
+<meta property="og:image" content="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936491521.png">
+<meta property="og:updated_time" content="2016-07-24T13:11:18.174Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="从零爬Hadoop系列_4-《Hadoop技术内幕2》NodeManager">
+<meta name="twitter:description" content="NM剖析NM是YARN中单个节点上的代理，负责管理Hadoop集群中单个计算节点。和RM剖析一样，我们可以先从最开始的YARN的工作流程中观察，NM都需要和哪些组件进行交互，分别需要完成什么功能，则在NM内部，便会细分出来各个功能类别的模块，在每个模块内部，还可以继续按照功能细分，落实到各个组成的类或接口。
+NM基本职能
+NM作为RPC的client端，周期性的主动向RM发起请求，这些请求包括向R">
+<meta name="twitter:image" content="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936491468.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 6269574853532059000,
+      author: '博主'
+    }
+  };
+</script>
+
+  <title> 从零爬Hadoop系列_4-《Hadoop技术内幕2》NodeManager | 栖静林 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?dc8c3422caa41521411bcb96984a10f6";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">栖静林</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">不忘初心，方得始终</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th fa-fw"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                从零爬Hadoop系列_4-《Hadoop技术内幕2》NodeManager
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-07-24T19:33:27+08:00" content="2016-07-24">
+              2016-07-24
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Hadoop/" itemprop="url" rel="index">
+                    <span itemprop="name">Hadoop</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/从零爬Hadoop系列_4-《Hadoop技术内幕2》NodeManager/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="从零爬Hadoop系列_4-《Hadoop技术内幕2》NodeManager/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="NM剖析"><a href="#NM剖析" class="headerlink" title="NM剖析"></a>NM剖析</h1><p>NM是YARN中单个节点上的代理，负责管理Hadoop集群中单个计算节点。和RM剖析一样，我们可以先从最开始的YARN的工作流程中观察，NM都需要和哪些组件进行交互，分别需要完成什么功能，则在NM内部，便会细分出来各个功能类别的模块，在每个模块内部，还可以继续按照功能细分，落实到各个组成的类或接口。</p>
+<h2 id="NM基本职能"><a href="#NM基本职能" class="headerlink" title="NM基本职能"></a>NM基本职能</h2><ol>
+<li>NM作为RPC的client端，周期性的主动向RM发起请求，这些请求包括向RM注册、汇报节点健康状况和节点上所有Container运行状态；并以请求应答的形式，领取RM下达的命令</li>
+<li>NM作为RPC的server端，接收并处理AM下达的命令，这些命令包括启动Container、杀死Container、获取Container执行状态等，并返回执行结果</li>
+<li>个人理解：其实以上两点都是NM作为整体对外负责的功能，而且并不是它最主要的功能，不要忘了，所有计算任务都是以Container的形式运行在NM上，所以NM最主要的功能是内部Container的管理，比如：  <ul>
+<li>既然要运行任务，就需要下载任务运行所需的资源，每个NM上有很多Container，需要考虑并行下载和文件管理问题</li>
+<li>资源下载完以后，还要监控各个Container的运行状态，进行日志记录</li>
+<li>Container运行完成以后，还要进行之前下载资源的清理</li>
+</ul>
+</li>
+</ol>
+<h2 id="NM内部架构"><a href="#NM内部架构" class="headerlink" title="NM内部架构"></a>NM内部架构</h2><p>通过对YARN工作流程和NM职能的分析，可以猜测NM至少包含一下模块：</p>
+<ol>
+<li>AM管理模块：每个NM上可以运行多个AM，需要有对应的管理模块负责信息归总和管理</li>
+<li>Container管理模块：每个NM上可以运行多个Container，且可以属于不同的AM，需要有对应的管理模块负责信息归总和管理  </li>
+</ol>
+<p>同时和RM一样，NM内部各个组件也是基于事件驱动的，NM内部架构组成如下：  </p>
+<ol>
+<li>NodeStatusUpdater：是NM和RM通信的唯一通道，对应职能1</li>
+<li>ContainerManager：是NM中最核心组件之一，有一下组件：  <ul>
+<li>RPC Servier：是AM和NM通信的唯一通道，对应职能2</li>
+<li>ResourceLocalizationService：负责Container运行所需资源的本地化，即从HDFS上下载，同时尽量分摊到各个磁盘上，避免访问热点，同时添加访问权限</li>
+<li>ContainersLauncher：维护了一个线程池并行完成Container相关的操作，比如启动或杀死Container，其中启动的命令来自AM，杀死的命令来自AM或RM（资源抢占时）</li>
+<li>AuxServices：NM允许用户以附属服务的方式扩展自己的功能</li>
+<li>ContainerMonitor：负责监控Container的资源使用量，防止超过RM分配的量，在YARN中，只有内存是通过它监控的</li>
+<li>LogHandler：可插拔式组件，用户通过它控制Container日志保存方式：写到本地磁盘或上传到一个文件系统中</li>
+<li>ContainerEventDispatcher：Container事件调度器，负责将ContainerEvent类型的事件调度给对应的Container的状态机ContainerImpl</li>
+<li>ApplicationEventDispatcher：Application事件调度器，负责将ApplicationEvent类型的事件调度给对应的Application的状态机ApplicationImpl</li>
+</ul>
+</li>
+<li>NodeHealthCheckerService：周期性运行自定义脚本和向磁盘写文件，以检查节点健康状况，然后通过NodeStatusUpdater汇报给RM，若发现不健康RM会将其加入黑名单，不再分配，直到其转为健康状态</li>
+<li>DeletionService：负责删除Container运行完成后遗留的无用的资源文件或临时输出文件，为了避免同步删除文件带来的开销，NM将删除文件功能服务化，进行异步删除</li>
+<li>Security：安全模块，主要两部分：  <ul>
+<li>ApplicationACLsManager：确保访问NM的用户的合法性，比如Web UI访问，该组件为每个应用程序维护了一个ACL列表</li>
+<li>ContainerTokenSecretManager：检查收到的各种访问请求的合法性，确保这些请求操作已被RM授权</li>
+</ul>
+</li>
+<li>WebServer：通过Web界面展示该节点上所有应用程序运行状态、健康状况、日志等信息<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936491468.png" alt="image"></li>
+</ol>
+<h2 id="健康节点状况监测"><a href="#健康节点状况监测" class="headerlink" title="健康节点状况监测"></a>健康节点状况监测</h2><ol>
+<li>自定义Shell脚本：  <ul>
+<li>NodeHealthScriptRunner服务周期性的执行监测脚本并检查其输出，如果标准输出打印出以字符串“ERROR”开头的语句，则认为节点不健康，通过心跳告诉RM</li>
+<li>自定义脚本的好处：  <ul>
+<li>可作为节点负载的反馈：因为当前YARN只对CPU和内存资源进行分配和隔离，所以用户可以通过自定义脚本检查网络、磁盘、文件系统等运行状况缓解这个问题</li>
+<li>认为暂时维护NM：可以通过脚本输出ERROR停止NM接受新任务比便进行维护</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>检测磁盘损坏数目：  <ul>
+<li>另外一种健康检测机制，默认开启，即与脚本检测同时进行，双重检查</li>
+<li>检测方法：如果一个目录具有rwx权限，则认为它是正常的，否则加入坏磁盘列表，当比例过低时，便认为NM不健康，通过心跳告诉RM</li>
+</ul>
+</li>
+</ol>
+<h2 id="分布式缓存机制"><a href="#分布式缓存机制" class="headerlink" title="分布式缓存机制"></a>分布式缓存机制</h2><ol>
+<li>主要作用：将用户应用程序执行时需要的外部文件资源自动透明地下载并缓存到各个节点上，省去用户手动部署。同时NM并不是一下子把所有资源下载下来，而是根据启动的Container按需下载，而且采用一定的缓存置换算法定期清理失效文件（默认10分钟）</li>
+<li>工作流程：  <ul>
+<li>步骤1：客户端将应用程序所需的文件资源提交到HDFS上</li>
+<li>步骤2：客户端将应用程序提交到RM上</li>
+<li>步骤3：RM与某个NM通信，让NM启动对应的AM，NM收到命令后，首先从HDFS下载文件（缓存），然后再启动AM</li>
+<li>步骤4：AM与RM通信，以请求和获取Container</li>
+<li>步骤5：AM收到新分配的Container后，与对应的NM通信，启动任务</li>
+<li>步骤6：如果该应用程序第一次在该节点上启动任务，NM首先从HDFS上下载文件缓存到本地，然后启动任务</li>
+<li>步骤7：NM后续收到启动任务请求后，如果有缓存，则直接启动，否则先等缓存成功再启动</li>
+</ul>
+</li>
+<li>资源可见性（三种）：  <ul>
+<li>PUBLIC：节点上所有用户共享，即只要存在，其他用户不用再下载</li>
+<li>PRIVATE：节点上同一用户的所有应用程序共享</li>
+<li>APPLICATION：节点上同一应用程序的所有Container共享</li>
+</ul>
+</li>
+<li>资源分类（三类）：  <ul>
+<li>ARCHIVE：归档文件，当前支持.jar、.zip、.tar.gz、.tgz、和.tar5种，NM可以自动解压缩</li>
+<li>FILE：普通文件，NM只下载，没有额外处理</li>
+<li>PATTERN：以上两种类型的混合体，用户需要通过正则表达式指定哪些属于ARCHIVE需要自动解压</li>
+</ul>
+</li>
+<li>YARN分布式缓存的实现<ul>
+<li>三种可见性资源分别放置在不同的目录下，通过目录权限实现不同的可见性</li>
+<li>PUBLIC资源下载：由公共服务ResourceLocalizationService中的一个公用线程PublicLocalizer下载，它内部维护了个线程池并行下载</li>
+<li>PRIVATE和APPLICATION：由公共服务ResourceLocalizationService中的一个专门线程下载：一个Container对应一个LocalizerRunner线程</li>
+</ul>
+</li>
+</ol>
+<h2 id="目录结构管理"><a href="#目录结构管理" class="headerlink" title="目录结构管理"></a>目录结构管理</h2><ol>
+<li>由于同一个NM上不同的Container往往并行向本地磁盘写数据，为了避免占用大量IO资源造成相互干扰，尽量提高写数据的可靠性和并发写性能，YARN允许NM配置多个挂在不同磁盘的目录作为中间结果存放目录，对于任意一个应用程序，YARN会在每个磁盘中创建相同的目录结构，然后采用轮询策略使用这些目录<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936491521.png" alt="image"></li>
+<li>目录分类：  <ul>
+<li>数据目录：存放Container运行所需和中间数据</li>
+<li>日志目录：运行时输出的日志</li>
+</ul>
+</li>
+<li>日志清理机制：  <ul>
+<li>定期删除（默认）：默认3小时，超时删除</li>
+<li>日志聚集转存：把日志上传到HDFS上，上传后删除，可以指定三种可以转存的类型（顾名思义）：  <ul>
+<li>ALL_CONTAINER</li>
+<li>APPLICATION_MASTER_ONLY</li>
+<li>AM_AND_FAILED_CONTAINER_ONLY</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h2 id="状态机管理"><a href="#状态机管理" class="headerlink" title="状态机管理"></a>状态机管理</h2><ol>
+<li>三类状态机：  <ul>
+<li>Application状态机：维护的信息是RM端维护的子集，方便对一个节点上同一个应用程序的所有Container进行统一管理</li>
+<li>Container状态机：维护一个Container的生命周期，三个阶段：  <ul>
+<li>资源本地化</li>
+<li>Container启动</li>
+<li>资源清理（资源本地化逆过程，这里的资源指临时文件，而非硬件资源）：  <ul>
+<li>这一步的清理，只是Container的临时数据，如Tokens文件和Shell运行脚本等</li>
+<li>因为各个Container之间可能有依赖关系，所以NM规定只有在一个应用程序的所有Container全部结束以后，由RM发送广播，NM才能清理程序所占的所有资源和中间数据</li>
+</ul>
+</li>
+<li>可以翻书了解详细的过程，进一步理解基于事件驱动的应用</li>
+</ul>
+</li>
+<li>LocalizedResource状态机：维护一种资源的生命周期，从初始化、到下载中、到下载完成/下载失败</li>
+</ul>
+</li>
+<li>个人理解：三类状态机的关系：从大流程上来看，基本可以认为是以下关系：  <ul>
+<li>NM启动一个AM，创建对应的Application状态机</li>
+<li>Application状态机在收到AM发送的启动Container请求后，会创建对应的Container状态机（一个或多个）</li>
+<li>Container运行之前，需要先下载缺少的资源，即会创建对应的LocalizedResource状态机（一个或多个）进行资源下载，并等待所有资源下载完，然后进入运行状态</li>
+</ul>
+</li>
+</ol>
+<h2 id="资源隔离"><a href="#资源隔离" class="headerlink" title="资源隔离"></a>资源隔离</h2><ol>
+<li>内存资源隔离：基于线程监控：  <ul>
+<li>由服务ContainersMonitorImpl实现，它保存了每个Container进程pid，内部的MonitoringThread每隔一段时间（默认3000ms）扫描所有正在运行的Container进程树</li>
+<li>步骤：  <ul>
+<li>读取/proc/<pid>/stat文件构造进程树</pid></li>
+<li>判断单个任务内存使用量是否超过最大值内存量</li>
+</ul>
+</li>
+<li>由于JVM创建一个子进程时，采用了“fork()+exec()”模型，意味着进程创建之后、执行之前会复制一份父进程内存空间，进而使得进程数在某一小段时间内存使用量翻倍，为了防止误杀，Hadoop赋予每个进程“年龄”属性，并规定刚启动的进程年龄为1，MonitoringThread线程每更新一次，各个进程年龄加1，则内存超量使用而被杀死的判断标准为：  <ul>
+<li>如果一个Container对应的进程树中所有进程（年龄大于0）总内存超过用户设定最大值的两倍</li>
+<li>或者所有年龄大于1的进程总内存量超过用户设定的最大值</li>
+<li>只要满足其一，则向对应的Container发送ContainerEventType.CKILL_CONTAINER事件将其杀死</li>
+</ul>
+</li>
+<li>个人理解：内存隔离并不是真正的物理上的隔离，其他内存还是可见的，只是简单的一个线程监控使用量而已，所以需要用户在设定内存最大值时有良好的预估和分配</li>
+</ul>
+</li>
+<li>CPU资源隔离：使用Cgroups（Control  groups）<ul>
+<li>Cgroups是Linux内核提供的一种可以限制、记录、隔离进程组所使用的物理资源的机制，YARN通过使用其子系统CPU实现CPU资源隔离，该子系统使用调度程序控制任务对CPU的访问</li>
+<li>Cgroups相比于虚拟机，是一种轻量级资源隔离方案</li>
+<li>Cgroups只能保证应用程序的CPU使用下限，但不能限制上限。举例说明，某个节点上有10个虚拟CPU：  <ul>
+<li>若该节点上只有一个应用程序A，且设定的CPU需求为4，则A最多能够使用全部CPU</li>
+<li>若该节点上有两个应用程序A和B，且CPU需求都为4，则A和B都最多能够使用全部CPU，最少使用一半</li>
+<li>若该节点上有三个应用程序A、B、C，CPU需求依次为4、4、2，则它们最多均可以使用全部CPU，最少可使用CPU资源比例依次为：4/(4+4+2)<em>10=40%、4/(4+4+2)</em>10=40%、2/(4+4+2)*10=20%</li>
+</ul>
+</li>
+<li>NM默认没有启用任何CPU资源隔离机制</li>
+<li>个人理解：CPU隔离也不是真正的物理上的隔离，而且按照上边的说明，基本可以说没有隔离，只能保证下限而已，同样需要用户对资源的使用量有良好的分配和设定</li>
+</ul>
+</li>
+<li>所以总的来讲，所谓的资源隔离是比较虚的，不能顾名思义</li>
+</ol>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><ol>
+<li>对NM的理解：作为资源管理系统YARN的一个重要服务，NM管理的是Container，而不是任务，一个Container中可能运行着各种任务，但是对NM而言是透明的，它只负责Container相关的操作，比如管理Container的生命周期等。这也是YARN能够作为一个通用的资源管理平台的重要原因，它不管具体的任务类型或内容，只要按它规定的规范进行封装就可以提交运行</li>
+<li>对Container的理解：Container从头到尾都只是一个逻辑抽象概念,RM把资源抽象为Container发送给AM，AM再发给NM，NM则会在Container描述的运行环境中启动任务，其实就是启动一个进程，然后在该进程下跑任务和各个状态机</li>
+</ol>
+<h2 id="思考问题"><a href="#思考问题" class="headerlink" title="思考问题"></a>思考问题</h2><ol>
+<li>第一天的疑问1：怎么保证AM没有撒谎？比如AM并没有向RM申请资源，绕过RM直接通知NM启动任务？<ul>
+<li>就是由Secret模块下的ContainerTokenSecretManager通过Token检查保证的</li>
+</ul>
+</li>
+<li>第一天疑问2：YARN的工作流程第6步，为什么运行脚本而不是直接运行命令？<ul>
+<li>因为直接执行命令可能让一些特殊符号发生转义</li>
+</ul>
+</li>
+<li>第二天的疑问3：Container只是对资源逻辑上的划分和规定，在实际使用中，如何保证严格的物理划分或隔离？<ul>
+<li>没有严格的物理划分或隔离，对于内存是监控上限，对于CPU是保证下限</li>
+</ul>
+</li>
+<li>本章只介绍了节点的健康检测，那NM向RM心跳时汇报的所有Container的运行状态都包括哪些呢？又是怎么汇总的？</li>
+<li>根据YARN工作流程的第七步的描述，听起来应该是各个Container心跳式的主动向AM汇报运行状态，但按照基本职能2的描述，只有一个AM主动查询运行状态的接口，那主动汇报的接口呢？本章好像没有提。</li>
+</ol>
+
+      
+    </div>
+    
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Hadoop/" rel="tag">#Hadoop</a>
+          
+            <a href="/tags/大数据/" rel="tag">#大数据</a>
+          
+            <a href="/tags/读书笔记/" rel="tag">#读书笔记</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/从零爬Hadoop系列_3-《Hadoop技术内幕2》RM-资源调度器/" rel="next" title="从零爬Hadoop系列_3-《Hadoop技术内幕2》RM-资源调度器">
+                <i class="fa fa-chevron-left"></i> 从零爬Hadoop系列_3-《Hadoop技术内幕2》RM-资源调度器
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/从零爬Hadoop系列_5-《Hadoop技术内幕2》计算框架/" rel="prev" title="从零爬Hadoop系列_5-《Hadoop技术内幕2》计算框架">
+                从零爬Hadoop系列_5-《Hadoop技术内幕2》计算框架 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="从零爬Hadoop系列_4-《Hadoop技术内幕2》NodeManager/"
+           data-title="从零爬Hadoop系列_4-《Hadoop技术内幕2》NodeManager" data-url="http://ksni88.github.io/从零爬Hadoop系列_4-《Hadoop技术内幕2》NodeManager/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/head.png"
+               alt="ksni88" />
+          <p class="site-author-name" itemprop="name">ksni88</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">11</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">18</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        <div class="links-of-blogroll motion-element">
+          
+            <div class="links-of-blogroll-title">Links</div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://cruise1008.github.io/" target="_blank">海神</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://moonfacex.github.io/blog/" target="_blank">杭城梦少</a>
+                </li>
+              
+            </ul>
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#NM剖析"><span class="nav-number">1.</span> <span class="nav-text">NM剖析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#NM基本职能"><span class="nav-number">1.1.</span> <span class="nav-text">NM基本职能</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NM内部架构"><span class="nav-number">1.2.</span> <span class="nav-text">NM内部架构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#健康节点状况监测"><span class="nav-number">1.3.</span> <span class="nav-text">健康节点状况监测</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分布式缓存机制"><span class="nav-number">1.4.</span> <span class="nav-text">分布式缓存机制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#目录结构管理"><span class="nav-number">1.5.</span> <span class="nav-text">目录结构管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#状态机管理"><span class="nav-number">1.6.</span> <span class="nav-text">状态机管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#资源隔离"><span class="nav-number">1.7.</span> <span class="nav-text">资源隔离</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#小结"><span class="nav-number">1.8.</span> <span class="nav-text">小结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#思考问题"><span class="nav-number">1.9.</span> <span class="nav-text">思考问题</span></a></li></ol></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ksni88</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+
+  
+
+
+
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=0.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=0.5.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=0.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=0.5.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=0.5.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=0.5.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=0.5.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"ksni88"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+      <script src="/vendors/ua-parser-js/dist/ua-parser.min.js"></script>
+      <script src="/js/src/hook-duoshuo.js"></script>
+    
+  
+
+
+
+
+
+  
+  
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,764 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.5.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hadoop,大数据,读书笔记," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/uploads/head.png?v=0.5.0" />
+
+
+
+
+
+
+<meta name="description" content="基础篇MRv1到YARN
+MRv1主要是以MR为主的计算框架，而MRv2主要是针对MRv1的缺陷改进而来的，以YARN为主的轻量级弹性计算平台；
+MRv1的缺陷：
+扩展性差：JobTracker兼备资源管理和作业控制；
+可靠性差：master单点故障；
+资源利用率低：粗粒度的划分单位，任务之间不共享；
+无法支持多种计算框架：只有基于磁盘的离线计算框架MR，不能满足多种需求；
+
+
+YARN的诞生背景">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从零爬Hadoop系列_1-《Hadoop技术内幕2》基础篇">
+<meta property="og:url" content="http://ksni88.github.io/从零爬Hadoop系列_1-《Hadoop技术内幕2》基础篇/index.html">
+<meta property="og:site_name" content="栖静林">
+<meta property="og:description" content="基础篇MRv1到YARN
+MRv1主要是以MR为主的计算框架，而MRv2主要是针对MRv1的缺陷改进而来的，以YARN为主的轻量级弹性计算平台；
+MRv1的缺陷：
+扩展性差：JobTracker兼备资源管理和作业控制；
+可靠性差：master单点故障；
+资源利用率低：粗粒度的划分单位，任务之间不共享；
+无法支持多种计算框架：只有基于磁盘的离线计算框架MR，不能满足多种需求；
+
+
+YARN的诞生背景">
+<meta property="og:image" content="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936452783.jpg">
+<meta property="og:image" content="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936452735.png">
+<meta property="og:updated_time" content="2016-07-24T13:06:03.017Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="从零爬Hadoop系列_1-《Hadoop技术内幕2》基础篇">
+<meta name="twitter:description" content="基础篇MRv1到YARN
+MRv1主要是以MR为主的计算框架，而MRv2主要是针对MRv1的缺陷改进而来的，以YARN为主的轻量级弹性计算平台；
+MRv1的缺陷：
+扩展性差：JobTracker兼备资源管理和作业控制；
+可靠性差：master单点故障；
+资源利用率低：粗粒度的划分单位，任务之间不共享；
+无法支持多种计算框架：只有基于磁盘的离线计算框架MR，不能满足多种需求；
+
+
+YARN的诞生背景">
+<meta name="twitter:image" content="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936452783.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 6269574853532059000,
+      author: '博主'
+    }
+  };
+</script>
+
+  <title> 从零爬Hadoop系列_1-《Hadoop技术内幕2》基础篇 | 栖静林 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?dc8c3422caa41521411bcb96984a10f6";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">栖静林</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">不忘初心，方得始终</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th fa-fw"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                从零爬Hadoop系列_1-《Hadoop技术内幕2》基础篇
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-07-24T18:36:15+08:00" content="2016-07-24">
+              2016-07-24
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Hadoop/" itemprop="url" rel="index">
+                    <span itemprop="name">Hadoop</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/从零爬Hadoop系列_1-《Hadoop技术内幕2》基础篇/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="从零爬Hadoop系列_1-《Hadoop技术内幕2》基础篇/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="基础篇"><a href="#基础篇" class="headerlink" title="基础篇"></a>基础篇</h1><h2 id="MRv1到YARN"><a href="#MRv1到YARN" class="headerlink" title="MRv1到YARN"></a>MRv1到YARN</h2><ol>
+<li>MRv1主要是以MR为主的计算框架，而MRv2主要是针对MRv1的缺陷改进而来的，以YARN为主的轻量级弹性计算平台；</li>
+<li>MRv1的缺陷：<ul>
+<li>扩展性差：JobTracker兼备资源管理和作业控制；</li>
+<li>可靠性差：master单点故障；</li>
+<li>资源利用率低：粗粒度的划分单位，任务之间不共享；</li>
+<li>无法支持多种计算框架：只有基于磁盘的离线计算框架MR，不能满足多种需求；</li>
+</ul>
+</li>
+<li>YARN的诞生背景：<ul>
+<li>基于数据密集型应用的计算框架层出不穷：<ul>
+<li>MR：离线处理；</li>
+<li>Storm：在线处理；</li>
+<li>Spark：迭代式处理；</li>
+<li>S4：流式处理；</li>
+</ul>
+</li>
+<li>各种框架各有所长，在同一个公司中，多种框架可能被同时采用，如网页建立索引用MR，自然语言处理/数据挖掘用Spark等，考虑到成本等，又希望把所有框架部署在一个共享集群中，而非各占一个独立集群，而且需要在对共享资源统一管理使用的同时，保证各个任务的隔离性，急需轻量级弹性计算平台。</li>
+</ul>
+</li>
+<li>共享集群的好处：<ul>
+<li>资源利用率高：多种框架共享资源，统一管理，不会出现分配不均或某些紧缺而某些空闲的问题；</li>
+<li>运维成本低：管理员成本和硬件成本；</li>
+<li>数据共享：减小数据移动带来的成本；</li>
+</ul>
+</li>
+<li>一个框架一个集群 到 多个框架共享集群：<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936452783.jpg" alt="[图片]"></li>
+</ol>
+<h2 id="YARN的组成结构和流程"><a href="#YARN的组成结构和流程" class="headerlink" title="YARN的组成结构和流程"></a>YARN的组成结构和流程</h2><ol>
+<li>YARN基本组成结构：<ul>
+<li>ResourceManager（RM）：全局资源管理器，负责资源管理和分配；<ul>
+<li>Schduler：纯调度器，只负责根据各个应用程序的资源需求进行资源分配；</li>
+<li>ApplicationManager（ASM）：负责管理整个系统中所有应用程序；</li>
+</ul>
+</li>
+<li>ApplicationMaster（AM）：用户提交的每个应用程序均包含一个AM，主要功能：<ul>
+<li>与Scheduler协商获取资源（Container）；</li>
+<li>将得到的任务进一步分配给内部的任务；</li>
+<li>与NM通信以启动/停止任务；</li>
+<li>监控所有任务运行状态，并在任务运行失败时重新为任务申请资源以重启任务；</li>
+</ul>
+</li>
+<li>NodeManager（NM）：每个节点上的资源和任务管理器，主要功能：<ul>
+<li>定时向RM汇报本节点上的资源使用情况和各个Container的运行状态；</li>
+<li>接受并处理来自AM的Container启动/停止等请求；</li>
+</ul>
+</li>
+<li>Container：资源抽象，封装某个节点上的多维度资源，如内存、CPU、磁盘等</li>
+</ul>
+</li>
+<li>YARN工作流程：<ul>
+<li>步骤1：用户向YARN提交应用程序，其中包括AM程序、启动AM的命令、用户程序等；</li>
+<li>步骤2：RM为该应用程序分配第一个Container，并与对应的NM通信，要求它在这个Container中启动该AM；</li>
+<li>步骤3：AM首先向RM注册，这样用户可以通过RM查看应用程序的运行状态，然后它将为各个任务申请资源，并监控它们的运行状态，直到运行结束，即重复步骤4~7；</li>
+<li>步骤4：AM采用轮询的方式，通过RPC协议向RM申请和领取资源；</li>
+<li>步骤5：一旦AM申请到资源后，便与对应的NM通信，要求它启动任务；</li>
+<li>步骤6：NM为任务设置好运行环境后，将任务启动命令写到一个脚本中，通过运行该脚本启动任务；</li>
+<li>步骤7：各个任务通过某个RPC协议向AM汇报自己的状态和进度，以便AM随时掌握各个任务的运行状态，从而可以在任务失败时重启任务；</li>
+<li>步骤9：应用程序运行完成后，AM向RM注销并关闭自己；</li>
+<li>如下图：<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936452735.png" alt="[图片]"></li>
+</ul>
+</li>
+<li>YARN的理解角度：<ul>
+<li>多线程并行编程：<ul>
+<li>YARN：云操作系统，为应用程序启动AM；</li>
+<li>AM：主线程，负责应用程序内部的数据切分、任务分配等，并启动各个Task；</li>
+<li>Task：子线程，仅负责自己的计算任务，完成即结束退出；</li>
+<li>当所有子线程（Task）结束以后，主线程（AM）结束退出；</li>
+</ul>
+</li>
+<li>资源管理器；</li>
+<li>云计算：YARN可以看做PAAS层，为不同类型的应用程序提供统一的管理和调度；</li>
+</ul>
+</li>
+</ol>
+<h2 id="YARN基础库"><a href="#YARN基础库" class="headerlink" title="YARN基础库"></a>YARN基础库</h2><h3 id="RPC"><a href="#RPC" class="headerlink" title="RPC"></a>RPC</h3><ol>
+<li>Hadoop RPC（集群各组件之间的通信方式）总体架构：<ul>
+<li>序列化层：结构化对象转为字节流便于网络传输或持久存储，主要用于请求中的参数和应答跨机器传输；</li>
+<li>函数调用层：定位要调用的函数并执行该函数，Hadoop RPC采用Java反射机制和动态代理实现；</li>
+<li>网络传输层：描述了Client和Server之间消息传输的方式，Hadoop RPC采用基于TCP/IP的Socket机制；</li>
+<li>服务器端处理框架：描述了Client和Server之间信息交互的方式，直接决定服务器端的并发处理能力，Hadoop RPC采用基于Reactor设计模式的事件驱动I/O模型；</li>
+</ul>
+</li>
+<li>YARN RPC：可以集成多种RPC框架，如Protocol Buflers、Thrift、Avro等；</li>
+<li>对RPC的理解和实现，可以通过查看具体的例子进行理解，比如NM的心跳函数；</li>
+</ol>
+<h3 id="服务库（使得YARN低耦合、高内聚、设计简单、易维护）"><a href="#服务库（使得YARN低耦合、高内聚、设计简单、易维护）" class="headerlink" title="服务库（使得YARN低耦合、高内聚、设计简单、易维护）"></a>服务库（使得YARN低耦合、高内聚、设计简单、易维护）</h3><ol>
+<li>对于生命周期较长的对象，YARN采用了基于服务的对象管理模型对其进行管理，几个特点：<ul>
+<li>每个被服务化的对象分为4个状态：NOTINITED、INITED、STARTED、STOPPED；</li>
+<li>任何服务状态变化都可以触发另外一些动作；</li>
+<li>可以通过组合的方式对任意服务进行组合，以便统一管理；</li>
+</ul>
+</li>
+<li>在YARN中，RM和NM属于组合服务，它们内部包含多个单一服务和组合服务，以实现对内部多种服务的统一管理；</li>
+</ol>
+<h3 id="事件库（使得YARN低耦合、高内聚、设计简单、易维护）"><a href="#事件库（使得YARN低耦合、高内聚、设计简单、易维护）" class="headerlink" title="事件库（使得YARN低耦合、高内聚、设计简单、易维护）"></a>事件库（使得YARN低耦合、高内聚、设计简单、易维护）</h3><ol>
+<li>为了构建基于事件驱动的并发模型，YARN将各种处理逻辑抽象成事件和对应的事件调度器，并把每类事件的处理过程分割成多个步骤，用有限状态机表示；</li>
+<li>处理过程：<ul>
+<li>处理请求作为事件进入系统；</li>
+<li>由中央异步调度器负责传递给对应的事件调度器；</li>
+<li>事件调度器有两种处理：<ul>
+<li>可能将该事件转发给另外一个事件调度器；</li>
+<li>也可能交给一个带有有限状态机的事件处理器，其处理结果也以事件的形式输出给中央异步调度器；</li>
+</ul>
+</li>
+<li>新的事件会再次被中央异步调度器转发给下一个事件调度器，直至处理完成（到达终止条件）。</li>
+</ul>
+</li>
+<li>在YARN中，所有核心服务实际上都是一个中央异步调度器，包括RM、NM、AM等，它们维护了事先注册的事件和事件处理器，并根据接收的事件类型驱动服务的运行；</li>
+</ol>
+<h3 id="状态机库（使得YARN设计架构更清晰）"><a href="#状态机库（使得YARN设计架构更清晰）" class="headerlink" title="状态机库（使得YARN设计架构更清晰）"></a>状态机库（使得YARN设计架构更清晰）</h3><ol>
+<li>如上所述，在YARN中，事件的处理过程被分割成多个步骤，用有限状态机表示，换言之，有限状态机维护着有状态对象的生命周期；</li>
+<li>在YARN中，每种状态转换由一个四元组表示，分别是转换前状态preState、转换后状态postState、事件event和回调函数hook，表示状态机在preState状态下，接收到事件event后，执行回调函数hook，并在执行完成后将状态转换为postState。</li>
+<li>YARN定义了三种状态转换方式：<ul>
+<li>一个初态、一个终态、一种事件；</li>
+<li>一个初态、多个终态、一种事件，终态由hook返回值确定；</li>
+<li>一个初态、一个终态、多种事件；</li>
+</ul>
+</li>
+</ol>
+
+      
+    </div>
+    
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Hadoop/" rel="tag">#Hadoop</a>
+          
+            <a href="/tags/大数据/" rel="tag">#大数据</a>
+          
+            <a href="/tags/读书笔记/" rel="tag">#读书笔记</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/从零爬Hadoop系列_0-我听说的Hadoop/" rel="next" title="从零爬Hadoop系列_0-我听说的Hadoop">
+                <i class="fa fa-chevron-left"></i> 从零爬Hadoop系列_0-我听说的Hadoop
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/从零爬Hadoop系列_2-《Hadoop技术内幕2》ResourceManager/" rel="prev" title="从零爬Hadoop系列_2-《Hadoop技术内幕2》ResourceManager">
+                从零爬Hadoop系列_2-《Hadoop技术内幕2》ResourceManager <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="从零爬Hadoop系列_1-《Hadoop技术内幕2》基础篇/"
+           data-title="从零爬Hadoop系列_1-《Hadoop技术内幕2》基础篇" data-url="http://ksni88.github.io/从零爬Hadoop系列_1-《Hadoop技术内幕2》基础篇/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/head.png"
+               alt="ksni88" />
+          <p class="site-author-name" itemprop="name">ksni88</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">11</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">18</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        <div class="links-of-blogroll motion-element">
+          
+            <div class="links-of-blogroll-title">Links</div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://cruise1008.github.io/" target="_blank">海神</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://moonfacex.github.io/blog/" target="_blank">杭城梦少</a>
+                </li>
+              
+            </ul>
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#基础篇"><span class="nav-number">1.</span> <span class="nav-text">基础篇</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#MRv1到YARN"><span class="nav-number">1.1.</span> <span class="nav-text">MRv1到YARN</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#YARN的组成结构和流程"><span class="nav-number">1.2.</span> <span class="nav-text">YARN的组成结构和流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#YARN基础库"><span class="nav-number">1.3.</span> <span class="nav-text">YARN基础库</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#RPC"><span class="nav-number">1.3.1.</span> <span class="nav-text">RPC</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#服务库（使得YARN低耦合、高内聚、设计简单、易维护）"><span class="nav-number">1.3.2.</span> <span class="nav-text">服务库（使得YARN低耦合、高内聚、设计简单、易维护）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#事件库（使得YARN低耦合、高内聚、设计简单、易维护）"><span class="nav-number">1.3.3.</span> <span class="nav-text">事件库（使得YARN低耦合、高内聚、设计简单、易维护）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#状态机库（使得YARN设计架构更清晰）"><span class="nav-number">1.3.4.</span> <span class="nav-text">状态机库（使得YARN设计架构更清晰）</span></a></li></ol></li></ol></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ksni88</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+
+  
+
+
+
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=0.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=0.5.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=0.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=0.5.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=0.5.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=0.5.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=0.5.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"ksni88"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+      <script src="/vendors/ua-parser-js/dist/ua-parser.min.js"></script>
+      <script src="/js/src/hook-duoshuo.js"></script>
+    
+  
+
+
+
+
+
+  
+  
+  
+
+  
+
+  
+
+</body>
+</html>
