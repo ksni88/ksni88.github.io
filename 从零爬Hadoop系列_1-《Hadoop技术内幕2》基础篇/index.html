@@ -83,7 +83,7 @@ MRv1的缺陷：
 YARN的诞生背景">
 <meta property="og:image" content="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936452783.jpg">
 <meta property="og:image" content="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936452735.png">
-<meta property="og:updated_time" content="2016-07-24T13:06:03.017Z">
+<meta property="og:updated_time" content="2016-07-29T11:11:39.689Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="从零爬Hadoop系列_1-《Hadoop技术内幕2》基础篇">
 <meta name="twitter:description" content="基础篇MRv1到YARN
@@ -345,7 +345,7 @@ YARN的诞生背景">
 <li>数据共享：减小数据移动带来的成本；</li>
 </ul>
 </li>
-<li>一个框架一个集群 到 多个框架共享集群：<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936452783.jpg" alt="[图片]"></li>
+<li>一个框架一个集群 到 多个框架共享集群：<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936452783.jpg" alt="共享集群"></li>
 </ol>
 <h2 id="YARN的组成结构和流程"><a href="#YARN的组成结构和流程" class="headerlink" title="YARN的组成结构和流程"></a>YARN的组成结构和流程</h2><ol>
 <li>YARN基本组成结构：<ul>
@@ -378,7 +378,7 @@ YARN的诞生背景">
 <li>步骤6：NM为任务设置好运行环境后，将任务启动命令写到一个脚本中，通过运行该脚本启动任务；</li>
 <li>步骤7：各个任务通过某个RPC协议向AM汇报自己的状态和进度，以便AM随时掌握各个任务的运行状态，从而可以在任务失败时重启任务；</li>
 <li>步骤9：应用程序运行完成后，AM向RM注销并关闭自己；</li>
-<li>如下图：<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936452735.png" alt="[图片]"></li>
+<li>如下图：<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936452735.png" alt="YARN工作流程"></li>
 </ul>
 </li>
 <li>YARN的理解角度：<ul>

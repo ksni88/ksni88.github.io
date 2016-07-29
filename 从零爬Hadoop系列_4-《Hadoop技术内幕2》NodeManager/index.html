@@ -69,7 +69,7 @@ NM基本职能
 NM作为RPC的client端，周期性的主动向RM发起请求，这些请求包括向R">
 <meta property="og:image" content="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936491468.png">
 <meta property="og:image" content="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936491521.png">
-<meta property="og:updated_time" content="2016-07-24T13:11:18.174Z">
+<meta property="og:updated_time" content="2016-07-29T11:09:32.480Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="从零爬Hadoop系列_4-《Hadoop技术内幕2》NodeManager">
 <meta name="twitter:description" content="NM剖析NM是YARN中单个节点上的代理，负责管理Hadoop集群中单个计算节点。和RM剖析一样，我们可以先从最开始的YARN的工作流程中观察，NM都需要和哪些组件进行交互，分别需要完成什么功能，则在NM内部，便会细分出来各个功能类别的模块，在每个模块内部，还可以继续按照功能细分，落实到各个组成的类或接口。
@@ -335,7 +335,7 @@ NM作为RPC的client端，周期性的主动向RM发起请求，这些请求包�
 <li>ContainerTokenSecretManager：检查收到的各种访问请求的合法性，确保这些请求操作已被RM授权</li>
 </ul>
 </li>
-<li>WebServer：通过Web界面展示该节点上所有应用程序运行状态、健康状况、日志等信息<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936491468.png" alt="image"></li>
+<li>WebServer：通过Web界面展示该节点上所有应用程序运行状态、健康状况、日志等信息<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936491468.png" alt="NM内部架构图"></li>
 </ol>
 <h2 id="健康节点状况监测"><a href="#健康节点状况监测" class="headerlink" title="健康节点状况监测"></a>健康节点状况监测</h2><ol>
 <li>自定义Shell脚本：  <ul>
@@ -385,7 +385,7 @@ NM作为RPC的client端，周期性的主动向RM发起请求，这些请求包�
 </li>
 </ol>
 <h2 id="目录结构管理"><a href="#目录结构管理" class="headerlink" title="目录结构管理"></a>目录结构管理</h2><ol>
-<li>由于同一个NM上不同的Container往往并行向本地磁盘写数据，为了避免占用大量IO资源造成相互干扰，尽量提高写数据的可靠性和并发写性能，YARN允许NM配置多个挂在不同磁盘的目录作为中间结果存放目录，对于任意一个应用程序，YARN会在每个磁盘中创建相同的目录结构，然后采用轮询策略使用这些目录<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936491521.png" alt="image"></li>
+<li>由于同一个NM上不同的Container往往并行向本地磁盘写数据，为了避免占用大量IO资源造成相互干扰，尽量提高写数据的可靠性和并发写性能，YARN允许NM配置多个挂在不同磁盘的目录作为中间结果存放目录，对于任意一个应用程序，YARN会在每个磁盘中创建相同的目录结构，然后采用轮询策略使用这些目录<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936491521.png" alt="NM目录结构"></li>
 <li>目录分类：  <ul>
 <li>数据目录：存放Container运行所需和中间数据</li>
 <li>日志目录：运行时输出的日志</li>

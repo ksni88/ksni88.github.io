@@ -303,7 +303,7 @@
 </ol>
 <p>所以对于YARN来说，不变的是RM（共享集群的资源调度）、NM（节点代理），可变的是计算框架（应用程序），这里的可变即通过编写自己的AM完成，再明了一点，即各个计算框架是通过编写各自的AM集成到YARN上以实现多个框架共享集群的，而本章的主要内容就是讲MR的AM。  </p>
 <p>看过前边的应该记得，YARN是由MRv1进化而来的，所以YARN天生支持MR，即提供了可以直接使用的AM：MRAppMaster，为了更好的理解，可以先来看一下两者的异同：  </p>
-<p><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936512189.png" alt="image">  </p>
+<p><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936512189.png" alt="MRV12异同">  </p>
 <p>即只有原来负责资源调度和任务管理的运行时环境发生了替换，其他还是原来的代码。</p>
 <p>名词解释：</p>
 <ol>
@@ -364,12 +364,12 @@
 <li>MR作业表示方式：  <ul>
 <li><code>Job</code>：一个MR作业（应用程序），负责整个job即各个task的监控和管理</li>
 <li><code>Task</code>：作业内部的任务，此处有MT和RT，负责下面各个taskAttemp的监控和管理</li>
-<li><code>TaskAttempt</code>：task真正的运行实例，负责真正的任务计算工作，在YARN中，任务实例是运行在Container中的<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936512323.png" alt="image"></li>
+<li><code>TaskAttempt</code>：task真正的运行实例，负责真正的任务计算工作，在YARN中，任务实例是运行在Container中的<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936512323.png" alt="作业表示方式"></li>
 </ul>
 </li>
 <li>MR作业生命周期：  <ul>
 <li>三种状态机：<code>Job状态机</code>、<code>Task状态机</code>、<code>TaskAttempt状态机</code>，属于层级包含关系</li>
-<li>状态机内部即基于事件驱动的状态转移，详情请翻书<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936512238.png" alt="image"></li>
+<li>状态机内部即基于事件驱动的状态转移，详情请翻书<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936512238.png" alt="作业声明周期"></li>
 </ul>
 </li>
 <li><p>资源申请和再分配（ContainerAllocator）：  </p>
@@ -477,13 +477,13 @@
 <li><p>数据切分：按照某个策略将输入数据切分成若干个split，以便确定MT个数以及对应的split，对应的函数：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">List&lt;InputSplit&gt; <span class="title">getSplits</span><span class="params">(in context：JobContext)</span></span></span><br></pre></td></tr></table></figure>
 </li>
-<li><p>为Mapper提供输入数据：给定某个split，Mapper将其解析成一个个key/value对，对应的函数：  </p>
+<li><p>为Mapper提供输入数据：给定某个split，将其解析成一个个key/value对，对应的函数：  </p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">RecordReader&lt;KEYIN,VALUEIN&gt;  <span class="title">createRecordReader</span><span class="params">(in split：InputSplit, in context：TaskAttemptContext)</span></span></span><br></pre></td></tr></table></figure>
 </li>
 </ul>
 </li>
 </ol>
-<p><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936512078.png" alt="image"></p>
+<p><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936512078.png" alt="InputFormat继承树"></p>
 <ol>
 <li>如上图所示，所有基于文件的基类都是FileInputFormat，由公共基类统一对各种输入文件进行切分，即第一个功能，然后由各个派生类自己提供机制进一步解析InputSplit，即第二个功能</li>
 <li><p>举例说明：对于TextInputFormat，每一行内容即为value，该行在整个文件中的偏移量即为key，对应为Mapper中map()方法参数中的<code>key/value</code>，所以实现的map()方法，即可将value视为文件中的一行进行进一步数据处理</p>
@@ -491,7 +491,7 @@
 </li>
 <li><p>MR框架会通过InputFormat获取一个个key/value，然后交给map()方法处理；</p>
 </li>
-<li>map()方法处理的还是文件中的原始数据，主要工作是从输入数据提取目标数据，然后以key/value的形式输出到磁盘，等待reduce处理</li>
+<li>对于TextInputFormat，map()方法处理的还是文件中的原始数据，主要工作是从输入数据提取目标数据，然后以key/value的形式输出到磁盘，等待reduce处理</li>
 </ol>
 <h3 id="Partitioner"><a href="#Partitioner" class="headerlink" title="Partitioner"></a>Partitioner</h3><p>作用是对map结果进行分片，以便将同一分片的数据交给同一个Reducer处理，直接影响Reduce阶段的负载均衡，对应的方法：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">getPartition</span><span class="params">(in key：KEY，in value：VALUE，in numPartitions：<span class="keyword">int</span>)</span></span></span><br></pre></td></tr></table></figure></p>
 <h3 id="Reducer："><a href="#Reducer：" class="headerlink" title="Reducer："></a>Reducer：</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">reduce</span><span class="params">(in key：KEYIN, in values：Iterable&lt;VALUEIN&gt;, in context：Reducer.Context)</span></span></span><br></pre></td></tr></table></figure>
@@ -508,33 +508,36 @@
 </ul>
 </li>
 <li>Collect过程分析（详情请翻书）：  <ul>
-<li>环形缓冲区，当缓冲区满了以后，可以读写并行，使得Collect阶段和Spill阶段并行进行</li>
-<li>缓冲区内部使用两级索引结构，从缓冲区写入磁盘时，以及文件合并时，都在维护着该索引</li>
+<li>首先通过Partitioner获取记录的分片号，组成三元组<key，value，partitionnum>，然后交给collect()函数写入环形缓冲区；</key，value，partitionnum></li>
+<li>环形缓冲区内部使用两级索引结构<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146979038031.png" alt="MapOutputBuffer两级索引结构"></li>
+<li>之所以适用环形缓冲区，是为了当缓冲区满了以后，Collect阶段和Spill阶段可以并行进行读写，类似于生产者消费者模型；</li>
 </ul>
 </li>
 <li>Spill过程分析：  <ul>
-<li>步骤1：利用快排对缓冲区内的数据进行排序，排序方式是：先按照分区编号partition排序，然后按照key排序，经过排序后，数据以分区为单位聚集在一起，同一分区内所有数据按照Key有序</li>
-<li>步骤2：按照分区编号从小到大依次将每个分区中的数据写入任务工作目录下的临时文件output/spillN.out中，如果用户设置了Combiner，则写入文件前，对每个分区中的数据进行一次聚集操作</li>
+<li>步骤1：利用快排对缓冲区内溢出（默认参数80%）的数据进行排序，排序方式是：先按照分区编号partition排序，然后按照key排序，经过排序后，数据以分区为单位聚集在一起，同一分区内所有数据按照Key有序</li>
+<li>步骤2：按照分区编号从小到大依次将每个分区中的数据写入任务工作目录下的临时文件output/spillN.out中（N表示当前溢写次数），如果用户设置了Combiner，则写入文件前，对每个分区中的数据进行一次聚集操作</li>
 <li>步骤3：将分区数据的元信息写到内存索引数据结构中，其中每个分区的元信息包括在临时文件中的偏移量、压缩前数据大小和压缩后数据大小，输入内存中的索引大于1MB，则写到文件output/spillN.out.index中</li>
 </ul>
 </li>
 <li>Combine过程分析：  <ul>
-<li>在所有数据处理完后，MT会将所有临时文件合并成一个大文件，并保存到文件output/file.out 中，同时生成相应的索引文件output/file.out.index</li>
-<li>在进行文件合并过程中，MT以分区为单位进行合并，对于某个分区，它将采用多轮递归合并的方式：每轮合并io.sort.factor（默认100）个文件，然后将合并后的文件重新加入待合并列表，重复直到最终得到一个大文件<h3 id="Reduce-Task内部实现"><a href="#Reduce-Task内部实现" class="headerlink" title="Reduce Task内部实现"></a>Reduce Task内部实现</h3></li>
+<li>在所有数据处理完后，MT会将所有临时文件合并成一个大文件，并保存到文件output/file.out中，同时生成相应的索引文件output/file.out.index</li>
+<li>在进行文件合并过程中，MT以分区为单位进行合并，对于某个分区，它将采用多轮递归合并的方式：每轮合并io.sort.factor（默认100）个文件，然后将合并后的文件重新加入待合并列表，重复直到最终得到一个大文件</li>
 </ul>
 </li>
+</ol>
+<h3 id="Reduce-Task内部实现"><a href="#Reduce-Task内部实现" class="headerlink" title="Reduce Task内部实现"></a>Reduce Task内部实现</h3><ol>
 <li>整体流程：  <ul>
 <li><code>Shuffle阶段</code>：也称为Copy阶段，RT从各个MT上远程拷贝一片数据，并针对某一片数据，如果其大小超过一定阈值，则写到磁盘，否则直接放到内存</li>
 <li><code>Merge阶段</code>：在远程拷贝数据的同时，RT启动了两个后台线程对内存和磁盘上的文件进行合并，以防止内存使用过多或磁盘上文件过多</li>
 <li><code>Sort阶段</code>：按照MR语义，为了在reduce之前，将key相同的数据聚在一起，RT对所有数据进行一次归并排序（因为MR排序，所以局部有序）</li>
-<li><code>Reduce阶段</code>：将魅族数据依次交给用户编写的reduce()函数处理</li>
+<li><code>Reduce阶段</code>：将每组数据依次交给用户编写的reduce()函数处理</li>
 <li><code>Write阶段</code>：reduce()函数将计算结果写到HDFS上</li>
 </ul>
 </li>
 <li>Shuffle和Merge阶段分析：<ul>
 <li>两个阶段是并行进行的</li>
 <li>可以分为三个子阶段：<ul>
-<li>准备运行完成的MT列表：GetMapEventsThread周期性通过RPC后去已完成MT列表，并保存到映射表mapLocations中。为了防止出现网络热点，RT通过对所有host进行“混洗”以打乱拷贝顺序，并保存到scheduledCopies列表中</li>
+<li>准备运行完成的MT列表：GetMapEventsThread周期性通过RPC获取已完成MT列表，并保存到映射表mapLocations中。为了防止出现网络热点，RT通过对所有host进行“混洗”以打乱拷贝顺序，并保存到scheduledCopies列表中</li>
 <li>远程拷贝数据：RT同时启动多个MapOutputCopier线程，这些线程从scheduledCopies列表中获取MT输出位置，通过HTTP GET远程拷贝数据</li>
 <li>合并内存文件和磁盘文件：为了防止内存或磁盘文件数据过多，RT启动了两个不同的线程分别对内存上和磁盘上的文件进行合并</li>
 </ul>
@@ -590,9 +593,11 @@
 <li>也可以把Tez作为MR之下的数据处理引擎，即用户依然使用MR编写程序，但使用Tez将之组装成一个DAG作业，Tez提供了一个MR到DAG的转换工具</li>
 </ul>
 </li>
-<li>优化Pig、Hive等引擎<h3 id="实时计算框架Storm（Twitter开源的）"><a href="#实时计算框架Storm（Twitter开源的）" class="headerlink" title="实时计算框架Storm（Twitter开源的）"></a>实时计算框架Storm（Twitter开源的）</h3></li>
+<li>优化Pig、Hive等引擎</li>
 </ul>
 </li>
+</ol>
+<h3 id="实时计算框架Storm（Twitter开源的）"><a href="#实时计算框架Storm（Twitter开源的）" class="headerlink" title="实时计算框架Storm（Twitter开源的）"></a>实时计算框架Storm（Twitter开源的）</h3><ol>
 <li>背景：MR因为以下几个特点，决定了它只适合离线批处理的应用场景：  <ul>
 <li>启动时间长：一个MR作业由启动任务、Map任务、Reduce任务和清理任务四种组成，即使最简单的MR作业也会运行几秒到十几秒</li>
 <li>调度开销大：当任务数目大时，全部调度完成耗时长，且资源不足时需排队等待</li>
@@ -603,15 +608,20 @@
 <li>实时计算：是指被处理的数据像流水一样不断流入系统，而系统需要针对每条数据进行实时处理和计算，并永不停止（直到用户显式杀死进程），考虑到数据源中数据流动的特点，也称为“流式计算”</li>
 <li>Storm和MR最大的不同：  <ul>
 <li>Storm的数据源是动态的，即受到一条处理一条</li>
-<li>MR的数据源是静态的，即数据被处理前整个数据集已经确定，且计算过程中不能被修改<h3 id="内存计算框架Spark（伯克利分校AMPLab实验室开发）"><a href="#内存计算框架Spark（伯克利分校AMPLab实验室开发）" class="headerlink" title="内存计算框架Spark（伯克利分校AMPLab实验室开发）"></a>内存计算框架Spark（伯克利分校AMPLab实验室开发）</h3></li>
+<li>MR的数据源是静态的，即数据被处理前整个数据集已经确定，且计算过程中不能被修改</li>
 </ul>
 </li>
+</ol>
+<h3 id="内存计算框架Spark（伯克利分校AMPLab实验室开发）"><a href="#内存计算框架Spark（伯克利分校AMPLab实验室开发）" class="headerlink" title="内存计算框架Spark（伯克利分校AMPLab实验室开发）"></a>内存计算框架Spark（伯克利分校AMPLab实验室开发）</h3><ol>
 <li>背景：因为MR每次均需要从HDFS上读取数据进行处理，且不同计算之间只能通过HDFS重用数据，使其在以下一个应用场景中效率缓慢：  <ul>
 <li>迭代计算：即相邻两轮计算要共享一部分数据，如果使用MR，只能通过HDFS读写共享，比如数据挖掘、机器学习、自然语言处理等领域的算法：PageRank、K-means聚类、逻辑回归等</li>
 <li>交互式计算：在数据仓库应用中，在用户大量的查询语句中，有很多是作用在同一个数据集上的相同运算，即查询语句中的部分计算是相同的，但当使用Hive或Pig这样的系统时，它们每次都会重复计算，而不能重用计算结果，效率极低</li>
 </ul>
 </li>
-<li>为了解决以上问题，Spark引入了弹性分布式数据集（RDD），它是一个有容错机制、可以被并行操作的数据集合，能够被缓存到内存中，共其他计算使用，而不必像MR那样每次都从HDFS上重新读取数据<h3 id="Storm和Spark比较"><a href="#Storm和Spark比较" class="headerlink" title="Storm和Spark比较"></a>Storm和Spark比较</h3>主要从运行的应用程序类型看：    </li>
+<li>为了解决以上问题，Spark引入了弹性分布式数据集（RDD），它是一个有容错机制、可以被并行操作的数据集合，能够被缓存到内存中，共其他计算使用，而不必像MR那样每次都从HDFS上重新读取数据</li>
+</ol>
+<h3 id="Storm和Spark比较"><a href="#Storm和Spark比较" class="headerlink" title="Storm和Spark比较"></a>Storm和Spark比较</h3><p>主要从运行的应用程序类型看：    </p>
+<ol>
 <li>Storm通常是长作业，实际上是服务，永不终止，直到管理员显式杀死或服务故障</li>
 <li>Spark通常是短作业，运行时间通常是分钟或者小时级别的</li>
 </ol>
@@ -770,7 +780,7 @@
 <li>ContainerTokenSecretManager：检查收到的各种访问请求的合法性，确保这些请求操作已被RM授权</li>
 </ul>
 </li>
-<li>WebServer：通过Web界面展示该节点上所有应用程序运行状态、健康状况、日志等信息<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936491468.png" alt="image"></li>
+<li>WebServer：通过Web界面展示该节点上所有应用程序运行状态、健康状况、日志等信息<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936491468.png" alt="NM内部架构图"></li>
 </ol>
 <h2 id="健康节点状况监测"><a href="#健康节点状况监测" class="headerlink" title="健康节点状况监测"></a>健康节点状况监测</h2><ol>
 <li>自定义Shell脚本：  <ul>
@@ -820,7 +830,7 @@
 </li>
 </ol>
 <h2 id="目录结构管理"><a href="#目录结构管理" class="headerlink" title="目录结构管理"></a>目录结构管理</h2><ol>
-<li>由于同一个NM上不同的Container往往并行向本地磁盘写数据，为了避免占用大量IO资源造成相互干扰，尽量提高写数据的可靠性和并发写性能，YARN允许NM配置多个挂在不同磁盘的目录作为中间结果存放目录，对于任意一个应用程序，YARN会在每个磁盘中创建相同的目录结构，然后采用轮询策略使用这些目录<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936491521.png" alt="image"></li>
+<li>由于同一个NM上不同的Container往往并行向本地磁盘写数据，为了避免占用大量IO资源造成相互干扰，尽量提高写数据的可靠性和并发写性能，YARN允许NM配置多个挂在不同磁盘的目录作为中间结果存放目录，对于任意一个应用程序，YARN会在每个磁盘中创建相同的目录结构，然后采用轮询策略使用这些目录<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936491521.png" alt="NM目录结构"></li>
 <li>目录分类：  <ul>
 <li>数据目录：存放Container运行所需和中间数据</li>
 <li>日志目录：运行时输出的日志</li>
@@ -1040,10 +1050,12 @@
 <ol>
 <li>FIFO的缺点：<ul>
 <li>不同应用程序对硬件资源需求侧重不同，FIFO不能充分利用集群资源</li>
-<li>不同用户对应用程序的服务质量要求（QoS：Quality of Service）不同，FIFO不能满足多样化的需求：<pre><code>* 批处理作业：耗时长，对反应时间没有严格要求，如数据挖掘、机器学习
-* 交互式作业：要求及时性，如SQL查询（Hive）
-* 生产性作业：要求有一定量的资源保证，如统计值计算、垃圾数据分析等
-</code></pre></li>
+<li>不同用户对应用程序的服务质量要求（QoS：Quality of Service）不同，FIFO不能满足多样化的需求：<ul>
+<li>批处理作业：耗时长，对反应时间没有严格要求，如数据挖掘、机器学习</li>
+<li>交互式作业：要求及时性，如SQL查询（Hive）</li>
+<li>生产性作业：要求有一定量的资源保证，如统计值计算、垃圾数据分析等</li>
+</ul>
+</li>
 </ul>
 </li>
 <li>新的需求：适用于多用户的资源调度器，能够根据不同用户需求或不用应用程序的QoS针对性地进行资源分配和调度，充分利用集群资源</li>
@@ -1070,7 +1082,7 @@
 <li>Fair Scheduler</li>
 </ul>
 </li>
-<li><p>YARN的资源调度器本质上是一个事件处理器，共需要处理来自外部的6种事件类型，并做不同的相应处理，其中NODE_UPDATE是最重要的事件，它会触发资源调度器最核心的资源分配机制；如下图：<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936469148.png" alt="[图片]"></p>
+<li><p>YARN的资源调度器本质上是一个事件处理器，共需要处理来自外部的6种事件类型，并做不同的相应处理，其中NODE_UPDATE是最重要的事件，它会触发资源调度器最核心的资源分配机制；如下图：<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936469148.png" alt="资源调度器事件处理"></p>
 </li>
 <li><p>资源表示模型：</p>
 <ul>
@@ -1092,13 +1104,13 @@
 </ol>
 </li>
 <li>详细步骤：<ol>
-<li>NM通过周期性心跳汇报节点信息</li>
-<li>RM为NM返回一个心跳应答，包括需要释放的Container列表等信息</li>
-<li>RM收到来自NM的信息后，会触发一个NODE_UPDATE事件</li>
-<li>RecourceScheduler收到NODE_UPDATE事件后，会按照一定的策略将该节点上的空闲资源（步骤2中有释放的资源）分配各应用程序，并将分配结果放到一个内存数据结构中，等待AM下次心跳时领取</li>
-<li>AM向RM发送周期性的心跳，汇报资源需求，并领取已经分配到的Container</li>
-<li>RM收到来自AM心跳信息后，把新的资源需求更新到对应的数据结构中，并返回为它分配的Container</li>
-<li>AM收到新分配的Container列表后，会将这些Container进一步分配给它内部的各个任务</li>
+<li>步骤1：NM通过周期性心跳汇报节点信息</li>
+<li>步骤2：RM为NM返回一个心跳应答，包括需要释放的Container列表等信息</li>
+<li>步骤3：RM收到来自NM的信息后，会触发一个NODE_UPDATE事件</li>
+<li>步骤4：RecourceScheduler收到NODE_UPDATE事件后，会按照一定的策略将该节点上的空闲资源（步骤2中有释放的资源）分配各应用程序，并将分配结果放到一个内存数据结构中，等待AM下次心跳时领取</li>
+<li>步骤5：AM向RM发送周期性的心跳，汇报资源需求，并领取已经分配到的Container</li>
+<li>步骤6：RM收到来自AM心跳信息后，把新的资源需求更新到对应的数据结构中，并返回为它分配的Container</li>
+<li>步骤7：AM收到新分配的Container列表后，会将这些Container进一步分配给它内部的各个任务</li>
 </ol>
 </li>
 </ul>
@@ -1116,18 +1128,18 @@
 <li>资源抢占模型：<ul>
 <li>资源抢占：在资源调度器中，每个队列可设置一个最小资源量和最大资源量，作用顾名思义，但最小资源量并不是绝对的底线，当某个队列不需要任何资源时，会将空闲资源暂时借给其他需要的队列使用，所谓的抢占就是：当某个把资源借出去的队列突然收到提交的应用程序急需资源时，就需要把借出去的资源抢占回来，采用的策略是先等待再强制抢占</li>
 <li>大致步骤：<ol>
-<li>SchedulingEditPolicy探测到需要抢占的资源，将需要抢占的资源通过事件DROP_RESERVATION和PREEMPT_CONTAINER发送给RM</li>
-<li>RM调用ResourceScheduler的dropContainerReservation和preemptContainer函数，标注待抢占的Container</li>
-<li>RM收到来自AM的心跳，并通过应答的形式把待释放的资源总量和待抢占的Container列表返回给它，AM收到列表后，可以选择如下操作：  <ul>
+<li>步骤1：SchedulingEditPolicy探测到需要抢占的资源，将需要抢占的资源通过事件DROP_RESERVATION和PREEMPT_CONTAINER发送给RM</li>
+<li>步骤2：RM调用ResourceScheduler的dropContainerReservation和preemptContainer函数，标注待抢占的Container</li>
+<li>步骤3：RM收到来自AM的心跳，并通过应答的形式把待释放的资源总量和待抢占的Container列表返回给它，AM收到列表后，可以选择如下操作：  <ul>
 <li>杀死这些Container</li>
 <li>选择并杀死其他Container凑够数量</li>
 <li>不做任何处理，过段时间可能有Container自行释放或被RM杀死</li>
 </ul>
 </li>
-<li>SchedulingEditPolicy探测到一段时间内，AM为自行杀死约定的Container，则将这些Container封装到KILL_CONTAINER事件中发送给RM</li>
-<li>RM收到后调用ResourceScheduler的killContainer函数，标注这些待杀死的Container</li>
-<li>RM收到来自NM的心跳，并以应答的形式把待杀死的Container列表返回给它，NM收到后，将这些Container杀死，并通过心跳告知RM</li>
-<li>RM收到来自AM的心跳，并通过应答的形式把已经杀死的Container列表发送给它（可能AM早已通过内部通信机制知道了）</li>
+<li>步骤3：SchedulingEditPolicy探测到一段时间内，AM为自行杀死约定的Container，则将这些Container封装到KILL_CONTAINER事件中发送给RM</li>
+<li>步骤5：RM收到后调用ResourceScheduler的killContainer函数，标注这些待杀死的Container</li>
+<li>步骤6：RM收到来自NM的心跳，并以应答的形式把待杀死的Container列表返回给它，NM收到后，将这些Container杀死，并通过心跳告知RM</li>
+<li>步骤7：RM收到来自AM的心跳，并通过应答的形式把已经杀死的Container列表发送给它（可能AM早已通过内部通信机制知道了）</li>
 </ol>
 </li>
 <li>需要考虑的问题：<ul>
@@ -1144,7 +1156,7 @@
 </ul>
 </li>
 </ol>
-<h3 id="层级队列管理机制："><a href="#层级队列管理机制：" class="headerlink" title="层级队列管理机制："></a>层级队列管理机制：</h3><p>YARN以树状层次的结构组织多个队列，其中用户只能把应用程序提交到最底层的叶子队列，非叶子队列的属性即下边所有叶子队列的属性和。<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936469103.png" alt="image"></p>
+<h3 id="层级队列管理机制："><a href="#层级队列管理机制：" class="headerlink" title="层级队列管理机制："></a>层级队列管理机制：</h3><p>YARN以树状层次的结构组织多个队列，其中用户只能把应用程序提交到最底层的叶子队列，非叶子队列的属性即下边所有叶子队列的属性和。<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936469103.png" alt="层级队列"></p>
 <ol>
 <li>特点：<ul>
 <li>子队列；</li>
@@ -1358,37 +1370,37 @@
       
         
           
-            <h2 id="RM剖析"><a href="#RM剖析" class="headerlink" title="RM剖析"></a>RM剖析</h2><h3 id="内部架构"><a href="#内部架构" class="headerlink" title="内部架构"></a>内部架构</h3><p>从前边YARN的工作流程图中可以看到，RM作为一个处理中心，分别需要和Client、NM、AM交互做处理，那RM是怎么做到这些交互的呢？其实很简单，从面向对象的角度理解，RM作为一个综合的处理中心，是一个大部门，所以在RM内部，又按照服务类别细分了很多“专一”的模块，每个模块作为服务或事件调度器对外提供访问接口，所有这些访问接口组合起来才形成了上边工作流程图中的各种交互。其中每个模块内部还能继续功能细分，直到把单一功能落实到具体的类或接口中，总的内部架构图如下：<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936452667.png" alt="image"></p>
+            <h2 id="RM剖析"><a href="#RM剖析" class="headerlink" title="RM剖析"></a>RM剖析</h2><h3 id="内部架构"><a href="#内部架构" class="headerlink" title="内部架构"></a>内部架构</h3><p>从前边YARN的工作流程图中可以看到，RM作为一个处理中心，分别需要和Client、NM、AM交互做处理，那RM是怎么做到这些交互的呢？其实很简单，从面向对象的角度理解，RM作为一个综合的处理中心，是一个大部门，所以在RM内部，又按照服务类别细分了很多“专一”的模块，每个模块作为服务或事件调度器对外提供访问接口，所有这些访问接口组合起来才形成了上边工作流程图中的各种交互。其中每个模块内部还能继续功能细分，直到把单一功能落实到具体的类或接口中，总的内部架构图如下：<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936452667.png" alt="RM内部架构图"></p>
 <h3 id="模块简介："><a href="#模块简介：" class="headerlink" title="模块简介："></a>模块简介：</h3><ol>
 <li>Client交互模块:<ul>
-<li>ClientRMService：为普通用户提供服务，如提交应用、终止应用、获取应用运行状态等</li>
-<li>AdminService：为管理员提供了一套独立的服务接口，防止大量普通用户请求使得管理命令饿死，如动态更新节点列表、更新ACL列表等</li>
+<li><code>ClientRMService</code>：为普通用户提供服务，如提交应用、终止应用、获取应用运行状态等</li>
+<li><code>AdminService</code>：为管理员提供了一套独立的服务接口，防止大量普通用户请求使得管理命令饿死，如动态更新节点列表、更新ACL列表等</li>
 <li>WebApp：Web界面，友好地展示集群资源使用情况和应用运行状态等信息</li>
 </ul>
 </li>
 <li>NM管理模块：<ul>
-<li>NMLivelinessMonitor：监控NM是否活着</li>
-<li>NodesListManager：维护正常节点和异常节点列表</li>
-<li>ResourceTrackerService：处理来自NM的请求，主要包括注册和心跳两种请求</li>
+<li><code>NMLivelinessMonitor</code>：监控NM是否活着</li>
+<li><code>NodesListManager</code>：维护正常节点和异常节点列表</li>
+<li><code>ResourceTrackerService</code>：处理来自NM的请求，主要包括注册和心跳两种请求</li>
 </ul>
 </li>
 <li>AM管理模块：<ul>
-<li>AMLivelinessMonitor：监控AM是否活着</li>
-<li>ApplicationMasterLauncher：与NM通信，要求它为某个应用启动AM</li>
-<li>ApplicationMasterService：处理来自AM的请求，主要包括注册和心跳两种请求</li>
+<li><code>AMLivelinessMonitor</code>：监控AM是否活着</li>
+<li><code>ApplicationMasterLauncher</code>：与NM通信，要求它为某个应用启动AM</li>
+<li><code>ApplicationMasterService</code>：处理来自AM的请求，主要包括注册和心跳两种请求</li>
 </ul>
 </li>
 <li>Application管理模块：<ul>
-<li>ApplicationACLsManager：管理应用程序访问权限，查看权限和修改权限</li>
-<li>RMAppManager：管理应用程序的启动（提交和后续对象的创建）和关闭</li>
-<li>ContainerAllocationExpirer：AM没有在规定时间内在对应的NM上启动新分配的Container，则RM强制回收，是否回收由该类决定和执行</li>
+<li><code>ApplicationACLsManager</code>：管理应用程序访问权限，查看权限和修改权限</li>
+<li><code>RMAppManager</code>：管理应用程序的启动（提交和后续对象的创建）和关闭</li>
+<li><code>ContainerAllocationExpirer</code>：AM没有在规定时间内在对应的NM上启动新分配的Container，则RM强制回收，是否回收由该类决定和执行</li>
 </ul>
 </li>
 <li>状态机管理模块：状态机维护着有状态对象的生命周期，RM中共维护4类：<ul>
-<li>RMApp：维护的是同一个Application启动的所有运行实例的生命周期，从启动到运行结束</li>
-<li>RMAppAttempt：app运行实例的每次启动称为一次运行尝试，该类维护着一次运行尝试的生命周期，从启动到运行结束</li>
-<li>RMContainer：维护一个Container的运行周期，从创建到运行结束</li>
-<li>RMNode：维护一个NM的生命周期，从启动到运行结束</li>
+<li><code>RMApp</code>：维护的是同一个Application启动的所有运行实例的生命周期，从启动到运行结束</li>
+<li><code>RMAppAttempt</code>：app运行实例的每次启动称为一次运行尝试，该类维护着一次运行尝试的生命周期，从启动到运行结束</li>
+<li><code>RMContainer</code>：维护一个Container的运行周期，从创建到运行结束</li>
+<li><code>RMNode</code>：维护一个NM的生命周期，从启动到运行结束</li>
 </ul>
 </li>
 <li>安全管理模块：<ul>
@@ -1397,17 +1409,19 @@
 </ul>
 </li>
 <li>资源分配模块：<ul>
-<li>ResourceScheduler：<ul>
-<li>批处理调度器：FIFO</li>
+<li><code>ResourceScheduler</code>：<ul>
+<li>批处理调度器：<code>FIFO</code></li>
 <li>多用户调度器<ul>
-<li>Fair Scheduler</li>
-<li>Capacity Scheduler<h3 id="容错机制："><a href="#容错机制：" class="headerlink" title="容错机制："></a>容错机制：</h3></li>
+<li><code>Fair Scheduler</code></li>
+<li><code>Capacity Scheduler</code></li>
 </ul>
 </li>
 </ul>
 </li>
 </ul>
 </li>
+</ol>
+<h3 id="容错机制："><a href="#容错机制：" class="headerlink" title="容错机制："></a>容错机制：</h3><ol>
 <li>AM容错：RM负责监控AM的运行状态，若运行失败或超时，会重新分配资源并重启它</li>
 <li>NM容错：NM定时向RM发送心跳，若超时，则NM上的Container状态置为失败，并交由对应的AM处理其中的任务</li>
 <li>Container容错：即前边提到的ContainerAllocationExpirer负责的超时未启动处理</li>
@@ -1420,12 +1434,13 @@
 <li>Slave隔离：确保只有一个Master可以向Slave下发命令</li>
 </ul>
 </li>
-<li>切换对外透明：多次连接失败后换一个连接<h3 id="常见行为分析"><a href="#常见行为分析" class="headerlink" title="常见行为分析"></a>常见行为分析</h3>因为RM相当于YARN整个系统的核心，具备很多功能，每个功能都是基于事件在各个组成结构之间驱动的，所以并没有一个固定或统一的处理流程，只能针对某一个功能来说，比如：  </li>
+<li>切换对外透明：多次连接失败后换一个连接</li>
 </ul>
 </li>
 </ul>
 </li>
 </ol>
+<h3 id="常见行为分析"><a href="#常见行为分析" class="headerlink" title="常见行为分析"></a>常见行为分析</h3><p>因为RM相当于YARN整个系统的核心，具备很多功能，每个功能都是基于事件在各个组成结构之间驱动的，所以并没有一个固定或统一的处理流程，只能针对某一个功能来说，比如：  </p>
 <ul>
 <li>启动AM</li>
 <li>申请和分配Container</li>
@@ -1588,7 +1603,7 @@
 <li>数据共享：减小数据移动带来的成本；</li>
 </ul>
 </li>
-<li>一个框架一个集群 到 多个框架共享集群：<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936452783.jpg" alt="[图片]"></li>
+<li>一个框架一个集群 到 多个框架共享集群：<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936452783.jpg" alt="共享集群"></li>
 </ol>
 <h2 id="YARN的组成结构和流程"><a href="#YARN的组成结构和流程" class="headerlink" title="YARN的组成结构和流程"></a>YARN的组成结构和流程</h2><ol>
 <li>YARN基本组成结构：<ul>
@@ -1621,7 +1636,7 @@
 <li>步骤6：NM为任务设置好运行环境后，将任务启动命令写到一个脚本中，通过运行该脚本启动任务；</li>
 <li>步骤7：各个任务通过某个RPC协议向AM汇报自己的状态和进度，以便AM随时掌握各个任务的运行状态，从而可以在任务失败时重启任务；</li>
 <li>步骤9：应用程序运行完成后，AM向RM注销并关闭自己；</li>
-<li>如下图：<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936452735.png" alt="[图片]"></li>
+<li>如下图：<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936452735.png" alt="YARN工作流程"></li>
 </ul>
 </li>
 <li>YARN的理解角度：<ul>

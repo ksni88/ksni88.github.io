@@ -75,7 +75,7 @@ MRv1中的资源调度器单队列FIFO调度机制，适">
 MRv1中的资源调度器单队列FIFO调度机制，适">
 <meta property="og:image" content="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936469148.png">
 <meta property="og:image" content="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936469103.png">
-<meta property="og:updated_time" content="2016-07-24T13:09:32.569Z">
+<meta property="og:updated_time" content="2016-07-29T11:10:46.681Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="从零爬Hadoop系列_3-《Hadoop技术内幕2》RM-资源调度器">
 <meta name="twitter:description" content="资源调度器资源调度器对应昨天总结的RM中的资源调度模块，它是RM中一个插拔式的服务组件，对于资源调度器的理解，可以从两个角度出发：  
@@ -316,10 +316,12 @@ MRv1中的资源调度器单队列FIFO调度机制，适">
 <ol>
 <li>FIFO的缺点：<ul>
 <li>不同应用程序对硬件资源需求侧重不同，FIFO不能充分利用集群资源</li>
-<li>不同用户对应用程序的服务质量要求（QoS：Quality of Service）不同，FIFO不能满足多样化的需求：<pre><code>* 批处理作业：耗时长，对反应时间没有严格要求，如数据挖掘、机器学习
-* 交互式作业：要求及时性，如SQL查询（Hive）
-* 生产性作业：要求有一定量的资源保证，如统计值计算、垃圾数据分析等
-</code></pre></li>
+<li>不同用户对应用程序的服务质量要求（QoS：Quality of Service）不同，FIFO不能满足多样化的需求：<ul>
+<li>批处理作业：耗时长，对反应时间没有严格要求，如数据挖掘、机器学习</li>
+<li>交互式作业：要求及时性，如SQL查询（Hive）</li>
+<li>生产性作业：要求有一定量的资源保证，如统计值计算、垃圾数据分析等</li>
+</ul>
+</li>
 </ul>
 </li>
 <li>新的需求：适用于多用户的资源调度器，能够根据不同用户需求或不用应用程序的QoS针对性地进行资源分配和调度，充分利用集群资源</li>
@@ -346,7 +348,7 @@ MRv1中的资源调度器单队列FIFO调度机制，适">
 <li>Fair Scheduler</li>
 </ul>
 </li>
-<li><p>YARN的资源调度器本质上是一个事件处理器，共需要处理来自外部的6种事件类型，并做不同的相应处理，其中NODE_UPDATE是最重要的事件，它会触发资源调度器最核心的资源分配机制；如下图：<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936469148.png" alt="[图片]"></p>
+<li><p>YARN的资源调度器本质上是一个事件处理器，共需要处理来自外部的6种事件类型，并做不同的相应处理，其中NODE_UPDATE是最重要的事件，它会触发资源调度器最核心的资源分配机制；如下图：<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936469148.png" alt="资源调度器事件处理"></p>
 </li>
 <li><p>资源表示模型：</p>
 <ul>
@@ -368,13 +370,13 @@ MRv1中的资源调度器单队列FIFO调度机制，适">
 </ol>
 </li>
 <li>详细步骤：<ol>
-<li>NM通过周期性心跳汇报节点信息</li>
-<li>RM为NM返回一个心跳应答，包括需要释放的Container列表等信息</li>
-<li>RM收到来自NM的信息后，会触发一个NODE_UPDATE事件</li>
-<li>RecourceScheduler收到NODE_UPDATE事件后，会按照一定的策略将该节点上的空闲资源（步骤2中有释放的资源）分配各应用程序，并将分配结果放到一个内存数据结构中，等待AM下次心跳时领取</li>
-<li>AM向RM发送周期性的心跳，汇报资源需求，并领取已经分配到的Container</li>
-<li>RM收到来自AM心跳信息后，把新的资源需求更新到对应的数据结构中，并返回为它分配的Container</li>
-<li>AM收到新分配的Container列表后，会将这些Container进一步分配给它内部的各个任务</li>
+<li>步骤1：NM通过周期性心跳汇报节点信息</li>
+<li>步骤2：RM为NM返回一个心跳应答，包括需要释放的Container列表等信息</li>
+<li>步骤3：RM收到来自NM的信息后，会触发一个NODE_UPDATE事件</li>
+<li>步骤4：RecourceScheduler收到NODE_UPDATE事件后，会按照一定的策略将该节点上的空闲资源（步骤2中有释放的资源）分配各应用程序，并将分配结果放到一个内存数据结构中，等待AM下次心跳时领取</li>
+<li>步骤5：AM向RM发送周期性的心跳，汇报资源需求，并领取已经分配到的Container</li>
+<li>步骤6：RM收到来自AM心跳信息后，把新的资源需求更新到对应的数据结构中，并返回为它分配的Container</li>
+<li>步骤7：AM收到新分配的Container列表后，会将这些Container进一步分配给它内部的各个任务</li>
 </ol>
 </li>
 </ul>
@@ -392,18 +394,18 @@ MRv1中的资源调度器单队列FIFO调度机制，适">
 <li>资源抢占模型：<ul>
 <li>资源抢占：在资源调度器中，每个队列可设置一个最小资源量和最大资源量，作用顾名思义，但最小资源量并不是绝对的底线，当某个队列不需要任何资源时，会将空闲资源暂时借给其他需要的队列使用，所谓的抢占就是：当某个把资源借出去的队列突然收到提交的应用程序急需资源时，就需要把借出去的资源抢占回来，采用的策略是先等待再强制抢占</li>
 <li>大致步骤：<ol>
-<li>SchedulingEditPolicy探测到需要抢占的资源，将需要抢占的资源通过事件DROP_RESERVATION和PREEMPT_CONTAINER发送给RM</li>
-<li>RM调用ResourceScheduler的dropContainerReservation和preemptContainer函数，标注待抢占的Container</li>
-<li>RM收到来自AM的心跳，并通过应答的形式把待释放的资源总量和待抢占的Container列表返回给它，AM收到列表后，可以选择如下操作：  <ul>
+<li>步骤1：SchedulingEditPolicy探测到需要抢占的资源，将需要抢占的资源通过事件DROP_RESERVATION和PREEMPT_CONTAINER发送给RM</li>
+<li>步骤2：RM调用ResourceScheduler的dropContainerReservation和preemptContainer函数，标注待抢占的Container</li>
+<li>步骤3：RM收到来自AM的心跳，并通过应答的形式把待释放的资源总量和待抢占的Container列表返回给它，AM收到列表后，可以选择如下操作：  <ul>
 <li>杀死这些Container</li>
 <li>选择并杀死其他Container凑够数量</li>
 <li>不做任何处理，过段时间可能有Container自行释放或被RM杀死</li>
 </ul>
 </li>
-<li>SchedulingEditPolicy探测到一段时间内，AM为自行杀死约定的Container，则将这些Container封装到KILL_CONTAINER事件中发送给RM</li>
-<li>RM收到后调用ResourceScheduler的killContainer函数，标注这些待杀死的Container</li>
-<li>RM收到来自NM的心跳，并以应答的形式把待杀死的Container列表返回给它，NM收到后，将这些Container杀死，并通过心跳告知RM</li>
-<li>RM收到来自AM的心跳，并通过应答的形式把已经杀死的Container列表发送给它（可能AM早已通过内部通信机制知道了）</li>
+<li>步骤3：SchedulingEditPolicy探测到一段时间内，AM为自行杀死约定的Container，则将这些Container封装到KILL_CONTAINER事件中发送给RM</li>
+<li>步骤5：RM收到后调用ResourceScheduler的killContainer函数，标注这些待杀死的Container</li>
+<li>步骤6：RM收到来自NM的心跳，并以应答的形式把待杀死的Container列表返回给它，NM收到后，将这些Container杀死，并通过心跳告知RM</li>
+<li>步骤7：RM收到来自AM的心跳，并通过应答的形式把已经杀死的Container列表发送给它（可能AM早已通过内部通信机制知道了）</li>
 </ol>
 </li>
 <li>需要考虑的问题：<ul>
@@ -420,7 +422,7 @@ MRv1中的资源调度器单队列FIFO调度机制，适">
 </ul>
 </li>
 </ol>
-<h3 id="层级队列管理机制："><a href="#层级队列管理机制：" class="headerlink" title="层级队列管理机制："></a>层级队列管理机制：</h3><p>YARN以树状层次的结构组织多个队列，其中用户只能把应用程序提交到最底层的叶子队列，非叶子队列的属性即下边所有叶子队列的属性和。<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936469103.png" alt="image"></p>
+<h3 id="层级队列管理机制："><a href="#层级队列管理机制：" class="headerlink" title="层级队列管理机制："></a>层级队列管理机制：</h3><p>YARN以树状层次的结构组织多个队列，其中用户只能把应用程序提交到最底层的叶子队列，非叶子队列的属性即下边所有叶子队列的属性和。<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936469103.png" alt="层级队列"></p>
 <ol>
 <li>特点：<ul>
 <li>子队列；</li>

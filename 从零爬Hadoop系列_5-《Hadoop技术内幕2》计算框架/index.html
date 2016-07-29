@@ -75,7 +75,8 @@ AM：AM负责向RM申请">
 <meta property="og:image" content="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936512323.png">
 <meta property="og:image" content="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936512238.png">
 <meta property="og:image" content="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936512078.png">
-<meta property="og:updated_time" content="2016-07-24T13:20:13.453Z">
+<meta property="og:image" content="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146979038031.png">
+<meta property="og:updated_time" content="2016-07-29T11:08:52.478Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="从零爬Hadoop系列_5-《Hadoop技术内幕2》计算框架">
 <meta name="twitter:description" content="计算框架现在有很多计算框架，各有特点，各有应用场景，该篇主要介绍MR，简短介绍Tez、Storm、Spark。
@@ -314,7 +315,7 @@ AM：AM负责向RM申请">
 </ol>
 <p>所以对于YARN来说，不变的是RM（共享集群的资源调度）、NM（节点代理），可变的是计算框架（应用程序），这里的可变即通过编写自己的AM完成，再明了一点，即各个计算框架是通过编写各自的AM集成到YARN上以实现多个框架共享集群的，而本章的主要内容就是讲MR的AM。  </p>
 <p>看过前边的应该记得，YARN是由MRv1进化而来的，所以YARN天生支持MR，即提供了可以直接使用的AM：MRAppMaster，为了更好的理解，可以先来看一下两者的异同：  </p>
-<p><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936512189.png" alt="image">  </p>
+<p><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936512189.png" alt="MRV12异同">  </p>
 <p>即只有原来负责资源调度和任务管理的运行时环境发生了替换，其他还是原来的代码。</p>
 <p>名词解释：</p>
 <ol>
@@ -375,12 +376,12 @@ AM：AM负责向RM申请">
 <li>MR作业表示方式：  <ul>
 <li><code>Job</code>：一个MR作业（应用程序），负责整个job即各个task的监控和管理</li>
 <li><code>Task</code>：作业内部的任务，此处有MT和RT，负责下面各个taskAttemp的监控和管理</li>
-<li><code>TaskAttempt</code>：task真正的运行实例，负责真正的任务计算工作，在YARN中，任务实例是运行在Container中的<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936512323.png" alt="image"></li>
+<li><code>TaskAttempt</code>：task真正的运行实例，负责真正的任务计算工作，在YARN中，任务实例是运行在Container中的<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936512323.png" alt="作业表示方式"></li>
 </ul>
 </li>
 <li>MR作业生命周期：  <ul>
 <li>三种状态机：<code>Job状态机</code>、<code>Task状态机</code>、<code>TaskAttempt状态机</code>，属于层级包含关系</li>
-<li>状态机内部即基于事件驱动的状态转移，详情请翻书<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936512238.png" alt="image"></li>
+<li>状态机内部即基于事件驱动的状态转移，详情请翻书<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936512238.png" alt="作业声明周期"></li>
 </ul>
 </li>
 <li><p>资源申请和再分配（ContainerAllocator）：  </p>
@@ -488,13 +489,13 @@ AM：AM负责向RM申请">
 <li><p>数据切分：按照某个策略将输入数据切分成若干个split，以便确定MT个数以及对应的split，对应的函数：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">List&lt;InputSplit&gt; <span class="title">getSplits</span><span class="params">(in context：JobContext)</span></span></span><br></pre></td></tr></table></figure>
 </li>
-<li><p>为Mapper提供输入数据：给定某个split，Mapper将其解析成一个个key/value对，对应的函数：  </p>
+<li><p>为Mapper提供输入数据：给定某个split，将其解析成一个个key/value对，对应的函数：  </p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">RecordReader&lt;KEYIN,VALUEIN&gt;  <span class="title">createRecordReader</span><span class="params">(in split：InputSplit, in context：TaskAttemptContext)</span></span></span><br></pre></td></tr></table></figure>
 </li>
 </ul>
 </li>
 </ol>
-<p><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936512078.png" alt="image"></p>
+<p><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936512078.png" alt="InputFormat继承树"></p>
 <ol>
 <li>如上图所示，所有基于文件的基类都是FileInputFormat，由公共基类统一对各种输入文件进行切分，即第一个功能，然后由各个派生类自己提供机制进一步解析InputSplit，即第二个功能</li>
 <li><p>举例说明：对于TextInputFormat，每一行内容即为value，该行在整个文件中的偏移量即为key，对应为Mapper中map()方法参数中的<code>key/value</code>，所以实现的map()方法，即可将value视为文件中的一行进行进一步数据处理</p>
@@ -502,7 +503,7 @@ AM：AM负责向RM申请">
 </li>
 <li><p>MR框架会通过InputFormat获取一个个key/value，然后交给map()方法处理；</p>
 </li>
-<li>map()方法处理的还是文件中的原始数据，主要工作是从输入数据提取目标数据，然后以key/value的形式输出到磁盘，等待reduce处理</li>
+<li>对于TextInputFormat，map()方法处理的还是文件中的原始数据，主要工作是从输入数据提取目标数据，然后以key/value的形式输出到磁盘，等待reduce处理</li>
 </ol>
 <h3 id="Partitioner"><a href="#Partitioner" class="headerlink" title="Partitioner"></a>Partitioner</h3><p>作用是对map结果进行分片，以便将同一分片的数据交给同一个Reducer处理，直接影响Reduce阶段的负载均衡，对应的方法：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">getPartition</span><span class="params">(in key：KEY，in value：VALUE，in numPartitions：<span class="keyword">int</span>)</span></span></span><br></pre></td></tr></table></figure></p>
 <h3 id="Reducer："><a href="#Reducer：" class="headerlink" title="Reducer："></a>Reducer：</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">reduce</span><span class="params">(in key：KEYIN, in values：Iterable&lt;VALUEIN&gt;, in context：Reducer.Context)</span></span></span><br></pre></td></tr></table></figure>
@@ -519,33 +520,36 @@ AM：AM负责向RM申请">
 </ul>
 </li>
 <li>Collect过程分析（详情请翻书）：  <ul>
-<li>环形缓冲区，当缓冲区满了以后，可以读写并行，使得Collect阶段和Spill阶段并行进行</li>
-<li>缓冲区内部使用两级索引结构，从缓冲区写入磁盘时，以及文件合并时，都在维护着该索引</li>
+<li>首先通过Partitioner获取记录的分片号，组成三元组<key，value，partitionnum>，然后交给collect()函数写入环形缓冲区；</key，value，partitionnum></li>
+<li>环形缓冲区内部使用两级索引结构<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146979038031.png" alt="MapOutputBuffer两级索引结构"></li>
+<li>之所以适用环形缓冲区，是为了当缓冲区满了以后，Collect阶段和Spill阶段可以并行进行读写，类似于生产者消费者模型；</li>
 </ul>
 </li>
 <li>Spill过程分析：  <ul>
-<li>步骤1：利用快排对缓冲区内的数据进行排序，排序方式是：先按照分区编号partition排序，然后按照key排序，经过排序后，数据以分区为单位聚集在一起，同一分区内所有数据按照Key有序</li>
-<li>步骤2：按照分区编号从小到大依次将每个分区中的数据写入任务工作目录下的临时文件output/spillN.out中，如果用户设置了Combiner，则写入文件前，对每个分区中的数据进行一次聚集操作</li>
+<li>步骤1：利用快排对缓冲区内溢出（默认参数80%）的数据进行排序，排序方式是：先按照分区编号partition排序，然后按照key排序，经过排序后，数据以分区为单位聚集在一起，同一分区内所有数据按照Key有序</li>
+<li>步骤2：按照分区编号从小到大依次将每个分区中的数据写入任务工作目录下的临时文件output/spillN.out中（N表示当前溢写次数），如果用户设置了Combiner，则写入文件前，对每个分区中的数据进行一次聚集操作</li>
 <li>步骤3：将分区数据的元信息写到内存索引数据结构中，其中每个分区的元信息包括在临时文件中的偏移量、压缩前数据大小和压缩后数据大小，输入内存中的索引大于1MB，则写到文件output/spillN.out.index中</li>
 </ul>
 </li>
 <li>Combine过程分析：  <ul>
-<li>在所有数据处理完后，MT会将所有临时文件合并成一个大文件，并保存到文件output/file.out 中，同时生成相应的索引文件output/file.out.index</li>
-<li>在进行文件合并过程中，MT以分区为单位进行合并，对于某个分区，它将采用多轮递归合并的方式：每轮合并io.sort.factor（默认100）个文件，然后将合并后的文件重新加入待合并列表，重复直到最终得到一个大文件<h3 id="Reduce-Task内部实现"><a href="#Reduce-Task内部实现" class="headerlink" title="Reduce Task内部实现"></a>Reduce Task内部实现</h3></li>
+<li>在所有数据处理完后，MT会将所有临时文件合并成一个大文件，并保存到文件output/file.out中，同时生成相应的索引文件output/file.out.index</li>
+<li>在进行文件合并过程中，MT以分区为单位进行合并，对于某个分区，它将采用多轮递归合并的方式：每轮合并io.sort.factor（默认100）个文件，然后将合并后的文件重新加入待合并列表，重复直到最终得到一个大文件</li>
 </ul>
 </li>
+</ol>
+<h3 id="Reduce-Task内部实现"><a href="#Reduce-Task内部实现" class="headerlink" title="Reduce Task内部实现"></a>Reduce Task内部实现</h3><ol>
 <li>整体流程：  <ul>
 <li><code>Shuffle阶段</code>：也称为Copy阶段，RT从各个MT上远程拷贝一片数据，并针对某一片数据，如果其大小超过一定阈值，则写到磁盘，否则直接放到内存</li>
 <li><code>Merge阶段</code>：在远程拷贝数据的同时，RT启动了两个后台线程对内存和磁盘上的文件进行合并，以防止内存使用过多或磁盘上文件过多</li>
 <li><code>Sort阶段</code>：按照MR语义，为了在reduce之前，将key相同的数据聚在一起，RT对所有数据进行一次归并排序（因为MR排序，所以局部有序）</li>
-<li><code>Reduce阶段</code>：将魅族数据依次交给用户编写的reduce()函数处理</li>
+<li><code>Reduce阶段</code>：将每组数据依次交给用户编写的reduce()函数处理</li>
 <li><code>Write阶段</code>：reduce()函数将计算结果写到HDFS上</li>
 </ul>
 </li>
 <li>Shuffle和Merge阶段分析：<ul>
 <li>两个阶段是并行进行的</li>
 <li>可以分为三个子阶段：<ul>
-<li>准备运行完成的MT列表：GetMapEventsThread周期性通过RPC后去已完成MT列表，并保存到映射表mapLocations中。为了防止出现网络热点，RT通过对所有host进行“混洗”以打乱拷贝顺序，并保存到scheduledCopies列表中</li>
+<li>准备运行完成的MT列表：GetMapEventsThread周期性通过RPC获取已完成MT列表，并保存到映射表mapLocations中。为了防止出现网络热点，RT通过对所有host进行“混洗”以打乱拷贝顺序，并保存到scheduledCopies列表中</li>
 <li>远程拷贝数据：RT同时启动多个MapOutputCopier线程，这些线程从scheduledCopies列表中获取MT输出位置，通过HTTP GET远程拷贝数据</li>
 <li>合并内存文件和磁盘文件：为了防止内存或磁盘文件数据过多，RT启动了两个不同的线程分别对内存上和磁盘上的文件进行合并</li>
 </ul>
@@ -601,9 +605,11 @@ AM：AM负责向RM申请">
 <li>也可以把Tez作为MR之下的数据处理引擎，即用户依然使用MR编写程序，但使用Tez将之组装成一个DAG作业，Tez提供了一个MR到DAG的转换工具</li>
 </ul>
 </li>
-<li>优化Pig、Hive等引擎<h3 id="实时计算框架Storm（Twitter开源的）"><a href="#实时计算框架Storm（Twitter开源的）" class="headerlink" title="实时计算框架Storm（Twitter开源的）"></a>实时计算框架Storm（Twitter开源的）</h3></li>
+<li>优化Pig、Hive等引擎</li>
 </ul>
 </li>
+</ol>
+<h3 id="实时计算框架Storm（Twitter开源的）"><a href="#实时计算框架Storm（Twitter开源的）" class="headerlink" title="实时计算框架Storm（Twitter开源的）"></a>实时计算框架Storm（Twitter开源的）</h3><ol>
 <li>背景：MR因为以下几个特点，决定了它只适合离线批处理的应用场景：  <ul>
 <li>启动时间长：一个MR作业由启动任务、Map任务、Reduce任务和清理任务四种组成，即使最简单的MR作业也会运行几秒到十几秒</li>
 <li>调度开销大：当任务数目大时，全部调度完成耗时长，且资源不足时需排队等待</li>
@@ -614,15 +620,20 @@ AM：AM负责向RM申请">
 <li>实时计算：是指被处理的数据像流水一样不断流入系统，而系统需要针对每条数据进行实时处理和计算，并永不停止（直到用户显式杀死进程），考虑到数据源中数据流动的特点，也称为“流式计算”</li>
 <li>Storm和MR最大的不同：  <ul>
 <li>Storm的数据源是动态的，即受到一条处理一条</li>
-<li>MR的数据源是静态的，即数据被处理前整个数据集已经确定，且计算过程中不能被修改<h3 id="内存计算框架Spark（伯克利分校AMPLab实验室开发）"><a href="#内存计算框架Spark（伯克利分校AMPLab实验室开发）" class="headerlink" title="内存计算框架Spark（伯克利分校AMPLab实验室开发）"></a>内存计算框架Spark（伯克利分校AMPLab实验室开发）</h3></li>
+<li>MR的数据源是静态的，即数据被处理前整个数据集已经确定，且计算过程中不能被修改</li>
 </ul>
 </li>
+</ol>
+<h3 id="内存计算框架Spark（伯克利分校AMPLab实验室开发）"><a href="#内存计算框架Spark（伯克利分校AMPLab实验室开发）" class="headerlink" title="内存计算框架Spark（伯克利分校AMPLab实验室开发）"></a>内存计算框架Spark（伯克利分校AMPLab实验室开发）</h3><ol>
 <li>背景：因为MR每次均需要从HDFS上读取数据进行处理，且不同计算之间只能通过HDFS重用数据，使其在以下一个应用场景中效率缓慢：  <ul>
 <li>迭代计算：即相邻两轮计算要共享一部分数据，如果使用MR，只能通过HDFS读写共享，比如数据挖掘、机器学习、自然语言处理等领域的算法：PageRank、K-means聚类、逻辑回归等</li>
 <li>交互式计算：在数据仓库应用中，在用户大量的查询语句中，有很多是作用在同一个数据集上的相同运算，即查询语句中的部分计算是相同的，但当使用Hive或Pig这样的系统时，它们每次都会重复计算，而不能重用计算结果，效率极低</li>
 </ul>
 </li>
-<li>为了解决以上问题，Spark引入了弹性分布式数据集（RDD），它是一个有容错机制、可以被并行操作的数据集合，能够被缓存到内存中，共其他计算使用，而不必像MR那样每次都从HDFS上重新读取数据<h3 id="Storm和Spark比较"><a href="#Storm和Spark比较" class="headerlink" title="Storm和Spark比较"></a>Storm和Spark比较</h3>主要从运行的应用程序类型看：    </li>
+<li>为了解决以上问题，Spark引入了弹性分布式数据集（RDD），它是一个有容错机制、可以被并行操作的数据集合，能够被缓存到内存中，共其他计算使用，而不必像MR那样每次都从HDFS上重新读取数据</li>
+</ol>
+<h3 id="Storm和Spark比较"><a href="#Storm和Spark比较" class="headerlink" title="Storm和Spark比较"></a>Storm和Spark比较</h3><p>主要从运行的应用程序类型看：    </p>
+<ol>
 <li>Storm通常是长作业，实际上是服务，永不终止，直到管理员显式杀死或服务故障</li>
 <li>Spark通常是短作业，运行时间通常是分钟或者小时级别的</li>
 </ol>
