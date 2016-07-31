@@ -226,6 +226,252 @@
             
               
                 
+                <a class="post-title-link" href="/线程池全面解析/" itemprop="url">
+                  线程池全面解析
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-04-04T15:09:33+08:00" content="2016-04-04">
+              2016-04-04
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/线程池全面解析/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="线程池全面解析/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>对于线程池，我在项目中只是简单的使用，大概知道JDK有四种线程池，但对于具体的实现和原理并不是很清楚，所以本文是在对线程池有一些了解之后，结合源码全面总结并讲解JDK线程池的实现和原理。但在开写之前呢，并没有预想到线程池有这么大的内容量，本想一下午看完，结果看了两三天，笔记也是越写越长，显得有些杂乱，可以根据目录按需选看。</p>
+<h2 id="为什么要使用线程池？"><a href="#为什么要使用线程池？" class="headerlink" title="为什么要使用线程池？"></a>为什么要使用线程池？</h2><p>诸如 Web 服务器、数据库服务器、文件服务器或邮件服务器之类的许多服务器应用程序都面向处理来自某些远程来源的大量短小的任务。不管请求如何到达，服务器应用程序中经常出现的情况是：单个任务处理的时间很短而请求的数目却是巨大的。构建服务器应用程序的一个过于简单的模型应该是：每当一个请求到达就创建一个新线程，然后在新线程中为请求服务。然而对于原型开发这种方法工作得很好，但如果试图部署以这种方式运行的服务器应用程序，那么这种方法的严重不足就很明显。比如创建和销毁线程的时间比真正执行任务的时间还多、过多的线程创建造成系统不稳定甚至崩溃。</p>
+<p>线程池为线程生命周期开销问题和资源不足问题提供了解决方案，使用线程池的好处有以下三点：</p>
+<ol>
+<li>降低资源消耗：通过重复利用已创建的线程降低线程创建和销毁造成的消耗；</li>
+<li>提高响应速度：当任务到达时，任务可以不需要的等到线程创建就能立即执行；</li>
+<li>提高线程的可管理性：线程是稀缺资源，如果无限制的创建，不仅会消耗系统资源，还会降低系统的稳定性，使用线程池可以进行统一的分配，调优和监控。</li>
+</ol>
+<h2 id="最简单的线程池模型"><a href="#最简单的线程池模型" class="headerlink" title="最简单的线程池模型"></a>最简单的线程池模型</h2><p>至少要有两个集合，其中一个集合用来存放线程，另一个集合用来存放等待执行的任务。针对线程的个数控制、任务执行的顺序、没有可用线程或任务满了以后对应的策略，JDK提供了几种常用的、实现好的线程池供我们使用，下面详细讲解JDK的线程池（这里先抛出一个重要的问题，对于这个简单模型，我只说了它静态的存储结构，但它的动态操作，比如把任务交给线程来执行这个动作是怎么完成的？线程执行完以后又怎么达到线程复用的？在讲解完JDK的四种线程池以后，我会在此文最后通过源码来回答这些问题）。</p>
+<h2 id="JDK提供的线程池"><a href="#JDK提供的线程池" class="headerlink" title="JDK提供的线程池"></a>JDK提供的线程池</h2><h3 id="UML图："><a href="#UML图：" class="headerlink" title="UML图："></a>UML图：</h3><p><img src="http://cevxd.img47.wal8.com/img47/542077_20160404152451/145975477752.png" alt="JDK线程池UML"></p>
+<p>标记一下比较重要的类：<table><tr><td>ExecutorService</td><td>真正的线程池接口</td></tr><tr><td>ScheduledExecutorService</td><td>能和Timer/TimerTask类似，解决那些需要任务重复执行的问题</td></tr><tr><td>ThreadPoolExecutor</td><td>ExecutorService的默认实现</td></tr><tr><td>ScheduledThreadPoolExecutor</td><td>继承ThreadPoolExecutor的ScheduledExecutorService接口实现，周期性任务调度的类实现</td></tr></table></p>
+<h3 id="ThreadPoolExecutor构造参数"><a href="#ThreadPoolExecutor构造参数" class="headerlink" title="ThreadPoolExecutor构造参数"></a>ThreadPoolExecutor构造参数</h3><p>对于我们上边提到的JDK提供的几种常用的线程池，其实都是通过ThreadPoolExecutor构造的，只是构造参数不同导致各个线程池的特性不同，所以在介绍那几种具体的线程池之前，先来了解一下ThreadPoolExecutor各个构造参数的含义，下边是其构造函数代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">ThreadPoolExecutor</span><span class="params">(<span class="keyword">int</span> corePoolSize,</span><br><span class="line">					  <span class="keyword">int</span> maximumPoolSize,</span><br><span class="line">					  <span class="keyword">long</span> keepAliveTime,</span><br><span class="line">					  TimeUnit unit,</span><br><span class="line">					  BlockingQueue&lt;Runnable&gt; workQueue,</span><br><span class="line">					  ThreadFactory threadFactory,</span><br><span class="line">					  RejectedExecutionHandler handler)</span> </span>&#123;</span><br><span class="line"><span class="keyword">if</span> (corePoolSize &lt; <span class="number">0</span> ||</span><br><span class="line">	maximumPoolSize &lt;= <span class="number">0</span> ||</span><br><span class="line">	maximumPoolSize &lt; corePoolSize ||</span><br><span class="line">	keepAliveTime &lt; <span class="number">0</span>)</span><br><span class="line">	<span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException();</span><br><span class="line"><span class="keyword">if</span> (workQueue == <span class="keyword">null</span> || threadFactory == <span class="keyword">null</span> || handler == <span class="keyword">null</span>)</span><br><span class="line">	<span class="keyword">throw</span> <span class="keyword">new</span> NullPointerException();</span><br><span class="line"><span class="keyword">this</span>.corePoolSize = corePoolSize;</span><br><span class="line"><span class="keyword">this</span>.maximumPoolSize = maximumPoolSize;</span><br><span class="line"><span class="keyword">this</span>.workQueue = workQueue;</span><br><span class="line"><span class="keyword">this</span>.keepAliveTime = unit.toNanos(keepAliveTime);</span><br><span class="line"><span class="keyword">this</span>.threadFactory = threadFactory;</span><br><span class="line"><span class="keyword">this</span>.handler = handler;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看到最多可以配置7个参数，下边一一讲解：</p>
+<ol>
+<li>corePoolSize：池中保存的所有线程的个数，包括空闲线程，也叫核心线程数；</li>
+<li>maximumPoolSize：池中允许的最大线程个数；</li>
+<li>keepAliveTime：当现有线程个数大于corePoolSize时，此为终止多余的空余线程等待新任务的最长时间；</li>
+<li>unit：keepAliveTime参数的时间单位；</li>
+<li><p>workQueue：用于保存待执行的任务的阻塞队列（BlockingQueue<runnable>，（上边提到还要有一个集合用于存放线程，JDK并没有提供可设置的方法，默认使用HashSet）阻塞队列和普通队列的区别如下表，它多了一些可能会造成阻塞的操作，如取的时候队列是空的，存的时候队列是满的情况（内部使用的是ReentrantLock进行同步，所以可以选择使用公平锁，Condition作为信号量）：<table><tr><th width="8%">\</th><th width="20%">可能报异常</th><th>返回布尔值/null</th><th width="15%"><font color="red">可能阻塞</font></th><th><font color="red">可能阻塞指定时间</font></th></tr><tr><td>入队</td><td>add(e)</td><td>boolean offer(e)</td><td>put(e)</td><td>offer(e, timeout, unit)</td></tr><tr><td>出队</td><td>remove(e)</td><td>E poll()</td><td>take()</td><td>poll(timeout, unit)</td></tr><tr><td>查看</td><td>element()</td><td>E peek()</td><td>无</td><td>无</td></tr></table></runnable></p>
+<ul>
+<li>其中JDK提供了六种（前五个都extends AbstractQueue<e>  implements BlockingQueue<e>，第六个的泛型为Runnable）：<ol>
+<li>ArrayBlockingQueue<e>：一个基于数组结构的有界阻塞队列，大小不可动态扩展，遵循FIFO原则；内部实现有三个int变量，count用来判断满或空，putIndex用于指示下一个可以存放的位置，takeIndex用于指示下一个可以取的位置，所以写操作并没有造成复制移动。</e></li>
+<li>LinkedBlockingQueue<e>：一个基于链表结构的无界阻塞队列，默认大小是MAX_VALUE，如果构造时指定了大小，则大小是不可动态扩展的，遵循FIFO原则；内部实现有静态内部类Node<e>，空的头引用head（item==null），尾引用last，AtomicInteger count用来判断满或空。</e></e></li>
+<li>SynchronousQueue<e>：一个不存储元素的阻塞队列，进出队列的顺序取决于是否采用公平模式，之所以不存储元素，是因为它的每一个put操作，都要阻塞等待一个poll操作，反之亦然，所以该队列不存在peek、遍历等操作；内部实现复杂，没看懂，类注释说明是对“dual stack and dual queue”的扩展实现，LIFO stack适用于非公平模式，FIFO queue适用于公平模式。</e></li>
+<li>PriorityBlockingQueue<e>：一个基于平衡二叉堆(数组，n，2n+1，2n+2)的无界阻塞队列，进出队列的顺序取决于排序顺序，排序标准基于提供的Comparator或者元素的natural order，大小可以动态扩展，默认初始大小为11，最大限制为MAX_VALUE-8（避免某些VM OOM），存操作会对堆调整，取操作会取走堆顶元素（array[0]）；</e></li>
+<li>DelayQueue<e extends="" delayed="">：一个内部使用PriorityQueue<e>（基于平衡二叉堆(数组，n，2n+1，2n+2)）的无界阻塞队列，性质同上，其中Delayed是一个接口，内部只有一个方法long getDelay(TimeUnit unit)，该接口还继承了Comparable<delayed>接口。排序标准：队头是过期（即getDelay方法返回值小于等于0）时间最长的元素，即getDelay返回值最小的元素，如果没有过期的元素，也就没有队头，此时poll方法会返回null，take方法会阻塞，其他所有方法不检查是否过期，和普通队列一样。</delayed></e></e></li>
+<li>DelayedWorkQueue：一种特殊的DelayQueue（所以上述特性都适用），属于ScheduledThreadPoolExecutor的静态内部类，也是基于平衡二叉堆的无界阻塞队列（唯一的区别是，如果元素类型是ScheduledFutureTask的话，还会设置每个ScheduledFutureTask在堆中的heapIndex，提高其取消和删除的效率）。但其内部使用的数组类型不是泛型，而是写死的RunnableScheduledFuture，所以该队列的元素类型只能是RunnableScheduledFuture。但使用该队列时，必须声明为BlockingQueue<runnable>，解释如下：<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span><br><span class="line"> * Specialized delay queue. To mesh with TPE declarations, this</span><br><span class="line"> * class must be declared as a BlockingQueue&lt;Runnable&gt; even though</span><br><span class="line"> * it can only hold RunnableScheduledFutures.</span><br><span class="line"> */</span></span><br><span class="line"><span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">DelayedWorkQueue</span> <span class="keyword">extends</span> <span class="title">AbstractQueue</span>&lt;<span class="title">Runnable</span>&gt;</span><br><span class="line">	<span class="keyword">implements</span> <span class="title">BlockingQueue</span>&lt;<span class="title">Runnable</span>&gt; </span>&#123;</span><br><span class="line">	<span class="comment">/*class code*/</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</runnable></li>
+</ol>
+</e></e></li>
+</ul>
+</li>
+<li><p>threadFactory：创建新线程时使用的工厂，该接口只有一个方法：Thread newThread(Runnable r)；使用的默认工厂只是对Thread进行了命名，原封不动的包装了Runnable的run方法，可以通过自己的实现达到一些自定义的包装效果；</p>
+</li>
+<li><p>handler：当现有线程个数等于maximumPoolSize &amp;&amp; 队列已满的时候，对新提交的任务的处理策略，JDK提供了四种可选的策略，对应的实现其实很简单，可以通过实现RejectedExecutionHandler接口自定义处理策略，该接口只有一个方法：</p>
+ <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">rejectedExecution</span><span class="params">(Runnable r, ThreadPoolExecutor executor)</span></span>;</span><br></pre></td></tr></table></figure>
+<p> 下边详细看JDK实现的四种策略：</p>
+<ul>
+<li><p>AbortPolicy：直接抛出异常，方法体如下：</p>
+  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">rejectedExecution</span><span class="params">(Runnable r, ThreadPoolExecutor e)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">throw</span> <span class="keyword">new</span> RejectedExecutionException(<span class="string">"Task "</span> + r.toString() +</span><br><span class="line">										 <span class="string">" rejected from "</span> +</span><br><span class="line">										 e.toString());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>DiscardPolicy：没有任何处理，丢弃掉，方法体如下：</p>
+  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">rejectedExecution</span><span class="params">(Runnable r, ThreadPoolExecutor e)</span> </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>DiscardOldestPolicy：取出并丢弃掉队列头的任务，然后重新添加，方法体如下：</p>
+  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">rejectedExecution</span><span class="params">(Runnable r, ThreadPoolExecutor e)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (!e.isShutdown()) &#123;</span><br><span class="line">		e.getQueue().poll();</span><br><span class="line">		e.execute(r);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>CallerRunsPolicy：由提交该任务的线程直接执行该任务，方法体如下：</p>
+  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">rejectedExecution</span><span class="params">(Runnable r, ThreadPoolExecutor e)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (!e.isShutdown()) &#123;</span><br><span class="line">		r.run();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ol>
+<h3 id="线程池的处理流程"><a href="#线程池的处理流程" class="headerlink" title="线程池的处理流程"></a>线程池的处理流程</h3><p><img src="http://cevxd.img47.wal8.com/img47/542077_20160404152451/145975630954.png" alt="线程池的处理流程"><br>如上图所示，大体流程依次如下：</p>
+<ol>
+<li><strong>第一步</strong> 是 看线程池是否关闭 &amp;&amp; corePoolSize是否满了；</li>
+<li>corePoolSize满了以后，<strong>第二步</strong> 是看 线程池是否关闭 &amp;&amp; 队列是否满了（判断队列是否已满用的是上表中的offer(e)方法），此处对线程池的状态检查是double check，即添加到队列以后，会再次检查状态，如果此时线程池是关闭状态，则回滚刚才的添加动作。</li>
+<li>队列满了以后，<strong>第三步</strong>是看 线程池是否关闭 &amp;&amp; maximumPoolSize是否满了；</li>
+<li>maximumPoolSize满了以后，<strong>第四步</strong>，也是最后一步，再执行拒绝策略。<br><em>特别要注意判断队列已满和maximumPoolSize已满的先后顺序</em></li>
+</ol>
+<h3 id="JDK提供的四种常用的线程池"><a href="#JDK提供的四种常用的线程池" class="headerlink" title="JDK提供的四种常用的线程池"></a>JDK提供的四种常用的线程池</h3><p>提供这四种线程池的类是Executors，该类相当于一个工厂类，提供四种线程池和一些通用方法，现在的关注点是这四种线程池，前边已经提到它们都是通过ThreadPoolExecutor构造的，只是参数不同导致它们特性不同，下边通过源码进行讲解。</p>
+<ol>
+<li><p>FixedThreadPool：固定大小线程池</p>
+ <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> ExecutorService <span class="title">newFixedThreadPool</span><span class="params">(<span class="keyword">int</span> nThreads)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="keyword">new</span> ThreadPoolExecutor(nThreads, nThreads,</span><br><span class="line">								  <span class="number">0L</span>, TimeUnit.MILLISECONDS,</span><br><span class="line">								  <span class="keyword">new</span> LinkedBlockingQueue&lt;Runnable&gt;());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p> 可以看到，它的corePoolSize == maximumPoolSize，这有两点影响，1. 线程个数不会增长，即永远不会走上述流程中的第三步，当队列满了以后，直接执行拒绝策略；2. 不会存在大于corePoolSize的额外线程，所以线程池中的所有线程不会因为空闲时间太长而终止，当且仅当整个线程池ShutDown时才终止，所以第三、四个参数是无用的。同时也可以看到它使用的是无界阻塞队列，<strong>所以要么所有任务正常执行或等待执行，要么任务实在太多OOM造成系统崩溃，拒绝策略永远不会被执行</strong>。而且当有线程因为任务抛出异常而终止时，线程池会新建一个线程顶替它，不会出现线程泄露。</p>
+</li>
+<li><p>SingleThreadPool：单线程池</p>
+ <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> ExecutorService <span class="title">newSingleThreadExecutor</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="keyword">new</span> FinalizableDelegatedExecutorService</span><br><span class="line">		(<span class="keyword">new</span> ThreadPoolExecutor(<span class="number">1</span>, <span class="number">1</span>,</span><br><span class="line">								<span class="number">0L</span>, TimeUnit.MILLISECONDS,</span><br><span class="line">								<span class="keyword">new</span> LinkedBlockingQueue&lt;Runnable&gt;()));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p> 可以看到，它就是一个corePoolSize和maximumPoolSize都为1的FixedThreadPool。所以<strong>以上所说的性质也都适用于它。它可以保证任务的顺序执行</strong>。</p>
+</li>
+<li><p>CachedThreadPool：缓存线程池</p>
+ <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> ExecutorService <span class="title">newCachedThreadPool</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="keyword">new</span> ThreadPoolExecutor(<span class="number">0</span>, Integer.MAX_VALUE,</span><br><span class="line">								  <span class="number">60L</span>, TimeUnit.SECONDS,</span><br><span class="line">								  <span class="keyword">new</span> SynchronousQueue&lt;Runnable&gt;());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p> 可以看到，它的corePoolSize==0，maximumPoolSize==Integer.MAX_VALUE，队列使用的是SynchronousQueue，最长空闲时间是60s。所以它的性质如下：</p>
+<ul>
+<li>因为corePoolSize==0，所以当该线程池空闲足够长的时间时（单个线程最长空闲时间是60s），线程池中就没有存储任何线程了，没有任何消耗；</li>
+<li>因为corePoolSize==0，所以按照上述线程池的流程，每次到来新任务时，第一步，当前线程个数总是&lt;corePoolSize的，所以新任务总会走第二步，尝试加到队列里。而又因为它使用的队列是SynchronousQueue，以及添加到队列的操作使用的是offer(e)方法，此方法只有当前正好有线程等待取数据时才会返回true，所以此处它永远返回false，即相当于队列永远是满的，所以新任务总会走第三步，而又因为maximumPoolSize==Integer.MAX_VALUE，<strong>所以对于到来的新任务，总会新建线程去执行它。要么所有任务正常执行，要么任务实在太多OOM造成系统崩溃，拒绝策略永远不会被执行</strong>，这和FixedThreadPool是一样的，但两者如果造成OOM的话，原因是不同的，FixedThreadPool是因为队列所占空间，CachedThreadPool是因为线程所占空间。</li>
+</ul>
+</li>
+<li><p>ScheduledThreadPool：调度线程池</p>
+ <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> ScheduledExecutorService <span class="title">newScheduledThreadPool</span><span class="params">(<span class="keyword">int</span> corePoolSize)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="keyword">new</span> ScheduledThreadPoolExecutor(corePoolSize);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">ScheduledThreadPoolExecutor</span><span class="params">(<span class="keyword">int</span> corePoolSize)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">super</span>(corePoolSize, Integer.MAX_VALUE, <span class="number">0</span>, TimeUnit.NANOSECONDS,</span><br><span class="line">		  <span class="keyword">new</span> DelayedWorkQueue());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p> 该线程池和以上线程池大不相同，需要另开一篇专门讲解。但其特性是，可以让任务延迟指定的时间执行，也可以让任务在指定的间隔时间内重复执行。要使用这些特性，就必须使用其新增的ScheduledFutureTask方法，而如果使用execute方法的话，它会包装成delay=0的任务按照延迟任务来执行。</p>
+</li>
+</ol>
+<h2 id="JDK线程池实现原理"><a href="#JDK线程池实现原理" class="headerlink" title="JDK线程池实现原理"></a>JDK线程池实现原理</h2><p>线程池的整体流程我们上边已经说了，但其中的细节和关键点并没有提及，现在通过源码来看其具体是怎么实现的。</p>
+<ol>
+<li><p>其实上边说的整体流程，全部是在execute方法中控制的，源码如下，不再累述：</p>
+ <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">execute</span><span class="params">(Runnable command)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (command == <span class="keyword">null</span>)</span><br><span class="line">		<span class="keyword">throw</span> <span class="keyword">new</span> NullPointerException();</span><br><span class="line">	<span class="comment">/*</span><br><span class="line">	 * Proceed in 3 steps:</span><br><span class="line">	 *</span><br><span class="line">	 * 1. If fewer than corePoolSize threads are running, try to</span><br><span class="line">	 * start a new thread with the given command as its first</span><br><span class="line">	 * task.  The call to addWorker atomically checks runState and</span><br><span class="line">	 * workerCount, and so prevents false alarms that would add</span><br><span class="line">	 * threads when it shouldn't, by returning false.</span><br><span class="line">	 *</span><br><span class="line">	 * 2. If a task can be successfully queued, then we still need</span><br><span class="line">	 * to double-check whether we should have added a thread</span><br><span class="line">	 * (because existing ones died since last checking) or that</span><br><span class="line">	 * the pool shut down since entry into this method. So we</span><br><span class="line">	 * recheck state and if necessary roll back the enqueuing if</span><br><span class="line">	 * stopped, or start a new thread if there are none.</span><br><span class="line">	 *</span><br><span class="line">	 * 3. If we cannot queue task, then we try to add a new</span><br><span class="line">	 * thread.  If it fails, we know we are shut down or saturated</span><br><span class="line">	 * and so reject the task.</span><br><span class="line">	 */</span></span><br><span class="line">	<span class="keyword">int</span> c = ctl.get();</span><br><span class="line">	<span class="keyword">if</span> (workerCountOf(c) &lt; corePoolSize) &#123;</span><br><span class="line">		<span class="keyword">if</span> (addWorker(command, <span class="keyword">true</span>))</span><br><span class="line">			<span class="keyword">return</span>;</span><br><span class="line">		c = ctl.get();</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> (isRunning(c) &amp;&amp; workQueue.offer(command)) &#123;</span><br><span class="line">		<span class="keyword">int</span> recheck = ctl.get();</span><br><span class="line">		<span class="keyword">if</span> (! isRunning(recheck) &amp;&amp; remove(command))</span><br><span class="line">			reject(command);</span><br><span class="line">		<span class="keyword">else</span> <span class="keyword">if</span> (workerCountOf(recheck) == <span class="number">0</span>)</span><br><span class="line">			addWorker(<span class="keyword">null</span>, <span class="keyword">false</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span> <span class="keyword">if</span> (!addWorker(command, <span class="keyword">false</span>))</span><br><span class="line">		reject(command);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>要说明的是，线程池把其中的线程包装成一个Worker类，该类实现了Runnable接口，内部定义了两个重要的成员变量：</p>
+<ul>
+<li>一个Runnable firstTask成员变量用来保存要执行的任务，然后在自己的run方法中调用firstTask的run方法；</li>
+<li>成员变量Thread t，每个Worker就是在这个线程t中运行的，其中t是由构造函数中指定的线程工厂生产的。这个设计有点绕，因为我们一般写得Runnable都是在本类外new一个Thread来执行自己，但这个Worker是自己指定由哪个Thread来执行自己，控制权在自己手里，外界需要先从Worker这里获取到这个Thread，然后start。上图中的addWorker（command，true）方法就是构造一个Worker，然后添加到HashSet中，然后获取其成员变量Thread t，然后t.start()开始执行该任务（该方法略长，不上代码了，方法参数command就是要执行的任务Runnable类，第二个参数为true时，检查线程个数时上限以corePoolSize为准，否则以maximumPoolSize为准）。</li>
+</ul>
+</li>
+<li><p>那么问题来了，这个线程t执行完该任务以后，怎么避免终止而被复用呢？玄机就在Worker的run方法中，它不只是简单的调用了firstTask的run方法：</p>
+ <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	runWorker(<span class="keyword">this</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">final</span> <span class="keyword">void</span> <span class="title">runWorker</span><span class="params">(Worker w)</span> </span>&#123;</span><br><span class="line">	Thread wt = Thread.currentThread();</span><br><span class="line">	Runnable task = w.firstTask;</span><br><span class="line">	w.firstTask = <span class="keyword">null</span>;</span><br><span class="line">	w.unlock(); <span class="comment">// allow interrupts</span></span><br><span class="line">	<span class="keyword">boolean</span> completedAbruptly = <span class="keyword">true</span>;</span><br><span class="line">	<span class="keyword">try</span> &#123;</span><br><span class="line">		<span class="keyword">while</span> (task != <span class="keyword">null</span> || (task = getTask()) != <span class="keyword">null</span>) &#123;</span><br><span class="line">			w.lock();</span><br><span class="line">			<span class="comment">// If pool is stopping, ensure thread is interrupted;</span></span><br><span class="line">			<span class="comment">// if not, ensure thread is not interrupted.  This</span></span><br><span class="line">			<span class="comment">// requires a recheck in second case to deal with</span></span><br><span class="line">			<span class="comment">// shutdownNow race while clearing interrupt</span></span><br><span class="line">			<span class="keyword">if</span> ((runStateAtLeast(ctl.get(), STOP) ||</span><br><span class="line">				 (Thread.interrupted() &amp;&amp;</span><br><span class="line">				  runStateAtLeast(ctl.get(), STOP))) &amp;&amp;</span><br><span class="line">				!wt.isInterrupted())</span><br><span class="line">				wt.interrupt();</span><br><span class="line">			<span class="keyword">try</span> &#123;</span><br><span class="line">				beforeExecute(wt, task);</span><br><span class="line">				Throwable thrown = <span class="keyword">null</span>;</span><br><span class="line">				<span class="keyword">try</span> &#123;</span><br><span class="line">					task.run();</span><br><span class="line">				&#125; <span class="keyword">catch</span> (RuntimeException x) &#123;</span><br><span class="line">					thrown = x; <span class="keyword">throw</span> x;</span><br><span class="line">				&#125; <span class="keyword">catch</span> (Error x) &#123;</span><br><span class="line">					thrown = x; <span class="keyword">throw</span> x;</span><br><span class="line">				&#125; <span class="keyword">catch</span> (Throwable x) &#123;</span><br><span class="line">					thrown = x; <span class="keyword">throw</span> <span class="keyword">new</span> Error(x);</span><br><span class="line">				&#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">					afterExecute(task, thrown);</span><br><span class="line">				&#125;</span><br><span class="line">			&#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">				task = <span class="keyword">null</span>;</span><br><span class="line">				w.completedTasks++;</span><br><span class="line">				w.unlock();</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		completedAbruptly = <span class="keyword">false</span>;</span><br><span class="line">	&#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">		processWorkerExit(w, completedAbruptly);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p> 到这里可以清楚的看到，task的run方法是在一个while循环中被调用的，这个while循环就是达到复用的关键。循环条件中的getTask()就是从队列中取任务。至此才算真相大白，线程池中的每个线程，在执行完任务以后，都会循环去取队列中的任务接着执行，就是这样实现线程复用的。<br> 这里也可以注意到，除了调用task的run方法以外，还有一些额外的操作，在文章一开始提到的线程监控功能，就是在这里完成的，JDK提供了一些默认监控参数，我们也可以通过继承重写beforeExecute和afterExecute方法实现自定义的监控，比如执行时间等记录，以下是JDK提供的参数：</p>
+<ul>
+<li>taskCount：线程池需要执行的任务数量。</li>
+<li>completedTaskCount：线程池在运行过程中已完成的任务数量。小于或等于taskCount。</li>
+<li>largestPoolSize：线程池曾经创建过的最大线程数量。通过这个数据可以知道线程池是否满过。如等于线程池的最大大小，则表示线程池曾经满了。</li>
+<li>getPoolSize：线程池的线程数量。如果线程池不销毁的话，池里的线程不会自动销毁，所以这个大小只增不减。</li>
+<li>getActiveCount：获取活动的线程数。</li>
+</ul>
+</li>
+<li><p>如果你还记得前边Exexutors构造参数的话，你应该注意到我们还剩最后一个问题没有讲清楚，那就是当线程池中没有可执行的任务时，是怎么控制多余线程在Timeout时间后终止的？机智如你一定发现上图中，如果while循环条件失败，即对应没有可执行的任务，while循环之后还有一个finally语句块，玄机应该就在这个processWorkerExit方法吧：</p>
+ <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">processWorkerExit</span><span class="params">(Worker w, <span class="keyword">boolean</span> completedAbruptly)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (completedAbruptly) <span class="comment">// If abrupt, then workerCount wasn't adjusted</span></span><br><span class="line">		decrementWorkerCount();</span><br><span class="line"></span><br><span class="line">	<span class="keyword">final</span> ReentrantLock mainLock = <span class="keyword">this</span>.mainLock;</span><br><span class="line">	mainLock.lock();</span><br><span class="line">	<span class="keyword">try</span> &#123;</span><br><span class="line">		completedTaskCount += w.completedTasks;</span><br><span class="line">		workers.remove(w);</span><br><span class="line">	&#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">		mainLock.unlock();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	tryTerminate();</span><br><span class="line"></span><br><span class="line">	<span class="keyword">int</span> c = ctl.get();</span><br><span class="line">	<span class="keyword">if</span> (runStateLessThan(c, STOP)) &#123;</span><br><span class="line">		<span class="keyword">if</span> (!completedAbruptly) &#123;</span><br><span class="line">			<span class="keyword">int</span> min = allowCoreThreadTimeOut ? <span class="number">0</span> : corePoolSize;</span><br><span class="line">			<span class="keyword">if</span> (min == <span class="number">0</span> &amp;&amp; ! workQueue.isEmpty())</span><br><span class="line">				min = <span class="number">1</span>;</span><br><span class="line">			<span class="keyword">if</span> (workerCountOf(c) &gt;= min)</span><br><span class="line">				<span class="keyword">return</span>; <span class="comment">// replacement not needed</span></span><br><span class="line">		&#125;</span><br><span class="line">		addWorker(<span class="keyword">null</span>, <span class="keyword">false</span>);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p> 看完这个方法的源码我是有点意外的，和我预想的处理方式完全不一样，接下来一步步讲：</p>
+<ol>
+<li>通过参数completedAbruptly的注释我们可以知道它==true时表示用户任务是由于用户代码抛出异常而终止的（这和runWorker方法中对其赋值是对应的），该方法做的第一件事是判断任务结束的原因，如果是因为用户代码抛出异常，那此时执行该任务的线程已经因为异常而终止了，接着decrementWorkerCount()是通过CAS执行线程个数减1操作；</li>
+<li>该方法做的第二件事，加锁，把该Worker完成的任务个数，汇总到整个线程池完成的任务个数上（开个小岔，这么做难道不会造成监控参数completedTaskCount的准确性延迟吗？其实并不会，因为当我们通过get方法获取该参数时，会加锁遍历所有的Worker汇总已完成的任务个数），然后从工作线程集合HashSet中去除该Worker。是的！这里没有判断是否超时，直接删了，而且要注意，这里是通过HashSet的remove方法删的，并没有对线程个数进行修改！先别急，接着往下看；</li>
+<li>该方法做的第三件事，tryTerminate()，通过该方法的注释可以了解到，这是一个任何牵扯到线程个数减少或从队列中取任务的操作都要做的保险措施，不是重点，接着往下看；</li>
+<li>第四件事才是关于线程个数维护的，首先检查线程池状态，如果没有关闭，接下来的分支很有意思：a)如果用户任务是因为异常终止的，就直接通过addWorker添加一个没有任务的工作线程顶替因异常挂掉的线程；b)如果用户任务是正常运行结束的，就根据allowCoreThreadTimeOut设置最少线程个数，然后检查当前是否少于最少个数，不少的话方法就结束了，否则通过addWorker添加一个没有任务的工作线程。这里可以再回顾一下上边addWorker方法的源码，该方法新建包装了一个工作线程，然后start线程开始通过runWorker方法执行任务，但这里任务是空的，也就是runWorker方法里while循环直接结束了，然后又会回到这里，如果一直没有新任务到来的话，线程池就是这样，循环往复的创建线程，删除线程来维护线程个数的。<br>看到这，如果上边讲得你已经理解消化了，你可能还会有疑问：如果我们在线程池空闲时，在它删除一个线程之后，创建充数的线程之前，获取这个时刻的线程个数的话，会不会少于corePoolSize呢？答案是不会的！该方法唯一一处对线程个数有操作的是，当线程是异常终止时，对线程个数减1操作。其他所有情况，空闲时只是不断的创建和删除线程实体，但并没有修改线程个数。<br>这个方法看似分支很少，其实处理了很多种情况，可以通过下边的流程图梳理一下：<br><img src="http://cevxd.img47.wal8.com/img47/542077_20160404152451/145975826897.png" alt="processWorkerExit流程图"></li>
+</ol>
+</li>
+<li><p>看到这里的时候，你如果还记得我们一开始的问题，应该会反应过来，这个processWorkerExit方法只是单纯的控制线程个数，但并没有依据keepAliveTime指定的空闲时间来裁决线程的去留啊！！我一开始也是笃定时间判断控制是在这里的！如果不在这里，那究竟在哪里呢？直接查看都有哪些方法调用过keepAliveTime参数就知道了：<br><img src="http://cevxd.img47.wal8.com/img47/542077_20160404152451/145975832373.png" alt="keepAliveTime调用"><br>通过排除法我们可以确定，原来是在被我们忽视的getTask()方法里！！真是没想到啊！这个方法其他的源码我们可以不看，只用看一行我们就什么都明白了：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Runnable r = timed ?</span><br><span class="line">	workQueue.poll(keepAliveTime, TimeUnit.NANOSECONDS) :</span><br><span class="line">	workQueue.take();</span><br></pre></td></tr></table></figure>
+<p>原来是在从队列中取任务的时候做到时间控制的！一开始我们可能是想不到的，但看到这里，仔细一想，放在这里真是再合适不过了：当一个线程在取任务的时候，说明这个线程是空闲的，当它从队列中取任务超时而失败的时候，它就已经超过了空闲时间上限了，这时候的流程是：runWorker方法中的while循环条件失败，走进processWorkerExit方法做最后的线程个数控制，简直完美！</p>
+</li>
+<li>参考<ol>
+<li><a href="http://ifeve.com/java-threadpool/" target="_blank" rel="external">http://ifeve.com/java-threadpool/</a></li>
+<li><a href="http://blog.csdn.net/it_man/article/details/7193727" target="_blank" rel="external">http://blog.csdn.net/it_man/article/details/7193727</a></li>
+<li><a href="http://www.oschina.net/question/565065_86540" target="_blank" rel="external">http://www.oschina.net/question/565065_86540</a></li>
+<li><a href="https://www.ibm.com/developerworks/cn/java/j-jtp0730/" target="_blank" rel="external">https://www.ibm.com/developerworks/cn/java/j-jtp0730/</a></li>
+</ol>
+</li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/hello-world/" itemprop="url">
                   Hello World
                 </a>
@@ -358,7 +604,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">11</span>
+              <span class="site-state-item-count">12</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -375,7 +621,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">18</span>
+                <span class="site-state-item-count">21</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

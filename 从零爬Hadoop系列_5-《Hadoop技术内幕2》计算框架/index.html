@@ -76,7 +76,7 @@ AM：AM负责向RM申请">
 <meta property="og:image" content="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936512238.png">
 <meta property="og:image" content="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936512078.png">
 <meta property="og:image" content="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146979038031.png">
-<meta property="og:updated_time" content="2016-07-29T11:08:52.478Z">
+<meta property="og:updated_time" content="2016-07-29T11:15:27.228Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="从零爬Hadoop系列_5-《Hadoop技术内幕2》计算框架">
 <meta name="twitter:description" content="计算框架现在有很多计算框架，各有特点，各有应用场景，该篇主要介绍MR，简短介绍Tez、Storm、Spark。
@@ -494,10 +494,8 @@ AM：AM负责向RM申请">
 </li>
 </ul>
 </li>
-</ol>
-<p><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936512078.png" alt="InputFormat继承树"></p>
-<ol>
-<li>如上图所示，所有基于文件的基类都是FileInputFormat，由公共基类统一对各种输入文件进行切分，即第一个功能，然后由各个派生类自己提供机制进一步解析InputSplit，即第二个功能</li>
+<li><p>如下图所示，所有基于文件的基类都是FileInputFormat，由公共基类统一对各种输入文件进行切分，即第一个功能，然后由各个派生类自己提供机制进一步解析InputSplit，即第二个功能<br> <img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936512078.png" alt="InputFormat继承树"></p>
+</li>
 <li><p>举例说明：对于TextInputFormat，每一行内容即为value，该行在整个文件中的偏移量即为key，对应为Mapper中map()方法参数中的<code>key/value</code>，所以实现的map()方法，即可将value视为文件中的一行进行进一步数据处理</p>
 <h3 id="Mapper"><a href="#Mapper" class="headerlink" title="Mapper"></a>Mapper</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">map</span><span class="params">(in key, in value, in context：Mapper.Context)</span></span></span><br></pre></td></tr></table></figure>
 </li>
@@ -680,6 +678,10 @@ AM：AM负责向RM申请">
 
           <div class="post-nav-prev post-nav-item">
             
+              <a href="/从零爬Hadoop系列_6-Hadoop2OnWindows/" rel="prev" title="从零爬Hadoop系列_6-Hadoop2OnWindows">
+                从零爬Hadoop系列_6-Hadoop2OnWindows <i class="fa fa-chevron-right"></i>
+              </a>
+            
           </div>
         </div>
       
@@ -750,7 +752,7 @@ AM：AM负责向RM申请">
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">11</span>
+              <span class="site-state-item-count">12</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -767,7 +769,7 @@ AM：AM负责向RM申请">
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">18</span>
+                <span class="site-state-item-count">21</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
