@@ -76,7 +76,7 @@ AM：AM负责向RM申请">
 <meta property="og:image" content="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936512238.png">
 <meta property="og:image" content="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936512078.png">
 <meta property="og:image" content="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146979038031.png">
-<meta property="og:updated_time" content="2016-07-29T11:15:27.228Z">
+<meta property="og:updated_time" content="2016-09-20T02:59:05.445Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="从零爬Hadoop系列_5-《Hadoop技术内幕2》计算框架">
 <meta name="twitter:description" content="计算框架现在有很多计算框架，各有特点，各有应用场景，该篇主要介绍MR，简短介绍Tez、Storm、Spark。
@@ -254,7 +254,7 @@ AM：AM负责向RM申请">
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-07-24T19:54:48+08:00" content="2016-07-24">
+            <time itemprop="dateCreated" datetime="2016-07-24T00:00:00+08:00" content="2016-07-24">
               2016-07-24
             </time>
           </span>
@@ -400,7 +400,7 @@ AM：AM负责向RM申请">
 <ul>
 <li>步骤1：将MT的资源需求发送给RM</li>
 <li>步骤2：如果达到了RT的启动条件，则开始为RT申请资源</li>
-<li>步骤3：如果为某个Task申请到了资源，则取消其他重复资源的申请，由于在HDFS中，任何一份数据通常有三备份，而对于一个任务而言，考虑到reack和any级别的本地性，它可能对应7个资源请求：  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">1. &lt;20, &quot;node1&quot;, &quot;memory:1G&quot;, 1, true&gt;</span><br><span class="line">2. &lt;20, &quot;node2&quot;, &quot;memory:1G&quot;, 1, true&gt;</span><br><span class="line">3. &lt;20, &quot;node3&quot;, &quot;memory:1G&quot;, 1, true&gt;</span><br><span class="line">4. &lt;20, &quot;rack1&quot;, &quot;memory:1G&quot;, 1, true&gt;</span><br><span class="line">5. &lt;20, &quot;rack1&quot;, &quot;memory:1G&quot;, 1, true&gt;</span><br><span class="line">6. &lt;20, &quot;rack1&quot;, &quot;memory:1G&quot;, 1, true&gt;</span><br><span class="line">7. &lt;20, &quot;*&quot;, &quot;memory:1G&quot;, 1, true&gt;</span><br><span class="line">8. &lt;优先级，期望资源所在的host，资源量，Container数目，是否松弛本地性&gt;</span><br></pre></td></tr></table></figure>
+<li>步骤3：如果为某个Task申请到了资源，则取消其他重复资源的申请，由于在HDFS中，任何一份数据通常有三备份，而对于一个任务而言，考虑到reack和any级别的本地性，它可能对应7个资源请求：  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">1. &lt;20, &quot;node1&quot;, &quot;memory:1G&quot;, 1, true&gt;</div><div class="line">2. &lt;20, &quot;node2&quot;, &quot;memory:1G&quot;, 1, true&gt;</div><div class="line">3. &lt;20, &quot;node3&quot;, &quot;memory:1G&quot;, 1, true&gt;</div><div class="line">4. &lt;20, &quot;rack1&quot;, &quot;memory:1G&quot;, 1, true&gt;</div><div class="line">5. &lt;20, &quot;rack1&quot;, &quot;memory:1G&quot;, 1, true&gt;</div><div class="line">6. &lt;20, &quot;rack1&quot;, &quot;memory:1G&quot;, 1, true&gt;</div><div class="line">7. &lt;20, &quot;*&quot;, &quot;memory:1G&quot;, 1, true&gt;</div><div class="line">8. &lt;优先级，期望资源所在的host，资源量，Container数目，是否松弛本地性&gt;</div></pre></td></tr></table></figure>
 </li>
 </ul>
 </li>
@@ -449,7 +449,7 @@ AM：AM负责向RM申请">
 <ul>
 <li>作用：防止个别任务拖后腿，通过内部竞争竞速完成</li>
 <li><p>算法核心思想：  </p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">estimatedRunTime  = (currentTimestamp - taskAttemptStartTime) / progress</span><br><span class="line">estimatedEndTime1 = estimatedRunTime + taskAttemptStartTime</span><br><span class="line">estimatedEndTime2 = currentTimestamp + averageRunTime </span><br><span class="line">estimatedEndTime1  - estimatedEndTime2 差值越大，理论收益越大；</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">estimatedRunTime  = (currentTimestamp - taskAttemptStartTime) / progress</div><div class="line">estimatedEndTime1 = estimatedRunTime + taskAttemptStartTime</div><div class="line">estimatedEndTime2 = currentTimestamp + averageRunTime </div><div class="line">estimatedEndTime1  - estimatedEndTime2 差值越大，理论收益越大；</div></pre></td></tr></table></figure>
 </li>
 <li><p>为了避免浪费资源，启动备份任务之前还要检查一些条件：  </p>
 <ul>
@@ -487,24 +487,24 @@ AM：AM负责向RM申请">
 <li><p>两个功能：</p>
 <ul>
 <li><p>数据切分：按照某个策略将输入数据切分成若干个split，以便确定MT个数以及对应的split，对应的函数：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">List&lt;InputSplit&gt; <span class="title">getSplits</span><span class="params">(in context：JobContext)</span></span></span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="function">List&lt;InputSplit&gt; <span class="title">getSplits</span><span class="params">(in context：JobContext)</span></span></div></pre></td></tr></table></figure>
 </li>
 <li><p>为Mapper提供输入数据：给定某个split，将其解析成一个个key/value对，对应的函数：  </p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">RecordReader&lt;KEYIN,VALUEIN&gt;  <span class="title">createRecordReader</span><span class="params">(in split：InputSplit, in context：TaskAttemptContext)</span></span></span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="function">RecordReader&lt;KEYIN,VALUEIN&gt;  <span class="title">createRecordReader</span><span class="params">(in split：InputSplit, in context：TaskAttemptContext)</span></span></div></pre></td></tr></table></figure>
 </li>
 </ul>
 </li>
 <li><p>如下图所示，所有基于文件的基类都是FileInputFormat，由公共基类统一对各种输入文件进行切分，即第一个功能，然后由各个派生类自己提供机制进一步解析InputSplit，即第二个功能<br> <img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936512078.png" alt="InputFormat继承树"></p>
 </li>
 <li><p>举例说明：对于TextInputFormat，每一行内容即为value，该行在整个文件中的偏移量即为key，对应为Mapper中map()方法参数中的<code>key/value</code>，所以实现的map()方法，即可将value视为文件中的一行进行进一步数据处理</p>
-<h3 id="Mapper"><a href="#Mapper" class="headerlink" title="Mapper"></a>Mapper</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">map</span><span class="params">(in key, in value, in context：Mapper.Context)</span></span></span><br></pre></td></tr></table></figure>
+<h3 id="Mapper"><a href="#Mapper" class="headerlink" title="Mapper"></a>Mapper</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">map</span><span class="params">(in key, in value, in context：Mapper.Context)</span></span></div></pre></td></tr></table></figure>
 </li>
 <li><p>MR框架会通过InputFormat获取一个个key/value，然后交给map()方法处理；</p>
 </li>
 <li>对于TextInputFormat，map()方法处理的还是文件中的原始数据，主要工作是从输入数据提取目标数据，然后以key/value的形式输出到磁盘，等待reduce处理</li>
 </ol>
-<h3 id="Partitioner"><a href="#Partitioner" class="headerlink" title="Partitioner"></a>Partitioner</h3><p>作用是对map结果进行分片，以便将同一分片的数据交给同一个Reducer处理，直接影响Reduce阶段的负载均衡，对应的方法：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">getPartition</span><span class="params">(in key：KEY，in value：VALUE，in numPartitions：<span class="keyword">int</span>)</span></span></span><br></pre></td></tr></table></figure></p>
-<h3 id="Reducer："><a href="#Reducer：" class="headerlink" title="Reducer："></a>Reducer：</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">reduce</span><span class="params">(in key：KEYIN, in values：Iterable&lt;VALUEIN&gt;, in context：Reducer.Context)</span></span></span><br></pre></td></tr></table></figure>
+<h3 id="Partitioner"><a href="#Partitioner" class="headerlink" title="Partitioner"></a>Partitioner</h3><p>作用是对map结果进行分片，以便将同一分片的数据交给同一个Reducer处理，直接影响Reduce阶段的负载均衡，对应的方法：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">getPartition</span><span class="params">(in key：KEY，in value：VALUE，in numPartitions：<span class="keyword">int</span>)</span></span></div></pre></td></tr></table></figure></p>
+<h3 id="Reducer："><a href="#Reducer：" class="headerlink" title="Reducer："></a>Reducer：</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">reduce</span><span class="params">(in key：KEYIN, in values：Iterable&lt;VALUEIN&gt;, in context：Reducer.Context)</span></span></div></pre></td></tr></table></figure>
 <p>可以看到，reduce的输入，value是一个集合，即Map阶段产生的<code>K,V</code>对中，所有key相同的value集合，进行归约处理。</p>
 <h3 id="OutputFormat"><a href="#OutputFormat" class="headerlink" title="OutputFormat"></a>OutputFormat</h3><p>用于描述Reduce阶段输出数据的格式。</p>
 <h2 id="Task运行过程"><a href="#Task运行过程" class="headerlink" title="Task运行过程"></a>Task运行过程</h2><p>当我们需要编写一个简单的MR作业时，只需实现<code>map()</code>和<code>reduce()</code>两个函数即可，一旦将作业提交到集群上后，Hadoop内部会将这两个函数封装到Map Task和Reduce Task中，同时将它们调度到多个节点上并行执行，而任务执行过程中可能涉及的数据跨节点传输、记录按key分组等操作均由Task内部实现好了，用户无需关心。</p>
@@ -670,8 +670,8 @@ AM：AM负责向RM申请">
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/从零爬Hadoop系列_4-《Hadoop技术内幕2》NodeManager/" rel="next" title="从零爬Hadoop系列_4-《Hadoop技术内幕2》NodeManager">
-                <i class="fa fa-chevron-left"></i> 从零爬Hadoop系列_4-《Hadoop技术内幕2》NodeManager
+              <a href="/从零爬Hadoop系列_1-《Hadoop技术内幕2》基础篇/" rel="next" title="从零爬Hadoop系列_1-《Hadoop技术内幕2》基础篇">
+                <i class="fa fa-chevron-left"></i> 从零爬Hadoop系列_1-《Hadoop技术内幕2》基础篇
               </a>
             
           </div>

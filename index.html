@@ -57,15 +57,12 @@
 
 
 
-<meta name="description">
 <meta property="og:type" content="website">
 <meta property="og:title" content="栖静林">
 <meta property="og:url" content="http://ksni88.github.io/index.html">
 <meta property="og:site_name" content="栖静林">
-<meta property="og:description">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="栖静林">
-<meta name="twitter:description">
 
 
 
@@ -240,7 +237,7 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-07-31T15:29:36+08:00" content="2016-07-31">
+            <time itemprop="dateCreated" datetime="2016-07-31T00:00:00+08:00" content="2016-07-31">
               2016-07-31
             </time>
           </span>
@@ -298,7 +295,7 @@
             <h1 id="Hadoop2OnWindows"><a href="#Hadoop2OnWindows" class="headerlink" title="Hadoop2OnWindows"></a>Hadoop2OnWindows</h1><p>本文主要是讲如何在Windows系统下编译、安装部署单机模式的Hadoop。</p>
 <h2 id="下载Hadoop源码"><a href="#下载Hadoop源码" class="headerlink" title="下载Hadoop源码"></a>下载Hadoop源码</h2><p>当前比较流行的Hadoop源代码版本有两个：Apache Hadoop和Cloudera Distributed<br>Hadoop（简称 CDH） 。Apache Hadoop是由雅虎、Cloudera、Facebook等公司组成的Hadoop社区共同研发的， 它属于最原始的开源版本，在该版本基础上，很多公司进行了封装和优化，<br>推出了自己的开源版本，其中，最有名的一个是Cloudera公司发布的CDH版本。</p>
 <p>YARN属于Hadoop 2.0的一个分支，此处我使用的是<a href="http://hadoop.apache.org/" target="_blank" rel="external">Apache版本</a>的2.7.2。</p>
-<h2 id="环境说明"><a href="#环境说明" class="headerlink" title="环境说明"></a>环境说明</h2><p>为什么把环境说明放在第二步呢？因为所需环境在源码文件里有明确说明。把刚才下载的源码解压到合适的路径下，然后在源码根目录下有一个<strong>BUILDING.txt</strong>文件，该文件依次列出了<code>Unix</code>和<code>Windows</code>的所需环境。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">----------------------------------------------------------------------------------</span><br><span class="line"></span><br><span class="line">Building on Windows</span><br><span class="line"></span><br><span class="line">----------------------------------------------------------------------------------</span><br><span class="line">Requirements:</span><br><span class="line"></span><br><span class="line">* Windows System</span><br><span class="line">* JDK 1.7+</span><br><span class="line">* Maven 3.0 or later</span><br><span class="line">* Findbugs 1.3.9 (if running findbugs)</span><br><span class="line">* ProtocolBuffer 2.5.0</span><br><span class="line">* CMake 2.6 or newer</span><br><span class="line">* Windows SDK 7.1 or Visual Studio 2010 Professional</span><br><span class="line">* Windows SDK 8.1 (if building CPU rate control for the container executor)</span><br><span class="line">* zlib headers (if building native code bindings for zlib)</span><br><span class="line">* Internet connection for first build (to fetch all Maven and Hadoop dependencies)</span><br><span class="line">* Unix command-line tools from GnuWin32: sh, mkdir, rm, cp, tar, gzip. These</span><br><span class="line">  tools must be present on your PATH.</span><br></pre></td></tr></table></figure></p>
+<h2 id="环境说明"><a href="#环境说明" class="headerlink" title="环境说明"></a>环境说明</h2><p>为什么把环境说明放在第二步呢？因为所需环境在源码文件里有明确说明。把刚才下载的源码解压到合适的路径下，然后在源码根目录下有一个<strong>BUILDING.txt</strong>文件，该文件依次列出了<code>Unix</code>和<code>Windows</code>的所需环境。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">----------------------------------------------------------------------------------</div><div class="line"></div><div class="line">Building on Windows</div><div class="line"></div><div class="line">----------------------------------------------------------------------------------</div><div class="line">Requirements:</div><div class="line"></div><div class="line">* Windows System</div><div class="line">* JDK 1.7+</div><div class="line">* Maven 3.0 or later</div><div class="line">* Findbugs 1.3.9 (if running findbugs)</div><div class="line">* ProtocolBuffer 2.5.0</div><div class="line">* CMake 2.6 or newer</div><div class="line">* Windows SDK 7.1 or Visual Studio 2010 Professional</div><div class="line">* Windows SDK 8.1 (if building CPU rate control for the container executor)</div><div class="line">* zlib headers (if building native code bindings for zlib)</div><div class="line">* Internet connection for first build (to fetch all Maven and Hadoop dependencies)</div><div class="line">* Unix command-line tools from GnuWin32: sh, mkdir, rm, cp, tar, gzip. These</div><div class="line">  tools must be present on your PATH.</div></pre></td></tr></table></figure></p>
 <p>按照上边的说明(如果你下的版本和我不一样，就看你的BUILDING文件)，依次下载配置好环境变量，其中Protocol只是一个exe编译器，把路径配到PATH中即可，其他环境的安装配置不再详述(对于<code>if</code>的可选项，我都没配，按需选配)。</p>
 <h3 id="Windows-SDK安装错误"><a href="#Windows-SDK安装错误" class="headerlink" title="Windows SDK安装错误"></a>Windows SDK安装错误</h3><p>如果你和我一样，在安装Windows SDK 7.1时出现如下图的错误：<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146994994572.png" alt="image"><br>具体错误原因我也没查到，我的解决方法是：</p>
 <ol>
@@ -329,31 +326,31 @@
 <h2 id="源码学习环境"><a href="#源码学习环境" class="headerlink" title="源码学习环境"></a>源码学习环境</h2><p>等编译好后，就可以直接导入IDE了，我这里使用的是IDEA，直接导入即可，如果你使用的是Eclipse，还需要在编译完成后执行命令<code>mvn eclipse:eclipse -DskipTests</code>将其转为Eclipse项目。</p>
 <p>其中我在系列开篇时提到的Hadoop四大模块对应的项目依次如下：</p>
 <ol>
-<li>hadoop-common-project：Hadoop 基础库所在目录，该目录中包含了其他所有模块可<br>能会用到的基础库，包括RPC、Metrics、Counter等</li>
-<li>hadoop-mapreduce-project：MapReduce框架的实现，在MRv1中，MapReduce 由编程模<br>型（map/reduce）、调度系统（JobTracker 和 TaskTracker）和数据处理引擎（MapTask 和<br>ReduceTask）等模块组成，而此处的MapReduce则不同于MRv1中的实现，它的资<br>源调度功能由新增的YARN完成（编程模型和数据处理引擎不变），自身仅包含非<br>常简单的任务分配功能</li>
-<li>hadoop-hdfs-project：Hadoop分布式文件系统实现，不同于Hadoop 1.0中单 NameNode<br>实现，Hadoop 2.0支持多NameNode，同时解决了NameNode单点故障问题</li>
-<li>hadoop-yarn-project：Hadoop资源管理系统YARN实现。这是Hadoop 2.0 新引入的<br>分支，该系统能够统一管理系统中的资源，并按照一定的策略分配给各个应用程序</li>
+<li>hadoop-common-project：Hadoop 基础库所在目录，该目录中包含了其他所有模块可能会用到的基础库，包括RPC、Metrics、Counter等</li>
+<li>hadoop-mapreduce-project：MapReduce框架的实现，在MRv1中，MapReduce 由编程模型（map/reduce）、调度系统（JobTracker 和 TaskTracker）和数据处理引擎（MapTask和ReduceTask）等模块组成，而此处的MapReduce则不同于MRv1中的实现，它的资源调度功能由新增的YARN完成（编程模型和数据处理引擎不变），自身仅包含非常简单的任务分配功能</li>
+<li>hadoop-hdfs-project：Hadoop分布式文件系统实现，不同于Hadoop 1.0中单NameNode实现，Hadoop 2.0支持多NameNode，同时解决了NameNode单点故障问题</li>
+<li>hadoop-yarn-project：Hadoop资源管理系统YARN实现。这是Hadoop 2.0 新引入的分支，该系统能够统一管理系统中的资源，并按照一定的策略分配给各个应用程序</li>
 </ol>
 <p>这时我们就可以结合之前看书的理解，对着代码再梳理一下，加深理解。</p>
 <h2 id="Hadoop安装部署"><a href="#Hadoop安装部署" class="headerlink" title="Hadoop安装部署"></a>Hadoop安装部署</h2><p>如果刚才编译成功的话，我们可以在Hadoop源码根目录下的target文件中得到一个二进制的hadoop-2.7.2.tar.gz（机智如你可能会问，干嘛费这么大劲，直接去官网下载不得了？因为官网的是Unix的发行版，不能在Windows上直接部署安装）。</p>
 <p>解压这个二进制文件，我们将得到如下目录：</p>
 <ol>
-<li><code>bin</code>：Hadoop最基本的管理脚本和使用脚本所在目录，这些脚本是sbin 目录下管理<br>脚本的基础实现，用户可以直接使用这些脚本管理和使用Hadoop。</li>
-<li><code>etc</code>：Hadoop配置文件所在的目录，包括 core-site.xml、hdfs-site.xml、mapred-site.<br>xml等从Hadoop 1.0继承而来的配置文件和yarn-site.xml等Hadoop 2.0 新增的配置<br>文件</li>
-<li><code>include</code>：对外提供的编程库头文件（具体动态库和静态库在lib 目录中），这些头文<br>件均是用C++定义的，通常用于C++语言访问HDFS或者编写MapReduce程序</li>
-<li><code>lib</code>：该目录包含了Hadoop对外提供的编程动态库和静态库，与include 目录中的头<br>文件结合使用。</li>
-<li><code>libexec</code>：各个服务对应的Shell 配置文件所在目录，可用于配置日志输出目录、启<br>动参数（比如 JVM 参数）等基本信息</li>
-<li><code>sbin</code>：Hadoop管理脚本所在目录，主要包含HDFS和YARN中各类服务的启动/ 关<br>闭脚本</li>
+<li><code>bin</code>：Hadoop最基本的管理脚本和使用脚本所在目录，这些脚本是sbin目录下管理脚本的基础实现，用户可以直接使用这些脚本管理和使用Hadoop</li>
+<li><code>etc</code>：Hadoop配置文件所在的目录，包括 core-site.xml、hdfs-site.xml、mapred-site.xml等从Hadoop 1.0继承而来的配置文件和yarn-site.xml等Hadoop 2.0 新增的配置文件</li>
+<li><code>include</code>：对外提供的编程库头文件（具体动态库和静态库在lib 目录中），这些头文件均是用C++定义的，通常用于C++语言访问HDFS或者编写MapReduce程序</li>
+<li><code>lib</code>：该目录包含了Hadoop对外提供的编程动态库和静态库，与include 目录中的头文件结合使用</li>
+<li><code>libexec</code>：各个服务对应的Shell 配置文件所在目录，可用于配置日志输出目录、启动参数（比如 JVM 参数）等基本信息</li>
+<li><code>sbin</code>：Hadoop管理脚本所在目录，主要包含HDFS和YARN中各类服务的启动/ 关闭脚本</li>
 <li><code>share</code>：Hadoop各个模块编译后的JAR包所在目录</li>
 </ol>
 <p>对于我们呢，只会用到etc里边的配置文件和sbin里边的管理脚本。下边我们开始进行主题——Hadoop2OnWindows，单节点(伪分布式)集群安装部署。</p>
 <h3 id="1-配置文件"><a href="#1-配置文件" class="headerlink" title="1. 配置文件"></a>1. 配置文件</h3><p>这里所提的配置文件都在/etc/hadoop目录下。</p>
-<h4 id="slaves"><a href="#slaves" class="headerlink" title="slaves"></a>slaves</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">localhost</span><br></pre></td></tr></table></figure>
-<h4 id="hadoop-env-cmd"><a href="#hadoop-env-cmd" class="headerlink" title="hadoop-env.cmd"></a>hadoop-env.cmd</h4><p>注意把<code>HADOOP_PREFIX</code>的值换成自己的解压路径。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">set HADOOP_PREFIX=D:\Project\hadoop-2.7.2-src</span><br><span class="line">set HADOOP_CONF_DIR=%HADOOP_PREFIX%\etc\hadoop</span><br><span class="line">set YARN_CONF_DIR=%HADOOP_CONF_DIR%</span><br><span class="line">set PATH=%PATH%;%HADOOP_PREFIX%\bin</span><br></pre></td></tr></table></figure></p>
-<h4 id="core-site-xml"><a href="#core-site-xml" class="headerlink" title="core-site.xml"></a>core-site.xml</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">  &lt;property&gt;</span><br><span class="line">    &lt;name&gt;fs.default.name&lt;/name&gt;</span><br><span class="line">    &lt;value&gt;hdfs://0.0.0.0:19000&lt;/value&gt;</span><br><span class="line">  &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
-<h4 id="hdfs-site-xml"><a href="#hdfs-site-xml" class="headerlink" title="hdfs-site.xml"></a>hdfs-site.xml</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">  &lt;property&gt;</span><br><span class="line">    &lt;name&gt;dfs.replication&lt;/name&gt;</span><br><span class="line">    &lt;value&gt;1&lt;/value&gt;</span><br><span class="line">  &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
-<h4 id="mapred-site-xml"><a href="#mapred-site-xml" class="headerlink" title="mapred-site.xml"></a>mapred-site.xml</h4><p>先将文件<code>mapred-site.xml.template</code>重命名然后编辑。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">   &lt;property&gt;</span><br><span class="line">     &lt;name&gt;mapreduce.framework.name&lt;/name&gt;</span><br><span class="line">     &lt;value&gt;yarn&lt;/value&gt;</span><br><span class="line">   &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure></p>
-<h4 id="yarn-site-xml"><a href="#yarn-site-xml" class="headerlink" title="yarn-site.xml"></a>yarn-site.xml</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">  &lt;property&gt;</span><br><span class="line">    &lt;name&gt;yarn.nodemanager.aux-services&lt;/name&gt;</span><br><span class="line">    &lt;value&gt;mapreduce_shuffle&lt;/value&gt;</span><br><span class="line">  &lt;/property&gt;</span><br><span class="line"></span><br><span class="line">  &lt;property&gt;</span><br><span class="line">    &lt;name&gt;yarn.nodemanager.aux-services.mapreduce.shuffle.class&lt;/name&gt;</span><br><span class="line">    &lt;value&gt;org.apache.hadoop.mapred.ShuffleHandler&lt;/value&gt;</span><br><span class="line">  &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
+<h4 id="slaves"><a href="#slaves" class="headerlink" title="slaves"></a>slaves</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">localhost</div></pre></td></tr></table></figure>
+<h4 id="hadoop-env-cmd"><a href="#hadoop-env-cmd" class="headerlink" title="hadoop-env.cmd"></a>hadoop-env.cmd</h4><p>注意把<code>HADOOP_PREFIX</code>的值换成自己的解压路径。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">set HADOOP_PREFIX=D:\Project\hadoop-2.7.2-src</div><div class="line">set HADOOP_CONF_DIR=%HADOOP_PREFIX%\etc\hadoop</div><div class="line">set YARN_CONF_DIR=%HADOOP_CONF_DIR%</div><div class="line">set PATH=%PATH%;%HADOOP_PREFIX%\bin</div></pre></td></tr></table></figure></p>
+<h4 id="core-site-xml"><a href="#core-site-xml" class="headerlink" title="core-site.xml"></a>core-site.xml</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">&lt;configuration&gt;</div><div class="line">  &lt;property&gt;</div><div class="line">    &lt;name&gt;fs.default.name&lt;/name&gt;</div><div class="line">    &lt;value&gt;hdfs://0.0.0.0:19000&lt;/value&gt;</div><div class="line">  &lt;/property&gt;</div><div class="line">&lt;/configuration&gt;</div></pre></td></tr></table></figure>
+<h4 id="hdfs-site-xml"><a href="#hdfs-site-xml" class="headerlink" title="hdfs-site.xml"></a>hdfs-site.xml</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">&lt;configuration&gt;</div><div class="line">  &lt;property&gt;</div><div class="line">    &lt;name&gt;dfs.replication&lt;/name&gt;</div><div class="line">    &lt;value&gt;1&lt;/value&gt;</div><div class="line">  &lt;/property&gt;</div><div class="line">&lt;/configuration&gt;</div></pre></td></tr></table></figure>
+<h4 id="mapred-site-xml"><a href="#mapred-site-xml" class="headerlink" title="mapred-site.xml"></a>mapred-site.xml</h4><p>先将文件<code>mapred-site.xml.template</code>重命名然后编辑。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">&lt;configuration&gt;</div><div class="line">   &lt;property&gt;</div><div class="line">     &lt;name&gt;mapreduce.framework.name&lt;/name&gt;</div><div class="line">     &lt;value&gt;yarn&lt;/value&gt;</div><div class="line">   &lt;/property&gt;</div><div class="line">&lt;/configuration&gt;</div></pre></td></tr></table></figure></p>
+<h4 id="yarn-site-xml"><a href="#yarn-site-xml" class="headerlink" title="yarn-site.xml"></a>yarn-site.xml</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">&lt;configuration&gt;</div><div class="line">  &lt;property&gt;</div><div class="line">    &lt;name&gt;yarn.nodemanager.aux-services&lt;/name&gt;</div><div class="line">    &lt;value&gt;mapreduce_shuffle&lt;/value&gt;</div><div class="line">  &lt;/property&gt;</div><div class="line"></div><div class="line">  &lt;property&gt;</div><div class="line">    &lt;name&gt;yarn.nodemanager.aux-services.mapreduce.shuffle.class&lt;/name&gt;</div><div class="line">    &lt;value&gt;org.apache.hadoop.mapred.ShuffleHandler&lt;/value&gt;</div><div class="line">  &lt;/property&gt;</div><div class="line">&lt;/configuration&gt;</div></pre></td></tr></table></figure>
 <h3 id="2-环境变量"><a href="#2-环境变量" class="headerlink" title="2. 环境变量"></a>2. 环境变量</h3><p>执行脚本命令文件<code>%HADOOP_PREFIX%\etc\hadoop\hadoop-env.cmd</code>，使所需的环境变量生效。</p>
 <h3 id="3-格式化HDFS文件系统"><a href="#3-格式化HDFS文件系统" class="headerlink" title="3. 格式化HDFS文件系统"></a>3. 格式化HDFS文件系统</h3><p>对于第一次启动，首先要格式化HDFS的namenode，通过执行如下命令：<br><code>%HADOOP_PREFIX%\bin\hdfs namenode -format</code></p>
 <h3 id="4-启动Hadoop"><a href="#4-启动Hadoop" class="headerlink" title="4. 启动Hadoop"></a>4. 启动Hadoop</h3><p>这里有两种方法：</p>
@@ -362,7 +359,7 @@
 <li>第二种，执行这个脚本命令文件：<code>%HADOOP_PREFIX%\sbin\start-all.cmd</code></li>
 </ol>
 <p>其实两种方法本质是一样的，后者只不过是顺序调用前者。</p>
-<h3 id="5-验证"><a href="#5-验证" class="headerlink" title="5. 验证"></a>5. 验证</h3><p>启动以后，执行<code>jps</code>命令，如果看到如下4个进程，说明启动成功，否则查看启动日志查明原因。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ResourceManager</span><br><span class="line">NodeManager</span><br><span class="line">NameNode</span><br><span class="line">DataNode</span><br></pre></td></tr></table></figure></p>
+<h3 id="5-验证"><a href="#5-验证" class="headerlink" title="5. 验证"></a>5. 验证</h3><p>启动以后，执行<code>jps</code>命令，如果看到如下4个进程，说明启动成功，否则查看启动日志查明原因。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">ResourceManager</div><div class="line">NodeManager</div><div class="line">NameNode</div><div class="line">DataNode</div></pre></td></tr></table></figure></p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p>在Windows系统下编译安装Hadoop简直是一种折磨，步履维艰，这个过程中遇到各种错误，本文只是列出了我记载的几个，大致步骤主要是参考这个链接：<a href="https://wiki.apache.org/hadoop/Hadoop2OnWindows" target="_blank" rel="external">Hadoop2OnWindows</a></p>
 
           
@@ -427,7 +424,7 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-07-24T19:54:48+08:00" content="2016-07-24">
+            <time itemprop="dateCreated" datetime="2016-07-24T00:00:00+08:00" content="2016-07-24">
               2016-07-24
             </time>
           </span>
@@ -575,7 +572,7 @@
 <ul>
 <li>步骤1：将MT的资源需求发送给RM</li>
 <li>步骤2：如果达到了RT的启动条件，则开始为RT申请资源</li>
-<li>步骤3：如果为某个Task申请到了资源，则取消其他重复资源的申请，由于在HDFS中，任何一份数据通常有三备份，而对于一个任务而言，考虑到reack和any级别的本地性，它可能对应7个资源请求：  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">1. &lt;20, &quot;node1&quot;, &quot;memory:1G&quot;, 1, true&gt;</span><br><span class="line">2. &lt;20, &quot;node2&quot;, &quot;memory:1G&quot;, 1, true&gt;</span><br><span class="line">3. &lt;20, &quot;node3&quot;, &quot;memory:1G&quot;, 1, true&gt;</span><br><span class="line">4. &lt;20, &quot;rack1&quot;, &quot;memory:1G&quot;, 1, true&gt;</span><br><span class="line">5. &lt;20, &quot;rack1&quot;, &quot;memory:1G&quot;, 1, true&gt;</span><br><span class="line">6. &lt;20, &quot;rack1&quot;, &quot;memory:1G&quot;, 1, true&gt;</span><br><span class="line">7. &lt;20, &quot;*&quot;, &quot;memory:1G&quot;, 1, true&gt;</span><br><span class="line">8. &lt;优先级，期望资源所在的host，资源量，Container数目，是否松弛本地性&gt;</span><br></pre></td></tr></table></figure>
+<li>步骤3：如果为某个Task申请到了资源，则取消其他重复资源的申请，由于在HDFS中，任何一份数据通常有三备份，而对于一个任务而言，考虑到reack和any级别的本地性，它可能对应7个资源请求：  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">1. &lt;20, &quot;node1&quot;, &quot;memory:1G&quot;, 1, true&gt;</div><div class="line">2. &lt;20, &quot;node2&quot;, &quot;memory:1G&quot;, 1, true&gt;</div><div class="line">3. &lt;20, &quot;node3&quot;, &quot;memory:1G&quot;, 1, true&gt;</div><div class="line">4. &lt;20, &quot;rack1&quot;, &quot;memory:1G&quot;, 1, true&gt;</div><div class="line">5. &lt;20, &quot;rack1&quot;, &quot;memory:1G&quot;, 1, true&gt;</div><div class="line">6. &lt;20, &quot;rack1&quot;, &quot;memory:1G&quot;, 1, true&gt;</div><div class="line">7. &lt;20, &quot;*&quot;, &quot;memory:1G&quot;, 1, true&gt;</div><div class="line">8. &lt;优先级，期望资源所在的host，资源量，Container数目，是否松弛本地性&gt;</div></pre></td></tr></table></figure>
 </li>
 </ul>
 </li>
@@ -624,7 +621,7 @@
 <ul>
 <li>作用：防止个别任务拖后腿，通过内部竞争竞速完成</li>
 <li><p>算法核心思想：  </p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">estimatedRunTime  = (currentTimestamp - taskAttemptStartTime) / progress</span><br><span class="line">estimatedEndTime1 = estimatedRunTime + taskAttemptStartTime</span><br><span class="line">estimatedEndTime2 = currentTimestamp + averageRunTime </span><br><span class="line">estimatedEndTime1  - estimatedEndTime2 差值越大，理论收益越大；</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">estimatedRunTime  = (currentTimestamp - taskAttemptStartTime) / progress</div><div class="line">estimatedEndTime1 = estimatedRunTime + taskAttemptStartTime</div><div class="line">estimatedEndTime2 = currentTimestamp + averageRunTime </div><div class="line">estimatedEndTime1  - estimatedEndTime2 差值越大，理论收益越大；</div></pre></td></tr></table></figure>
 </li>
 <li><p>为了避免浪费资源，启动备份任务之前还要检查一些条件：  </p>
 <ul>
@@ -662,24 +659,24 @@
 <li><p>两个功能：</p>
 <ul>
 <li><p>数据切分：按照某个策略将输入数据切分成若干个split，以便确定MT个数以及对应的split，对应的函数：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">List&lt;InputSplit&gt; <span class="title">getSplits</span><span class="params">(in context：JobContext)</span></span></span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="function">List&lt;InputSplit&gt; <span class="title">getSplits</span><span class="params">(in context：JobContext)</span></span></div></pre></td></tr></table></figure>
 </li>
 <li><p>为Mapper提供输入数据：给定某个split，将其解析成一个个key/value对，对应的函数：  </p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">RecordReader&lt;KEYIN,VALUEIN&gt;  <span class="title">createRecordReader</span><span class="params">(in split：InputSplit, in context：TaskAttemptContext)</span></span></span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="function">RecordReader&lt;KEYIN,VALUEIN&gt;  <span class="title">createRecordReader</span><span class="params">(in split：InputSplit, in context：TaskAttemptContext)</span></span></div></pre></td></tr></table></figure>
 </li>
 </ul>
 </li>
 <li><p>如下图所示，所有基于文件的基类都是FileInputFormat，由公共基类统一对各种输入文件进行切分，即第一个功能，然后由各个派生类自己提供机制进一步解析InputSplit，即第二个功能<br> <img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936512078.png" alt="InputFormat继承树"></p>
 </li>
 <li><p>举例说明：对于TextInputFormat，每一行内容即为value，该行在整个文件中的偏移量即为key，对应为Mapper中map()方法参数中的<code>key/value</code>，所以实现的map()方法，即可将value视为文件中的一行进行进一步数据处理</p>
-<h3 id="Mapper"><a href="#Mapper" class="headerlink" title="Mapper"></a>Mapper</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">map</span><span class="params">(in key, in value, in context：Mapper.Context)</span></span></span><br></pre></td></tr></table></figure>
+<h3 id="Mapper"><a href="#Mapper" class="headerlink" title="Mapper"></a>Mapper</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">map</span><span class="params">(in key, in value, in context：Mapper.Context)</span></span></div></pre></td></tr></table></figure>
 </li>
 <li><p>MR框架会通过InputFormat获取一个个key/value，然后交给map()方法处理；</p>
 </li>
 <li>对于TextInputFormat，map()方法处理的还是文件中的原始数据，主要工作是从输入数据提取目标数据，然后以key/value的形式输出到磁盘，等待reduce处理</li>
 </ol>
-<h3 id="Partitioner"><a href="#Partitioner" class="headerlink" title="Partitioner"></a>Partitioner</h3><p>作用是对map结果进行分片，以便将同一分片的数据交给同一个Reducer处理，直接影响Reduce阶段的负载均衡，对应的方法：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">getPartition</span><span class="params">(in key：KEY，in value：VALUE，in numPartitions：<span class="keyword">int</span>)</span></span></span><br></pre></td></tr></table></figure></p>
-<h3 id="Reducer："><a href="#Reducer：" class="headerlink" title="Reducer："></a>Reducer：</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">reduce</span><span class="params">(in key：KEYIN, in values：Iterable&lt;VALUEIN&gt;, in context：Reducer.Context)</span></span></span><br></pre></td></tr></table></figure>
+<h3 id="Partitioner"><a href="#Partitioner" class="headerlink" title="Partitioner"></a>Partitioner</h3><p>作用是对map结果进行分片，以便将同一分片的数据交给同一个Reducer处理，直接影响Reduce阶段的负载均衡，对应的方法：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">getPartition</span><span class="params">(in key：KEY，in value：VALUE，in numPartitions：<span class="keyword">int</span>)</span></span></div></pre></td></tr></table></figure></p>
+<h3 id="Reducer："><a href="#Reducer：" class="headerlink" title="Reducer："></a>Reducer：</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">reduce</span><span class="params">(in key：KEYIN, in values：Iterable&lt;VALUEIN&gt;, in context：Reducer.Context)</span></span></div></pre></td></tr></table></figure>
 <p>可以看到，reduce的输入，value是一个集合，即Map阶段产生的<code>K,V</code>对中，所有key相同的value集合，进行归约处理。</p>
 <h3 id="OutputFormat"><a href="#OutputFormat" class="headerlink" title="OutputFormat"></a>OutputFormat</h3><p>用于描述Reduce阶段输出数据的格式。</p>
 <h2 id="Task运行过程"><a href="#Task运行过程" class="headerlink" title="Task运行过程"></a>Task运行过程</h2><p>当我们需要编写一个简单的MR作业时，只需实现<code>map()</code>和<code>reduce()</code>两个函数即可，一旦将作业提交到集群上后，Hadoop内部会将这两个函数封装到Map Task和Reduce Task中，同时将它们调度到多个节点上并行执行，而任务执行过程中可能涉及的数据跨节点传输、记录按key分组等操作均由Task内部实现好了，用户无需关心。</p>
@@ -859,8 +856,8 @@
             
               
                 
-                <a class="post-title-link" href="/从零爬Hadoop系列_4-《Hadoop技术内幕2》NodeManager/" itemprop="url">
-                  从零爬Hadoop系列_4-《Hadoop技术内幕2》NodeManager
+                <a class="post-title-link" href="/从零爬Hadoop系列_1-《Hadoop技术内幕2》基础篇/" itemprop="url">
+                  从零爬Hadoop系列_1-《Hadoop技术内幕2》基础篇
                 </a>
               
             
@@ -873,7 +870,7 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-07-24T19:33:27+08:00" content="2016-07-24">
+            <time itemprop="dateCreated" datetime="2016-07-24T00:00:00+08:00" content="2016-07-24">
               2016-07-24
             </time>
           </span>
@@ -903,8 +900,8 @@
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/从零爬Hadoop系列_4-《Hadoop技术内幕2》NodeManager/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="从零爬Hadoop系列_4-《Hadoop技术内幕2》NodeManager/" itemprop="commentsCount"></span>
+                <a href="/从零爬Hadoop系列_1-《Hadoop技术内幕2》基础篇/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="从零爬Hadoop系列_1-《Hadoop技术内幕2》基础篇/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -928,185 +925,125 @@
       
         
           
-            <h1 id="NM剖析"><a href="#NM剖析" class="headerlink" title="NM剖析"></a>NM剖析</h1><p>NM是YARN中单个节点上的代理，负责管理Hadoop集群中单个计算节点。和RM剖析一样，我们可以先从最开始的YARN的工作流程中观察，NM都需要和哪些组件进行交互，分别需要完成什么功能，则在NM内部，便会细分出来各个功能类别的模块，在每个模块内部，还可以继续按照功能细分，落实到各个组成的类或接口。</p>
-<h2 id="NM基本职能"><a href="#NM基本职能" class="headerlink" title="NM基本职能"></a>NM基本职能</h2><ol>
-<li>NM作为RPC的client端，周期性的主动向RM发起请求，这些请求包括向RM注册、汇报节点健康状况和节点上所有Container运行状态；并以请求应答的形式，领取RM下达的命令</li>
-<li>NM作为RPC的server端，接收并处理AM下达的命令，这些命令包括启动Container、杀死Container、获取Container执行状态等，并返回执行结果</li>
-<li>个人理解：其实以上两点都是NM作为整体对外负责的功能，而且并不是它最主要的功能，不要忘了，所有计算任务都是以Container的形式运行在NM上，所以NM最主要的功能是内部Container的管理，比如：  <ul>
-<li>既然要运行任务，就需要下载任务运行所需的资源，每个NM上有很多Container，需要考虑并行下载和文件管理问题</li>
-<li>资源下载完以后，还要监控各个Container的运行状态，进行日志记录</li>
-<li>Container运行完成以后，还要进行之前下载资源的清理</li>
+            <h1 id="基础篇"><a href="#基础篇" class="headerlink" title="基础篇"></a>基础篇</h1><h2 id="MRv1到YARN"><a href="#MRv1到YARN" class="headerlink" title="MRv1到YARN"></a>MRv1到YARN</h2><ol>
+<li>MRv1主要是以MR为主的计算框架，而MRv2主要是针对MRv1的缺陷改进而来的，以YARN为主的轻量级弹性计算平台；</li>
+<li>MRv1的缺陷：<ul>
+<li>扩展性差：JobTracker兼备资源管理和作业控制；</li>
+<li>可靠性差：master单点故障；</li>
+<li>资源利用率低：粗粒度的划分单位，任务之间不共享；</li>
+<li>无法支持多种计算框架：只有基于磁盘的离线计算框架MR，不能满足多种需求；</li>
+</ul>
+</li>
+<li>YARN的诞生背景：<ul>
+<li>基于数据密集型应用的计算框架层出不穷：<ul>
+<li>MR：离线处理；</li>
+<li>Storm：在线处理；</li>
+<li>Spark：迭代式处理；</li>
+<li>S4：流式处理；</li>
+</ul>
+</li>
+<li>各种框架各有所长，在同一个公司中，多种框架可能被同时采用，如网页建立索引用MR，自然语言处理/数据挖掘用Spark等，考虑到成本等，又希望把所有框架部署在一个共享集群中，而非各占一个独立集群，而且需要在对共享资源统一管理使用的同时，保证各个任务的隔离性，急需轻量级弹性计算平台。</li>
+</ul>
+</li>
+<li>共享集群的好处：<ul>
+<li>资源利用率高：多种框架共享资源，统一管理，不会出现分配不均或某些紧缺而某些空闲的问题；</li>
+<li>运维成本低：管理员成本和硬件成本；</li>
+<li>数据共享：减小数据移动带来的成本；</li>
+</ul>
+</li>
+<li>一个框架一个集群 到 多个框架共享集群：<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936452783.jpg" alt="共享集群"></li>
+</ol>
+<h2 id="YARN的组成结构和流程"><a href="#YARN的组成结构和流程" class="headerlink" title="YARN的组成结构和流程"></a>YARN的组成结构和流程</h2><ol>
+<li>YARN基本组成结构：<ul>
+<li>ResourceManager（RM）：全局资源管理器，负责资源管理和分配；<ul>
+<li>Schduler：纯调度器，只负责根据各个应用程序的资源需求进行资源分配；</li>
+<li>ApplicationManager（ASM）：负责管理整个系统中所有应用程序；</li>
+</ul>
+</li>
+<li>ApplicationMaster（AM）：用户提交的每个应用程序均包含一个AM，主要功能：<ul>
+<li>与Scheduler协商获取资源（Container）；</li>
+<li>将得到的任务进一步分配给内部的任务；</li>
+<li>与NM通信以启动/停止任务；</li>
+<li>监控所有任务运行状态，并在任务运行失败时重新为任务申请资源以重启任务；</li>
+</ul>
+</li>
+<li>NodeManager（NM）：每个节点上的资源和任务管理器，主要功能：<ul>
+<li>定时向RM汇报本节点上的资源使用情况和各个Container的运行状态；</li>
+<li>接受并处理来自AM的Container启动/停止等请求；</li>
+</ul>
+</li>
+<li>Container：资源抽象，封装某个节点上的多维度资源，如内存、CPU、磁盘等</li>
+</ul>
+</li>
+<li>YARN工作流程：<ul>
+<li>步骤1：用户向YARN提交应用程序，其中包括AM程序、启动AM的命令、用户程序等；</li>
+<li>步骤2：RM为该应用程序分配第一个Container，并与对应的NM通信，要求它在这个Container中启动该AM；</li>
+<li>步骤3：AM首先向RM注册，这样用户可以通过RM查看应用程序的运行状态，然后它将为各个任务申请资源，并监控它们的运行状态，直到运行结束，即重复步骤4~7；</li>
+<li>步骤4：AM采用轮询的方式，通过RPC协议向RM申请和领取资源；</li>
+<li>步骤5：一旦AM申请到资源后，便与对应的NM通信，要求它启动任务；</li>
+<li>步骤6：NM为任务设置好运行环境后，将任务启动命令写到一个脚本中，通过运行该脚本启动任务；</li>
+<li>步骤7：各个任务通过某个RPC协议向AM汇报自己的状态和进度，以便AM随时掌握各个任务的运行状态，从而可以在任务失败时重启任务；</li>
+<li>步骤9：应用程序运行完成后，AM向RM注销并关闭自己；</li>
+<li>如下图：<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936452735.png" alt="YARN工作流程"></li>
+</ul>
+</li>
+<li>YARN的理解角度：<ul>
+<li>多线程并行编程：<ul>
+<li>YARN：云操作系统，为应用程序启动AM；</li>
+<li>AM：主线程，负责应用程序内部的数据切分、任务分配等，并启动各个Task；</li>
+<li>Task：子线程，仅负责自己的计算任务，完成即结束退出；</li>
+<li>当所有子线程（Task）结束以后，主线程（AM）结束退出；</li>
+</ul>
+</li>
+<li>资源管理器；</li>
+<li>云计算：YARN可以看做PAAS层，为不同类型的应用程序提供统一的管理和调度；</li>
 </ul>
 </li>
 </ol>
-<h2 id="NM内部架构"><a href="#NM内部架构" class="headerlink" title="NM内部架构"></a>NM内部架构</h2><p>通过对YARN工作流程和NM职能的分析，可以猜测NM至少包含一下模块：</p>
-<ol>
-<li>AM管理模块：每个NM上可以运行多个AM，需要有对应的管理模块负责信息归总和管理</li>
-<li>Container管理模块：每个NM上可以运行多个Container，且可以属于不同的AM，需要有对应的管理模块负责信息归总和管理  </li>
+<h2 id="YARN基础库"><a href="#YARN基础库" class="headerlink" title="YARN基础库"></a>YARN基础库</h2><h3 id="RPC"><a href="#RPC" class="headerlink" title="RPC"></a>RPC</h3><ol>
+<li>Hadoop RPC（集群各组件之间的通信方式）总体架构：<ul>
+<li>序列化层：结构化对象转为字节流便于网络传输或持久存储，主要用于请求中的参数和应答跨机器传输；</li>
+<li>函数调用层：定位要调用的函数并执行该函数，Hadoop RPC采用Java反射机制和动态代理实现；</li>
+<li>网络传输层：描述了Client和Server之间消息传输的方式，Hadoop RPC采用基于TCP/IP的Socket机制；</li>
+<li>服务器端处理框架：描述了Client和Server之间信息交互的方式，直接决定服务器端的并发处理能力，Hadoop RPC采用基于Reactor设计模式的事件驱动I/O模型；</li>
+</ul>
+</li>
+<li>YARN RPC：可以集成多种RPC框架，如Protocol Buflers、Thrift、Avro等；</li>
+<li>对RPC的理解和实现，可以通过查看具体的例子进行理解，比如NM的心跳函数；</li>
 </ol>
-<p>同时和RM一样，NM内部各个组件也是基于事件驱动的，NM内部架构组成如下：  </p>
-<ol>
-<li>NodeStatusUpdater：是NM和RM通信的唯一通道，对应职能1</li>
-<li>ContainerManager：是NM中最核心组件之一，有一下组件：  <ul>
-<li>RPC Servier：是AM和NM通信的唯一通道，对应职能2</li>
-<li>ResourceLocalizationService：负责Container运行所需资源的本地化，即从HDFS上下载，同时尽量分摊到各个磁盘上，避免访问热点，同时添加访问权限</li>
-<li>ContainersLauncher：维护了一个线程池并行完成Container相关的操作，比如启动或杀死Container，其中启动的命令来自AM，杀死的命令来自AM或RM（资源抢占时）</li>
-<li>AuxServices：NM允许用户以附属服务的方式扩展自己的功能</li>
-<li>ContainerMonitor：负责监控Container的资源使用量，防止超过RM分配的量，在YARN中，只有内存是通过它监控的</li>
-<li>LogHandler：可插拔式组件，用户通过它控制Container日志保存方式：写到本地磁盘或上传到一个文件系统中</li>
-<li>ContainerEventDispatcher：Container事件调度器，负责将ContainerEvent类型的事件调度给对应的Container的状态机ContainerImpl</li>
-<li>ApplicationEventDispatcher：Application事件调度器，负责将ApplicationEvent类型的事件调度给对应的Application的状态机ApplicationImpl</li>
+<h3 id="服务库（使得YARN低耦合、高内聚、设计简单、易维护）"><a href="#服务库（使得YARN低耦合、高内聚、设计简单、易维护）" class="headerlink" title="服务库（使得YARN低耦合、高内聚、设计简单、易维护）"></a>服务库（使得YARN低耦合、高内聚、设计简单、易维护）</h3><ol>
+<li>对于生命周期较长的对象，YARN采用了基于服务的对象管理模型对其进行管理，几个特点：<ul>
+<li>每个被服务化的对象分为4个状态：NOTINITED、INITED、STARTED、STOPPED；</li>
+<li>任何服务状态变化都可以触发另外一些动作；</li>
+<li>可以通过组合的方式对任意服务进行组合，以便统一管理；</li>
 </ul>
 </li>
-<li>NodeHealthCheckerService：周期性运行自定义脚本和向磁盘写文件，以检查节点健康状况，然后通过NodeStatusUpdater汇报给RM，若发现不健康RM会将其加入黑名单，不再分配，直到其转为健康状态</li>
-<li>DeletionService：负责删除Container运行完成后遗留的无用的资源文件或临时输出文件，为了避免同步删除文件带来的开销，NM将删除文件功能服务化，进行异步删除</li>
-<li>Security：安全模块，主要两部分：  <ul>
-<li>ApplicationACLsManager：确保访问NM的用户的合法性，比如Web UI访问，该组件为每个应用程序维护了一个ACL列表</li>
-<li>ContainerTokenSecretManager：检查收到的各种访问请求的合法性，确保这些请求操作已被RM授权</li>
-</ul>
-</li>
-<li>WebServer：通过Web界面展示该节点上所有应用程序运行状态、健康状况、日志等信息<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936491468.png" alt="NM内部架构图"></li>
+<li>在YARN中，RM和NM属于组合服务，它们内部包含多个单一服务和组合服务，以实现对内部多种服务的统一管理；</li>
 </ol>
-<h2 id="健康节点状况监测"><a href="#健康节点状况监测" class="headerlink" title="健康节点状况监测"></a>健康节点状况监测</h2><ol>
-<li>自定义Shell脚本：  <ul>
-<li>NodeHealthScriptRunner服务周期性的执行监测脚本并检查其输出，如果标准输出打印出以字符串“ERROR”开头的语句，则认为节点不健康，通过心跳告诉RM</li>
-<li>自定义脚本的好处：  <ul>
-<li>可作为节点负载的反馈：因为当前YARN只对CPU和内存资源进行分配和隔离，所以用户可以通过自定义脚本检查网络、磁盘、文件系统等运行状况缓解这个问题</li>
-<li>认为暂时维护NM：可以通过脚本输出ERROR停止NM接受新任务比便进行维护</li>
+<h3 id="事件库（使得YARN低耦合、高内聚、设计简单、易维护）"><a href="#事件库（使得YARN低耦合、高内聚、设计简单、易维护）" class="headerlink" title="事件库（使得YARN低耦合、高内聚、设计简单、易维护）"></a>事件库（使得YARN低耦合、高内聚、设计简单、易维护）</h3><ol>
+<li>为了构建基于事件驱动的并发模型，YARN将各种处理逻辑抽象成事件和对应的事件调度器，并把每类事件的处理过程分割成多个步骤，用有限状态机表示；</li>
+<li>处理过程：<ul>
+<li>处理请求作为事件进入系统；</li>
+<li>由中央异步调度器负责传递给对应的事件调度器；</li>
+<li>事件调度器有两种处理：<ul>
+<li>可能将该事件转发给另外一个事件调度器；</li>
+<li>也可能交给一个带有有限状态机的事件处理器，其处理结果也以事件的形式输出给中央异步调度器；</li>
 </ul>
 </li>
+<li>新的事件会再次被中央异步调度器转发给下一个事件调度器，直至处理完成（到达终止条件）。</li>
 </ul>
 </li>
-<li>检测磁盘损坏数目：  <ul>
-<li>另外一种健康检测机制，默认开启，即与脚本检测同时进行，双重检查</li>
-<li>检测方法：如果一个目录具有rwx权限，则认为它是正常的，否则加入坏磁盘列表，当比例过低时，便认为NM不健康，通过心跳告诉RM</li>
-</ul>
-</li>
+<li>在YARN中，所有核心服务实际上都是一个中央异步调度器，包括RM、NM、AM等，它们维护了事先注册的事件和事件处理器，并根据接收的事件类型驱动服务的运行；</li>
 </ol>
-<h2 id="分布式缓存机制"><a href="#分布式缓存机制" class="headerlink" title="分布式缓存机制"></a>分布式缓存机制</h2><ol>
-<li>主要作用：将用户应用程序执行时需要的外部文件资源自动透明地下载并缓存到各个节点上，省去用户手动部署。同时NM并不是一下子把所有资源下载下来，而是根据启动的Container按需下载，而且采用一定的缓存置换算法定期清理失效文件（默认10分钟）</li>
-<li>工作流程：  <ul>
-<li>步骤1：客户端将应用程序所需的文件资源提交到HDFS上</li>
-<li>步骤2：客户端将应用程序提交到RM上</li>
-<li>步骤3：RM与某个NM通信，让NM启动对应的AM，NM收到命令后，首先从HDFS下载文件（缓存），然后再启动AM</li>
-<li>步骤4：AM与RM通信，以请求和获取Container</li>
-<li>步骤5：AM收到新分配的Container后，与对应的NM通信，启动任务</li>
-<li>步骤6：如果该应用程序第一次在该节点上启动任务，NM首先从HDFS上下载文件缓存到本地，然后启动任务</li>
-<li>步骤7：NM后续收到启动任务请求后，如果有缓存，则直接启动，否则先等缓存成功再启动</li>
+<h3 id="状态机库（使得YARN设计架构更清晰）"><a href="#状态机库（使得YARN设计架构更清晰）" class="headerlink" title="状态机库（使得YARN设计架构更清晰）"></a>状态机库（使得YARN设计架构更清晰）</h3><ol>
+<li>如上所述，在YARN中，事件的处理过程被分割成多个步骤，用有限状态机表示，换言之，有限状态机维护着有状态对象的生命周期；</li>
+<li>在YARN中，每种状态转换由一个四元组表示，分别是转换前状态preState、转换后状态postState、事件event和回调函数hook，表示状态机在preState状态下，接收到事件event后，执行回调函数hook，并在执行完成后将状态转换为postState。</li>
+<li>YARN定义了三种状态转换方式：<ul>
+<li>一个初态、一个终态、一种事件；</li>
+<li>一个初态、多个终态、一种事件，终态由hook返回值确定；</li>
+<li>一个初态、一个终态、多种事件；</li>
 </ul>
 </li>
-<li>资源可见性（三种）：  <ul>
-<li>PUBLIC：节点上所有用户共享，即只要存在，其他用户不用再下载</li>
-<li>PRIVATE：节点上同一用户的所有应用程序共享</li>
-<li>APPLICATION：节点上同一应用程序的所有Container共享</li>
-</ul>
-</li>
-<li>资源分类（三类）：  <ul>
-<li>ARCHIVE：归档文件，当前支持.jar、.zip、.tar.gz、.tgz、和.tar5种，NM可以自动解压缩</li>
-<li>FILE：普通文件，NM只下载，没有额外处理</li>
-<li>PATTERN：以上两种类型的混合体，用户需要通过正则表达式指定哪些属于ARCHIVE需要自动解压</li>
-</ul>
-</li>
-<li>YARN分布式缓存的实现<ul>
-<li>三种可见性资源分别放置在不同的目录下，通过目录权限实现不同的可见性</li>
-<li>PUBLIC资源下载：由公共服务ResourceLocalizationService中的一个公用线程PublicLocalizer下载，它内部维护了个线程池并行下载</li>
-<li>PRIVATE和APPLICATION：由公共服务ResourceLocalizationService中的一个专门线程下载：一个Container对应一个LocalizerRunner线程</li>
-</ul>
-</li>
-</ol>
-<h2 id="目录结构管理"><a href="#目录结构管理" class="headerlink" title="目录结构管理"></a>目录结构管理</h2><ol>
-<li>由于同一个NM上不同的Container往往并行向本地磁盘写数据，为了避免占用大量IO资源造成相互干扰，尽量提高写数据的可靠性和并发写性能，YARN允许NM配置多个挂在不同磁盘的目录作为中间结果存放目录，对于任意一个应用程序，YARN会在每个磁盘中创建相同的目录结构，然后采用轮询策略使用这些目录<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936491521.png" alt="NM目录结构"></li>
-<li>目录分类：  <ul>
-<li>数据目录：存放Container运行所需和中间数据</li>
-<li>日志目录：运行时输出的日志</li>
-</ul>
-</li>
-<li>日志清理机制：  <ul>
-<li>定期删除（默认）：默认3小时，超时删除</li>
-<li>日志聚集转存：把日志上传到HDFS上，上传后删除，可以指定三种可以转存的类型（顾名思义）：  <ul>
-<li>ALL_CONTAINER</li>
-<li>APPLICATION_MASTER_ONLY</li>
-<li>AM_AND_FAILED_CONTAINER_ONLY</li>
-</ul>
-</li>
-</ul>
-</li>
-</ol>
-<h2 id="状态机管理"><a href="#状态机管理" class="headerlink" title="状态机管理"></a>状态机管理</h2><ol>
-<li>三类状态机：  <ul>
-<li>Application状态机：维护的信息是RM端维护的子集，方便对一个节点上同一个应用程序的所有Container进行统一管理</li>
-<li>Container状态机：维护一个Container的生命周期，三个阶段：  <ul>
-<li>资源本地化</li>
-<li>Container启动</li>
-<li>资源清理（资源本地化逆过程，这里的资源指临时文件，而非硬件资源）：  <ul>
-<li>这一步的清理，只是Container的临时数据，如Tokens文件和Shell运行脚本等</li>
-<li>因为各个Container之间可能有依赖关系，所以NM规定只有在一个应用程序的所有Container全部结束以后，由RM发送广播，NM才能清理程序所占的所有资源和中间数据</li>
-</ul>
-</li>
-<li>可以翻书了解详细的过程，进一步理解基于事件驱动的应用</li>
-</ul>
-</li>
-<li>LocalizedResource状态机：维护一种资源的生命周期，从初始化、到下载中、到下载完成/下载失败</li>
-</ul>
-</li>
-<li>个人理解：三类状态机的关系：从大流程上来看，基本可以认为是以下关系：  <ul>
-<li>NM启动一个AM，创建对应的Application状态机</li>
-<li>Application状态机在收到AM发送的启动Container请求后，会创建对应的Container状态机（一个或多个）</li>
-<li>Container运行之前，需要先下载缺少的资源，即会创建对应的LocalizedResource状态机（一个或多个）进行资源下载，并等待所有资源下载完，然后进入运行状态</li>
-</ul>
-</li>
-</ol>
-<h2 id="资源隔离"><a href="#资源隔离" class="headerlink" title="资源隔离"></a>资源隔离</h2><ol>
-<li>内存资源隔离：基于线程监控：  <ul>
-<li>由服务ContainersMonitorImpl实现，它保存了每个Container进程pid，内部的MonitoringThread每隔一段时间（默认3000ms）扫描所有正在运行的Container进程树</li>
-<li>步骤：  <ul>
-<li>读取/proc/<pid>/stat文件构造进程树</pid></li>
-<li>判断单个任务内存使用量是否超过最大值内存量</li>
-</ul>
-</li>
-<li>由于JVM创建一个子进程时，采用了“fork()+exec()”模型，意味着进程创建之后、执行之前会复制一份父进程内存空间，进而使得进程数在某一小段时间内存使用量翻倍，为了防止误杀，Hadoop赋予每个进程“年龄”属性，并规定刚启动的进程年龄为1，MonitoringThread线程每更新一次，各个进程年龄加1，则内存超量使用而被杀死的判断标准为：  <ul>
-<li>如果一个Container对应的进程树中所有进程（年龄大于0）总内存超过用户设定最大值的两倍</li>
-<li>或者所有年龄大于1的进程总内存量超过用户设定的最大值</li>
-<li>只要满足其一，则向对应的Container发送ContainerEventType.CKILL_CONTAINER事件将其杀死</li>
-</ul>
-</li>
-<li>个人理解：内存隔离并不是真正的物理上的隔离，其他内存还是可见的，只是简单的一个线程监控使用量而已，所以需要用户在设定内存最大值时有良好的预估和分配</li>
-</ul>
-</li>
-<li>CPU资源隔离：使用Cgroups（Control  groups）<ul>
-<li>Cgroups是Linux内核提供的一种可以限制、记录、隔离进程组所使用的物理资源的机制，YARN通过使用其子系统CPU实现CPU资源隔离，该子系统使用调度程序控制任务对CPU的访问</li>
-<li>Cgroups相比于虚拟机，是一种轻量级资源隔离方案</li>
-<li>Cgroups只能保证应用程序的CPU使用下限，但不能限制上限。举例说明，某个节点上有10个虚拟CPU：  <ul>
-<li>若该节点上只有一个应用程序A，且设定的CPU需求为4，则A最多能够使用全部CPU</li>
-<li>若该节点上有两个应用程序A和B，且CPU需求都为4，则A和B都最多能够使用全部CPU，最少使用一半</li>
-<li>若该节点上有三个应用程序A、B、C，CPU需求依次为4、4、2，则它们最多均可以使用全部CPU，最少可使用CPU资源比例依次为：4/(4+4+2)<em>10=40%、4/(4+4+2)</em>10=40%、2/(4+4+2)*10=20%</li>
-</ul>
-</li>
-<li>NM默认没有启用任何CPU资源隔离机制</li>
-<li>个人理解：CPU隔离也不是真正的物理上的隔离，而且按照上边的说明，基本可以说没有隔离，只能保证下限而已，同样需要用户对资源的使用量有良好的分配和设定</li>
-</ul>
-</li>
-<li>所以总的来讲，所谓的资源隔离是比较虚的，不能顾名思义</li>
-</ol>
-<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><ol>
-<li>对NM的理解：作为资源管理系统YARN的一个重要服务，NM管理的是Container，而不是任务，一个Container中可能运行着各种任务，但是对NM而言是透明的，它只负责Container相关的操作，比如管理Container的生命周期等。这也是YARN能够作为一个通用的资源管理平台的重要原因，它不管具体的任务类型或内容，只要按它规定的规范进行封装就可以提交运行</li>
-<li>对Container的理解：Container从头到尾都只是一个逻辑抽象概念,RM把资源抽象为Container发送给AM，AM再发给NM，NM则会在Container描述的运行环境中启动任务，其实就是启动一个进程，然后在该进程下跑任务和各个状态机</li>
-</ol>
-<h2 id="思考问题"><a href="#思考问题" class="headerlink" title="思考问题"></a>思考问题</h2><ol>
-<li>第一天的疑问1：怎么保证AM没有撒谎？比如AM并没有向RM申请资源，绕过RM直接通知NM启动任务？<ul>
-<li>就是由Secret模块下的ContainerTokenSecretManager通过Token检查保证的</li>
-</ul>
-</li>
-<li>第一天疑问2：YARN的工作流程第6步，为什么运行脚本而不是直接运行命令？<ul>
-<li>因为直接执行命令可能让一些特殊符号发生转义</li>
-</ul>
-</li>
-<li>第二天的疑问3：Container只是对资源逻辑上的划分和规定，在实际使用中，如何保证严格的物理划分或隔离？<ul>
-<li>没有严格的物理划分或隔离，对于内存是监控上限，对于CPU是保证下限</li>
-</ul>
-</li>
-<li>本章只介绍了节点的健康检测，那NM向RM心跳时汇报的所有Container的运行状态都包括哪些呢？又是怎么汇总的？</li>
-<li>根据YARN工作流程的第七步的描述，听起来应该是各个Container心跳式的主动向AM汇报运行状态，但按照基本职能2的描述，只有一个AM主动查询运行状态的接口，那主动汇报的接口呢？本章好像没有提。</li>
 </ol>
 
           
@@ -1171,7 +1108,7 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-07-24T19:14:00+08:00" content="2016-07-24">
+            <time itemprop="dateCreated" datetime="2016-07-24T00:00:00+08:00" content="2016-07-24">
               2016-07-24
             </time>
           </span>
@@ -1500,7 +1437,7 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-07-24T18:50:57+08:00" content="2016-07-24">
+            <time itemprop="dateCreated" datetime="2016-07-24T00:00:00+08:00" content="2016-07-24">
               2016-07-24
             </time>
           </span>
@@ -1693,8 +1630,8 @@
             
               
                 
-                <a class="post-title-link" href="/从零爬Hadoop系列_1-《Hadoop技术内幕2》基础篇/" itemprop="url">
-                  从零爬Hadoop系列_1-《Hadoop技术内幕2》基础篇
+                <a class="post-title-link" href="/从零爬Hadoop系列_4-《Hadoop技术内幕2》NodeManager/" itemprop="url">
+                  从零爬Hadoop系列_4-《Hadoop技术内幕2》NodeManager
                 </a>
               
             
@@ -1707,7 +1644,7 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-07-24T18:36:15+08:00" content="2016-07-24">
+            <time itemprop="dateCreated" datetime="2016-07-24T00:00:00+08:00" content="2016-07-24">
               2016-07-24
             </time>
           </span>
@@ -1737,8 +1674,8 @@
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/从零爬Hadoop系列_1-《Hadoop技术内幕2》基础篇/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="从零爬Hadoop系列_1-《Hadoop技术内幕2》基础篇/" itemprop="commentsCount"></span>
+                <a href="/从零爬Hadoop系列_4-《Hadoop技术内幕2》NodeManager/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="从零爬Hadoop系列_4-《Hadoop技术内幕2》NodeManager/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -1762,125 +1699,185 @@
       
         
           
-            <h1 id="基础篇"><a href="#基础篇" class="headerlink" title="基础篇"></a>基础篇</h1><h2 id="MRv1到YARN"><a href="#MRv1到YARN" class="headerlink" title="MRv1到YARN"></a>MRv1到YARN</h2><ol>
-<li>MRv1主要是以MR为主的计算框架，而MRv2主要是针对MRv1的缺陷改进而来的，以YARN为主的轻量级弹性计算平台；</li>
-<li>MRv1的缺陷：<ul>
-<li>扩展性差：JobTracker兼备资源管理和作业控制；</li>
-<li>可靠性差：master单点故障；</li>
-<li>资源利用率低：粗粒度的划分单位，任务之间不共享；</li>
-<li>无法支持多种计算框架：只有基于磁盘的离线计算框架MR，不能满足多种需求；</li>
-</ul>
-</li>
-<li>YARN的诞生背景：<ul>
-<li>基于数据密集型应用的计算框架层出不穷：<ul>
-<li>MR：离线处理；</li>
-<li>Storm：在线处理；</li>
-<li>Spark：迭代式处理；</li>
-<li>S4：流式处理；</li>
-</ul>
-</li>
-<li>各种框架各有所长，在同一个公司中，多种框架可能被同时采用，如网页建立索引用MR，自然语言处理/数据挖掘用Spark等，考虑到成本等，又希望把所有框架部署在一个共享集群中，而非各占一个独立集群，而且需要在对共享资源统一管理使用的同时，保证各个任务的隔离性，急需轻量级弹性计算平台。</li>
-</ul>
-</li>
-<li>共享集群的好处：<ul>
-<li>资源利用率高：多种框架共享资源，统一管理，不会出现分配不均或某些紧缺而某些空闲的问题；</li>
-<li>运维成本低：管理员成本和硬件成本；</li>
-<li>数据共享：减小数据移动带来的成本；</li>
-</ul>
-</li>
-<li>一个框架一个集群 到 多个框架共享集群：<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936452783.jpg" alt="共享集群"></li>
-</ol>
-<h2 id="YARN的组成结构和流程"><a href="#YARN的组成结构和流程" class="headerlink" title="YARN的组成结构和流程"></a>YARN的组成结构和流程</h2><ol>
-<li>YARN基本组成结构：<ul>
-<li>ResourceManager（RM）：全局资源管理器，负责资源管理和分配；<ul>
-<li>Schduler：纯调度器，只负责根据各个应用程序的资源需求进行资源分配；</li>
-<li>ApplicationManager（ASM）：负责管理整个系统中所有应用程序；</li>
-</ul>
-</li>
-<li>ApplicationMaster（AM）：用户提交的每个应用程序均包含一个AM，主要功能：<ul>
-<li>与Scheduler协商获取资源（Container）；</li>
-<li>将得到的任务进一步分配给内部的任务；</li>
-<li>与NM通信以启动/停止任务；</li>
-<li>监控所有任务运行状态，并在任务运行失败时重新为任务申请资源以重启任务；</li>
-</ul>
-</li>
-<li>NodeManager（NM）：每个节点上的资源和任务管理器，主要功能：<ul>
-<li>定时向RM汇报本节点上的资源使用情况和各个Container的运行状态；</li>
-<li>接受并处理来自AM的Container启动/停止等请求；</li>
-</ul>
-</li>
-<li>Container：资源抽象，封装某个节点上的多维度资源，如内存、CPU、磁盘等</li>
-</ul>
-</li>
-<li>YARN工作流程：<ul>
-<li>步骤1：用户向YARN提交应用程序，其中包括AM程序、启动AM的命令、用户程序等；</li>
-<li>步骤2：RM为该应用程序分配第一个Container，并与对应的NM通信，要求它在这个Container中启动该AM；</li>
-<li>步骤3：AM首先向RM注册，这样用户可以通过RM查看应用程序的运行状态，然后它将为各个任务申请资源，并监控它们的运行状态，直到运行结束，即重复步骤4~7；</li>
-<li>步骤4：AM采用轮询的方式，通过RPC协议向RM申请和领取资源；</li>
-<li>步骤5：一旦AM申请到资源后，便与对应的NM通信，要求它启动任务；</li>
-<li>步骤6：NM为任务设置好运行环境后，将任务启动命令写到一个脚本中，通过运行该脚本启动任务；</li>
-<li>步骤7：各个任务通过某个RPC协议向AM汇报自己的状态和进度，以便AM随时掌握各个任务的运行状态，从而可以在任务失败时重启任务；</li>
-<li>步骤9：应用程序运行完成后，AM向RM注销并关闭自己；</li>
-<li>如下图：<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936452735.png" alt="YARN工作流程"></li>
-</ul>
-</li>
-<li>YARN的理解角度：<ul>
-<li>多线程并行编程：<ul>
-<li>YARN：云操作系统，为应用程序启动AM；</li>
-<li>AM：主线程，负责应用程序内部的数据切分、任务分配等，并启动各个Task；</li>
-<li>Task：子线程，仅负责自己的计算任务，完成即结束退出；</li>
-<li>当所有子线程（Task）结束以后，主线程（AM）结束退出；</li>
-</ul>
-</li>
-<li>资源管理器；</li>
-<li>云计算：YARN可以看做PAAS层，为不同类型的应用程序提供统一的管理和调度；</li>
+            <h1 id="NM剖析"><a href="#NM剖析" class="headerlink" title="NM剖析"></a>NM剖析</h1><p>NM是YARN中单个节点上的代理，负责管理Hadoop集群中单个计算节点。和RM剖析一样，我们可以先从最开始的YARN的工作流程中观察，NM都需要和哪些组件进行交互，分别需要完成什么功能，则在NM内部，便会细分出来各个功能类别的模块，在每个模块内部，还可以继续按照功能细分，落实到各个组成的类或接口。</p>
+<h2 id="NM基本职能"><a href="#NM基本职能" class="headerlink" title="NM基本职能"></a>NM基本职能</h2><ol>
+<li>NM作为RPC的client端，周期性的主动向RM发起请求，这些请求包括向RM注册、汇报节点健康状况和节点上所有Container运行状态；并以请求应答的形式，领取RM下达的命令</li>
+<li>NM作为RPC的server端，接收并处理AM下达的命令，这些命令包括启动Container、杀死Container、获取Container执行状态等，并返回执行结果</li>
+<li>个人理解：其实以上两点都是NM作为整体对外负责的功能，而且并不是它最主要的功能，不要忘了，所有计算任务都是以Container的形式运行在NM上，所以NM最主要的功能是内部Container的管理，比如：  <ul>
+<li>既然要运行任务，就需要下载任务运行所需的资源，每个NM上有很多Container，需要考虑并行下载和文件管理问题</li>
+<li>资源下载完以后，还要监控各个Container的运行状态，进行日志记录</li>
+<li>Container运行完成以后，还要进行之前下载资源的清理</li>
 </ul>
 </li>
 </ol>
-<h2 id="YARN基础库"><a href="#YARN基础库" class="headerlink" title="YARN基础库"></a>YARN基础库</h2><h3 id="RPC"><a href="#RPC" class="headerlink" title="RPC"></a>RPC</h3><ol>
-<li>Hadoop RPC（集群各组件之间的通信方式）总体架构：<ul>
-<li>序列化层：结构化对象转为字节流便于网络传输或持久存储，主要用于请求中的参数和应答跨机器传输；</li>
-<li>函数调用层：定位要调用的函数并执行该函数，Hadoop RPC采用Java反射机制和动态代理实现；</li>
-<li>网络传输层：描述了Client和Server之间消息传输的方式，Hadoop RPC采用基于TCP/IP的Socket机制；</li>
-<li>服务器端处理框架：描述了Client和Server之间信息交互的方式，直接决定服务器端的并发处理能力，Hadoop RPC采用基于Reactor设计模式的事件驱动I/O模型；</li>
-</ul>
-</li>
-<li>YARN RPC：可以集成多种RPC框架，如Protocol Buflers、Thrift、Avro等；</li>
-<li>对RPC的理解和实现，可以通过查看具体的例子进行理解，比如NM的心跳函数；</li>
+<h2 id="NM内部架构"><a href="#NM内部架构" class="headerlink" title="NM内部架构"></a>NM内部架构</h2><p>通过对YARN工作流程和NM职能的分析，可以猜测NM至少包含一下模块：</p>
+<ol>
+<li>AM管理模块：每个NM上可以运行多个AM，需要有对应的管理模块负责信息归总和管理</li>
+<li>Container管理模块：每个NM上可以运行多个Container，且可以属于不同的AM，需要有对应的管理模块负责信息归总和管理  </li>
 </ol>
-<h3 id="服务库（使得YARN低耦合、高内聚、设计简单、易维护）"><a href="#服务库（使得YARN低耦合、高内聚、设计简单、易维护）" class="headerlink" title="服务库（使得YARN低耦合、高内聚、设计简单、易维护）"></a>服务库（使得YARN低耦合、高内聚、设计简单、易维护）</h3><ol>
-<li>对于生命周期较长的对象，YARN采用了基于服务的对象管理模型对其进行管理，几个特点：<ul>
-<li>每个被服务化的对象分为4个状态：NOTINITED、INITED、STARTED、STOPPED；</li>
-<li>任何服务状态变化都可以触发另外一些动作；</li>
-<li>可以通过组合的方式对任意服务进行组合，以便统一管理；</li>
+<p>同时和RM一样，NM内部各个组件也是基于事件驱动的，NM内部架构组成如下：  </p>
+<ol>
+<li>NodeStatusUpdater：是NM和RM通信的唯一通道，对应职能1</li>
+<li>ContainerManager：是NM中最核心组件之一，有一下组件：  <ul>
+<li>RPC Servier：是AM和NM通信的唯一通道，对应职能2</li>
+<li>ResourceLocalizationService：负责Container运行所需资源的本地化，即从HDFS上下载，同时尽量分摊到各个磁盘上，避免访问热点，同时添加访问权限</li>
+<li>ContainersLauncher：维护了一个线程池并行完成Container相关的操作，比如启动或杀死Container，其中启动的命令来自AM，杀死的命令来自AM或RM（资源抢占时）</li>
+<li>AuxServices：NM允许用户以附属服务的方式扩展自己的功能</li>
+<li>ContainerMonitor：负责监控Container的资源使用量，防止超过RM分配的量，在YARN中，只有内存是通过它监控的</li>
+<li>LogHandler：可插拔式组件，用户通过它控制Container日志保存方式：写到本地磁盘或上传到一个文件系统中</li>
+<li>ContainerEventDispatcher：Container事件调度器，负责将ContainerEvent类型的事件调度给对应的Container的状态机ContainerImpl</li>
+<li>ApplicationEventDispatcher：Application事件调度器，负责将ApplicationEvent类型的事件调度给对应的Application的状态机ApplicationImpl</li>
 </ul>
 </li>
-<li>在YARN中，RM和NM属于组合服务，它们内部包含多个单一服务和组合服务，以实现对内部多种服务的统一管理；</li>
+<li>NodeHealthCheckerService：周期性运行自定义脚本和向磁盘写文件，以检查节点健康状况，然后通过NodeStatusUpdater汇报给RM，若发现不健康RM会将其加入黑名单，不再分配，直到其转为健康状态</li>
+<li>DeletionService：负责删除Container运行完成后遗留的无用的资源文件或临时输出文件，为了避免同步删除文件带来的开销，NM将删除文件功能服务化，进行异步删除</li>
+<li>Security：安全模块，主要两部分：  <ul>
+<li>ApplicationACLsManager：确保访问NM的用户的合法性，比如Web UI访问，该组件为每个应用程序维护了一个ACL列表</li>
+<li>ContainerTokenSecretManager：检查收到的各种访问请求的合法性，确保这些请求操作已被RM授权</li>
+</ul>
+</li>
+<li>WebServer：通过Web界面展示该节点上所有应用程序运行状态、健康状况、日志等信息<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936491468.png" alt="NM内部架构图"></li>
 </ol>
-<h3 id="事件库（使得YARN低耦合、高内聚、设计简单、易维护）"><a href="#事件库（使得YARN低耦合、高内聚、设计简单、易维护）" class="headerlink" title="事件库（使得YARN低耦合、高内聚、设计简单、易维护）"></a>事件库（使得YARN低耦合、高内聚、设计简单、易维护）</h3><ol>
-<li>为了构建基于事件驱动的并发模型，YARN将各种处理逻辑抽象成事件和对应的事件调度器，并把每类事件的处理过程分割成多个步骤，用有限状态机表示；</li>
-<li>处理过程：<ul>
-<li>处理请求作为事件进入系统；</li>
-<li>由中央异步调度器负责传递给对应的事件调度器；</li>
-<li>事件调度器有两种处理：<ul>
-<li>可能将该事件转发给另外一个事件调度器；</li>
-<li>也可能交给一个带有有限状态机的事件处理器，其处理结果也以事件的形式输出给中央异步调度器；</li>
+<h2 id="健康节点状况监测"><a href="#健康节点状况监测" class="headerlink" title="健康节点状况监测"></a>健康节点状况监测</h2><ol>
+<li>自定义Shell脚本：  <ul>
+<li>NodeHealthScriptRunner服务周期性的执行监测脚本并检查其输出，如果标准输出打印出以字符串“ERROR”开头的语句，则认为节点不健康，通过心跳告诉RM</li>
+<li>自定义脚本的好处：  <ul>
+<li>可作为节点负载的反馈：因为当前YARN只对CPU和内存资源进行分配和隔离，所以用户可以通过自定义脚本检查网络、磁盘、文件系统等运行状况缓解这个问题</li>
+<li>认为暂时维护NM：可以通过脚本输出ERROR停止NM接受新任务比便进行维护</li>
 </ul>
 </li>
-<li>新的事件会再次被中央异步调度器转发给下一个事件调度器，直至处理完成（到达终止条件）。</li>
 </ul>
 </li>
-<li>在YARN中，所有核心服务实际上都是一个中央异步调度器，包括RM、NM、AM等，它们维护了事先注册的事件和事件处理器，并根据接收的事件类型驱动服务的运行；</li>
+<li>检测磁盘损坏数目：  <ul>
+<li>另外一种健康检测机制，默认开启，即与脚本检测同时进行，双重检查</li>
+<li>检测方法：如果一个目录具有rwx权限，则认为它是正常的，否则加入坏磁盘列表，当比例过低时，便认为NM不健康，通过心跳告诉RM</li>
+</ul>
+</li>
 </ol>
-<h3 id="状态机库（使得YARN设计架构更清晰）"><a href="#状态机库（使得YARN设计架构更清晰）" class="headerlink" title="状态机库（使得YARN设计架构更清晰）"></a>状态机库（使得YARN设计架构更清晰）</h3><ol>
-<li>如上所述，在YARN中，事件的处理过程被分割成多个步骤，用有限状态机表示，换言之，有限状态机维护着有状态对象的生命周期；</li>
-<li>在YARN中，每种状态转换由一个四元组表示，分别是转换前状态preState、转换后状态postState、事件event和回调函数hook，表示状态机在preState状态下，接收到事件event后，执行回调函数hook，并在执行完成后将状态转换为postState。</li>
-<li>YARN定义了三种状态转换方式：<ul>
-<li>一个初态、一个终态、一种事件；</li>
-<li>一个初态、多个终态、一种事件，终态由hook返回值确定；</li>
-<li>一个初态、一个终态、多种事件；</li>
+<h2 id="分布式缓存机制"><a href="#分布式缓存机制" class="headerlink" title="分布式缓存机制"></a>分布式缓存机制</h2><ol>
+<li>主要作用：将用户应用程序执行时需要的外部文件资源自动透明地下载并缓存到各个节点上，省去用户手动部署。同时NM并不是一下子把所有资源下载下来，而是根据启动的Container按需下载，而且采用一定的缓存置换算法定期清理失效文件（默认10分钟）</li>
+<li>工作流程：  <ul>
+<li>步骤1：客户端将应用程序所需的文件资源提交到HDFS上</li>
+<li>步骤2：客户端将应用程序提交到RM上</li>
+<li>步骤3：RM与某个NM通信，让NM启动对应的AM，NM收到命令后，首先从HDFS下载文件（缓存），然后再启动AM</li>
+<li>步骤4：AM与RM通信，以请求和获取Container</li>
+<li>步骤5：AM收到新分配的Container后，与对应的NM通信，启动任务</li>
+<li>步骤6：如果该应用程序第一次在该节点上启动任务，NM首先从HDFS上下载文件缓存到本地，然后启动任务</li>
+<li>步骤7：NM后续收到启动任务请求后，如果有缓存，则直接启动，否则先等缓存成功再启动</li>
 </ul>
 </li>
+<li>资源可见性（三种）：  <ul>
+<li>PUBLIC：节点上所有用户共享，即只要存在，其他用户不用再下载</li>
+<li>PRIVATE：节点上同一用户的所有应用程序共享</li>
+<li>APPLICATION：节点上同一应用程序的所有Container共享</li>
+</ul>
+</li>
+<li>资源分类（三类）：  <ul>
+<li>ARCHIVE：归档文件，当前支持.jar、.zip、.tar.gz、.tgz、和.tar5种，NM可以自动解压缩</li>
+<li>FILE：普通文件，NM只下载，没有额外处理</li>
+<li>PATTERN：以上两种类型的混合体，用户需要通过正则表达式指定哪些属于ARCHIVE需要自动解压</li>
+</ul>
+</li>
+<li>YARN分布式缓存的实现<ul>
+<li>三种可见性资源分别放置在不同的目录下，通过目录权限实现不同的可见性</li>
+<li>PUBLIC资源下载：由公共服务ResourceLocalizationService中的一个公用线程PublicLocalizer下载，它内部维护了个线程池并行下载</li>
+<li>PRIVATE和APPLICATION：由公共服务ResourceLocalizationService中的一个专门线程下载：一个Container对应一个LocalizerRunner线程</li>
+</ul>
+</li>
+</ol>
+<h2 id="目录结构管理"><a href="#目录结构管理" class="headerlink" title="目录结构管理"></a>目录结构管理</h2><ol>
+<li>由于同一个NM上不同的Container往往并行向本地磁盘写数据，为了避免占用大量IO资源造成相互干扰，尽量提高写数据的可靠性和并发写性能，YARN允许NM配置多个挂在不同磁盘的目录作为中间结果存放目录，对于任意一个应用程序，YARN会在每个磁盘中创建相同的目录结构，然后采用轮询策略使用这些目录<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936491521.png" alt="NM目录结构"></li>
+<li>目录分类：  <ul>
+<li>数据目录：存放Container运行所需和中间数据</li>
+<li>日志目录：运行时输出的日志</li>
+</ul>
+</li>
+<li>日志清理机制：  <ul>
+<li>定期删除（默认）：默认3小时，超时删除</li>
+<li>日志聚集转存：把日志上传到HDFS上，上传后删除，可以指定三种可以转存的类型（顾名思义）：  <ul>
+<li>ALL_CONTAINER</li>
+<li>APPLICATION_MASTER_ONLY</li>
+<li>AM_AND_FAILED_CONTAINER_ONLY</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h2 id="状态机管理"><a href="#状态机管理" class="headerlink" title="状态机管理"></a>状态机管理</h2><ol>
+<li>三类状态机：  <ul>
+<li>Application状态机：维护的信息是RM端维护的子集，方便对一个节点上同一个应用程序的所有Container进行统一管理</li>
+<li>Container状态机：维护一个Container的生命周期，三个阶段：  <ul>
+<li>资源本地化</li>
+<li>Container启动</li>
+<li>资源清理（资源本地化逆过程，这里的资源指临时文件，而非硬件资源）：  <ul>
+<li>这一步的清理，只是Container的临时数据，如Tokens文件和Shell运行脚本等</li>
+<li>因为各个Container之间可能有依赖关系，所以NM规定只有在一个应用程序的所有Container全部结束以后，由RM发送广播，NM才能清理程序所占的所有资源和中间数据</li>
+</ul>
+</li>
+<li>可以翻书了解详细的过程，进一步理解基于事件驱动的应用</li>
+</ul>
+</li>
+<li>LocalizedResource状态机：维护一种资源的生命周期，从初始化、到下载中、到下载完成/下载失败</li>
+</ul>
+</li>
+<li>个人理解：三类状态机的关系：从大流程上来看，基本可以认为是以下关系：  <ul>
+<li>NM启动一个AM，创建对应的Application状态机</li>
+<li>Application状态机在收到AM发送的启动Container请求后，会创建对应的Container状态机（一个或多个）</li>
+<li>Container运行之前，需要先下载缺少的资源，即会创建对应的LocalizedResource状态机（一个或多个）进行资源下载，并等待所有资源下载完，然后进入运行状态</li>
+</ul>
+</li>
+</ol>
+<h2 id="资源隔离"><a href="#资源隔离" class="headerlink" title="资源隔离"></a>资源隔离</h2><ol>
+<li>内存资源隔离：基于线程监控：  <ul>
+<li>由服务ContainersMonitorImpl实现，它保存了每个Container进程pid，内部的MonitoringThread每隔一段时间（默认3000ms）扫描所有正在运行的Container进程树</li>
+<li>步骤：  <ul>
+<li>读取/proc/<pid>/stat文件构造进程树</pid></li>
+<li>判断单个任务内存使用量是否超过最大值内存量</li>
+</ul>
+</li>
+<li>由于JVM创建一个子进程时，采用了“fork()+exec()”模型，意味着进程创建之后、执行之前会复制一份父进程内存空间，进而使得进程数在某一小段时间内存使用量翻倍，为了防止误杀，Hadoop赋予每个进程“年龄”属性，并规定刚启动的进程年龄为1，MonitoringThread线程每更新一次，各个进程年龄加1，则内存超量使用而被杀死的判断标准为：  <ul>
+<li>如果一个Container对应的进程树中所有进程（年龄大于0）总内存超过用户设定最大值的两倍</li>
+<li>或者所有年龄大于1的进程总内存量超过用户设定的最大值</li>
+<li>只要满足其一，则向对应的Container发送ContainerEventType.CKILL_CONTAINER事件将其杀死</li>
+</ul>
+</li>
+<li>个人理解：内存隔离并不是真正的物理上的隔离，其他内存还是可见的，只是简单的一个线程监控使用量而已，所以需要用户在设定内存最大值时有良好的预估和分配</li>
+</ul>
+</li>
+<li>CPU资源隔离：使用Cgroups（Control  groups）<ul>
+<li>Cgroups是Linux内核提供的一种可以限制、记录、隔离进程组所使用的物理资源的机制，YARN通过使用其子系统CPU实现CPU资源隔离，该子系统使用调度程序控制任务对CPU的访问</li>
+<li>Cgroups相比于虚拟机，是一种轻量级资源隔离方案</li>
+<li>Cgroups只能保证应用程序的CPU使用下限，但不能限制上限。举例说明，某个节点上有10个虚拟CPU：  <ul>
+<li>若该节点上只有一个应用程序A，且设定的CPU需求为4，则A最多能够使用全部CPU</li>
+<li>若该节点上有两个应用程序A和B，且CPU需求都为4，则A和B都最多能够使用全部CPU，最少使用一半</li>
+<li>若该节点上有三个应用程序A、B、C，CPU需求依次为4、4、2，则它们最多均可以使用全部CPU，最少可使用CPU资源比例依次为：4/(4+4+2)<em>10=40%、4/(4+4+2)</em>10=40%、2/(4+4+2)*10=20%</li>
+</ul>
+</li>
+<li>NM默认没有启用任何CPU资源隔离机制</li>
+<li>个人理解：CPU隔离也不是真正的物理上的隔离，而且按照上边的说明，基本可以说没有隔离，只能保证下限而已，同样需要用户对资源的使用量有良好的分配和设定</li>
+</ul>
+</li>
+<li>所以总的来讲，所谓的资源隔离是比较虚的，不能顾名思义</li>
+</ol>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><ol>
+<li>对NM的理解：作为资源管理系统YARN的一个重要服务，NM管理的是Container，而不是任务，一个Container中可能运行着各种任务，但是对NM而言是透明的，它只负责Container相关的操作，比如管理Container的生命周期等。这也是YARN能够作为一个通用的资源管理平台的重要原因，它不管具体的任务类型或内容，只要按它规定的规范进行封装就可以提交运行</li>
+<li>对Container的理解：Container从头到尾都只是一个逻辑抽象概念,RM把资源抽象为Container发送给AM，AM再发给NM，NM则会在Container描述的运行环境中启动任务，其实就是启动一个进程，然后在该进程下跑任务和各个状态机</li>
+</ol>
+<h2 id="思考问题"><a href="#思考问题" class="headerlink" title="思考问题"></a>思考问题</h2><ol>
+<li>第一天的疑问1：怎么保证AM没有撒谎？比如AM并没有向RM申请资源，绕过RM直接通知NM启动任务？<ul>
+<li>就是由Secret模块下的ContainerTokenSecretManager通过Token检查保证的</li>
+</ul>
+</li>
+<li>第一天疑问2：YARN的工作流程第6步，为什么运行脚本而不是直接运行命令？<ul>
+<li>因为直接执行命令可能让一些特殊符号发生转义</li>
+</ul>
+</li>
+<li>第二天的疑问3：Container只是对资源逻辑上的划分和规定，在实际使用中，如何保证严格的物理划分或隔离？<ul>
+<li>没有严格的物理划分或隔离，对于内存是监控上限，对于CPU是保证下限</li>
+</ul>
+</li>
+<li>本章只介绍了节点的健康检测，那NM向RM心跳时汇报的所有Container的运行状态都包括哪些呢？又是怎么汇总的？</li>
+<li>根据YARN工作流程的第七步的描述，听起来应该是各个Container心跳式的主动向AM汇报运行状态，但按照基本职能2的描述，只有一个AM主动查询运行状态的接口，那主动汇报的接口呢？本章好像没有提。</li>
 </ol>
 
           
@@ -1945,7 +1942,7 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-07-23T14:54:29+08:00" content="2016-07-23">
+            <time itemprop="dateCreated" datetime="2016-07-23T00:00:00+08:00" content="2016-07-23">
               2016-07-23
             </time>
           </span>
@@ -2081,7 +2078,7 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-05-01T16:47:55+08:00" content="2016-05-01">
+            <time itemprop="dateCreated" datetime="2016-05-01T00:00:00+08:00" content="2016-05-01">
               2016-05-01
             </time>
           </span>
@@ -2148,15 +2145,15 @@
 <li>实际主题(RealSubject)：实际主题是实现抽象主题接口的类。实际主题的实例是代理角色实例所要代理的对象。</li>
 <li>代理(Proxy)：代理是实现抽象主题接口的类(代理和实际主题实现了相同的接口)。代理含有主题接口声明的变量，该变量用来存放RealSubject的实例引用，这样一来，代理的实例就可以控制对它所包含的RealSubject的实例访问，即可以控制对它所代理对象的访问。</li>
 </ul>
-<h3 id="一个例子"><a href="#一个例子" class="headerlink" title="一个例子"></a>一个例子</h3><p>登录注册是最常见的基本功能，如果我们还想记录登录的时间，就可以让代理类来完成。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//抽象主题，统一对外公开的方法</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">IUserService</span> </span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">login</span><span class="params">(String username)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//实际主题，对外是不可见的</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserServiceImpl</span> <span class="keyword">implements</span> <span class="title">IUserService</span> </span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">login</span><span class="params">(String username)</span> </span>&#123;</span><br><span class="line">		System.out.println(username + <span class="string">"登录成功"</span>);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//代理，外界对实际主题访问的中介</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserServiceImplProxy</span> <span class="keyword">implements</span> <span class="title">IUserService</span> </span>&#123;</span><br><span class="line">	<span class="comment">//被代理类的实例</span></span><br><span class="line">	IUserService userService = <span class="keyword">new</span> UserServiceImpl();</span><br><span class="line">	</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">login</span><span class="params">(String username)</span> </span>&#123;</span><br><span class="line">		System.out.println(<span class="string">"当前时间："</span> + Calendar.getInstance().toString());</span><br><span class="line">		</span><br><span class="line">		<span class="comment">//调用被代理类的方法</span></span><br><span class="line">		userService.login(username);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="一个例子"><a href="#一个例子" class="headerlink" title="一个例子"></a>一个例子</h3><p>登录注册是最常见的基本功能，如果我们还想记录登录的时间，就可以让代理类来完成。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//抽象主题，统一对外公开的方法</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">IUserService</span> </span>&#123;</div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">login</span><span class="params">(String username)</span></span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">//实际主题，对外是不可见的</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserServiceImpl</span> <span class="keyword">implements</span> <span class="title">IUserService</span> </span>&#123;</div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">login</span><span class="params">(String username)</span> </span>&#123;</div><div class="line">		System.out.println(username + <span class="string">"登录成功"</span>);</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">//代理，外界对实际主题访问的中介</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserServiceImplProxy</span> <span class="keyword">implements</span> <span class="title">IUserService</span> </span>&#123;</div><div class="line">	<span class="comment">//被代理类的实例</span></div><div class="line">	IUserService userService = <span class="keyword">new</span> UserServiceImpl();</div><div class="line">	</div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">login</span><span class="params">(String username)</span> </span>&#123;</div><div class="line">		System.out.println(<span class="string">"当前时间："</span> + Calendar.getInstance().toString());</div><div class="line">		</div><div class="line">		<span class="comment">//调用被代理类的方法</span></div><div class="line">		userService.login(username);</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <h3 id="静态代理"><a href="#静态代理" class="headerlink" title="静态代理"></a>静态代理</h3><p>上边写得例子属于动态代理的前身：<strong>静态代理，静态是什么意思呢？对于上边的代码，它是写死的，<em>被代理的方法</em>、<em>被代理的原始类</em>和<em>被代理的接口</em>都是写死固定不变的，即login方法、UserServiceImpl类和IUserService接口是确定的。而动态代理的动态，是指这三者是不确定的，未知的，可变的，不是写死的。</strong>是不是还不太懂？那我们来想一下静态代理都有哪些缺点，为什么需要动态代理。</p>
-<p>第一个缺点，对于接口IUserService，如果还有其他的方法，比如注册、修改个人资料等，那就要在代理类中对每一个方法进行一对一的代理，而且每一个代理方法都非常类似，结构如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//一般化的代理类中的方法</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> ResultType <span class="title">methodName</span><span class="params">(ParamType paramName0, ParamType paramName1...)</span> </span>&#123;</span><br><span class="line">	<span class="comment">//实际调用前，增强功能、额外操作</span></span><br><span class="line">	doSomethingBefore();</span><br><span class="line">	</span><br><span class="line">	<span class="comment">//调用被代理类的方法</span></span><br><span class="line">	ResultType result = target.methodName(paramName0, paramName1...);</span><br><span class="line">	</span><br><span class="line">	<span class="comment">//实际调用后，增强功能、额外操作</span></span><br><span class="line">	doSomethingAfter();</span><br><span class="line">	</span><br><span class="line">	<span class="comment">//返回被代理类方法的执行结果</span></span><br><span class="line">	<span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>第一个缺点，对于接口IUserService，如果还有其他的方法，比如注册、修改个人资料等，那就要在代理类中对每一个方法进行一对一的代理，而且每一个代理方法都非常类似，结构如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//一般化的代理类中的方法</span></div><div class="line"><span class="function"><span class="keyword">public</span> ResultType <span class="title">methodName</span><span class="params">(ParamType paramName0, ParamType paramName1...)</span> </span>&#123;</div><div class="line">	<span class="comment">//实际调用前，增强功能、额外操作</span></div><div class="line">	doSomethingBefore();</div><div class="line">	</div><div class="line">	<span class="comment">//调用被代理类的方法</span></div><div class="line">	ResultType result = target.methodName(paramName0, paramName1...);</div><div class="line">	</div><div class="line">	<span class="comment">//实际调用后，增强功能、额外操作</span></div><div class="line">	doSomethingAfter();</div><div class="line">	</div><div class="line">	<span class="comment">//返回被代理类方法的执行结果</span></div><div class="line">	<span class="keyword">return</span> result;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <p>可以想象当有很多需要被代理的方法时，会存在大量重复冗余的代码。</p>
 <p>第二个缺点，上边第一个缺点只是针对<em>被代理的方法</em>需要变化时带来的不便，那如果<em>被代理的原始类</em>和<em>被代理的接口</em>也需要变化呢？比如现在不只是用户相关的接口(IUserService)需要记录访问时间，其他任何接口都需要记录，即如果当前有N个接口，每个接口中有M个方法，那按照静态代理一对一进行编码，就至少需要写N*M个代理方法，而且结构非常类似，光是想想就爆炸。</p>
 <p>那应该怎么改进呢？</p>
 <h3 id="动态代理"><a href="#动态代理" class="headerlink" title="动态代理"></a>动态代理</h3><p>现在我们针对上边的两个缺点，来一步步分析静态代理是怎么进化成动态代理的。如果不想写那么多重复的，想合并到一起，就需要把写死的变化的部分转化为动态可变的。</p>
-<p>对于上边代理方法的结构，变化的部分只有一行，即调用被代理类的方法，其中被代理类target可以不同，对应的方法methodName也可以不同。静态代理中target和methodName是写死的，比如上边的UserServiceImpl和login，那能不能把target和methodName写成变量，比如String类型的，然后在运行时根据传进来的类型名和方法名实现动态调用执行呢？可以吗？有这种技术吗？机智如你有没有想到反射呢？这时上边的代理方法的结构就可以写成如下形式了(示意代码，勿抠细节)。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//使用反射后，通用的代理方法</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Object <span class="title">methodProxy</span><span class="params">(String targetFullName, String methodName, Object[] args)</span> </span>&#123;</span><br><span class="line">	<span class="comment">//实际调用前，增强功能、额外操作</span></span><br><span class="line">	doSomethingBefore();</span><br><span class="line">	</span><br><span class="line">	<span class="comment">/**</span><br><span class="line">	 *调用被代理类的方法</span><br><span class="line">	 *1. 根据targetFullName反射获取被代理类的实例</span><br><span class="line">	 *2. 根据methodName获取被代理方法的实例methodInstance (java.lang.reflect.Method类型)</span><br><span class="line">	 *3. 调用methodInstance类型的invoke方法完成调用</span><br><span class="line">	 */</span></span><br><span class="line">	Object target = Class.forName(targetFullName).newInstance();</span><br><span class="line">	Method methodInstance = Class.forName(targetFullName).getMethod(methodName, <span class="keyword">new</span> Class[] &#123;</span><br><span class="line">							args[<span class="number">0</span>].getClass(), </span><br><span class="line">							args[<span class="number">1</span>].getClass(),</span><br><span class="line">							......</span><br><span class="line">							&#125;);</span><br><span class="line">	Object result = methodInstance.invoke(target, args);</span><br><span class="line">	</span><br><span class="line">	<span class="comment">//实际调用后，增强功能、额外操作</span></span><br><span class="line">	doSomethingAfter();</span><br><span class="line">	</span><br><span class="line">	<span class="comment">//返回被代理类方法的执行结果</span></span><br><span class="line">	<span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>这样写得话就可以做到“一次编写，到处复用”了，每个代理类中所有的代理方法都可以像上边那样，调用并返回methodProxy。不同的只是：在不同的代理类中，变量targetFullName不同；在不同的方法中，变量methodName不同。这时，无论<em>被代理的原始类</em>和<em>被代理的接口</em>是谁，其对应的代理类，结构都非常类似，如下所示。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//代理，外界对实际主题访问的中介</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ProxyClassName</span> <span class="keyword">implements</span> <span class="title">SubjectInterfaceName</span> </span>&#123;</span><br><span class="line">	<span class="comment">//被代理类的全名称</span></span><br><span class="line">	String targetFullName;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">//构造时绑定被代理类的全名称</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">ProxyClassName</span><span class="params">(String targetFullName)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.targetFullName = targetFullName;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">//一般化的代理类中的方法</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> ResultType <span class="title">methodName0</span><span class="params">(ParamType paramName0, ParamType paramName1...)</span> </span>&#123;</span><br><span class="line">		<span class="comment">//调用上边的通用方法</span></span><br><span class="line">		<span class="keyword">return</span> (ResultType) methodProxy(targetFullName, methodName0, <span class="keyword">new</span> Object[] &#123;</span><br><span class="line">							paramName0,</span><br><span class="line">							paramName1,</span><br><span class="line">							......</span><br><span class="line">		&#125;);</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">//一般化的代理类中的方法</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> ResultType <span class="title">methodName1</span><span class="params">(ParamType paramName0, ParamType paramName1...)</span> </span>&#123;</span><br><span class="line">		<span class="comment">//调用上边的通用方法</span></span><br><span class="line">		<span class="keyword">return</span> (ResultType) methodProxy(targetFullName, methodName1, <span class="keyword">new</span> Object[] &#123;</span><br><span class="line">							paramName0,</span><br><span class="line">							paramName1,</span><br><span class="line">							......</span><br><span class="line">		&#125;);</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">//......所有SubjectInterfaceName接口中定义的方法都有如上实现</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>对于上边代理方法的结构，变化的部分只有一行，即调用被代理类的方法，其中被代理类target可以不同，对应的方法methodName也可以不同。静态代理中target和methodName是写死的，比如上边的UserServiceImpl和login，那能不能把target和methodName写成变量，比如String类型的，然后在运行时根据传进来的类型名和方法名实现动态调用执行呢？可以吗？有这种技术吗？机智如你有没有想到反射呢？这时上边的代理方法的结构就可以写成如下形式了(示意代码，勿抠细节)。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//使用反射后，通用的代理方法</span></div><div class="line"><span class="function"><span class="keyword">public</span> Object <span class="title">methodProxy</span><span class="params">(String targetFullName, String methodName, Object[] args)</span> </span>&#123;</div><div class="line">	<span class="comment">//实际调用前，增强功能、额外操作</span></div><div class="line">	doSomethingBefore();</div><div class="line">	</div><div class="line">	<span class="comment">/**</span></div><div class="line">	 *调用被代理类的方法</div><div class="line">	 *1. 根据targetFullName反射获取被代理类的实例</div><div class="line">	 *2. 根据methodName获取被代理方法的实例methodInstance (java.lang.reflect.Method类型)</div><div class="line">	 *3. 调用methodInstance类型的invoke方法完成调用</div><div class="line">	 */</div><div class="line">	Object target = Class.forName(targetFullName).newInstance();</div><div class="line">	Method methodInstance = Class.forName(targetFullName).getMethod(methodName, <span class="keyword">new</span> Class[] &#123;</div><div class="line">							args[<span class="number">0</span>].getClass(), </div><div class="line">							args[<span class="number">1</span>].getClass(),</div><div class="line">							......</div><div class="line">							&#125;);</div><div class="line">	Object result = methodInstance.invoke(target, args);</div><div class="line">	</div><div class="line">	<span class="comment">//实际调用后，增强功能、额外操作</span></div><div class="line">	doSomethingAfter();</div><div class="line">	</div><div class="line">	<span class="comment">//返回被代理类方法的执行结果</span></div><div class="line">	<span class="keyword">return</span> result;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这样写得话就可以做到“一次编写，到处复用”了，每个代理类中所有的代理方法都可以像上边那样，调用并返回methodProxy。不同的只是：在不同的代理类中，变量targetFullName不同；在不同的方法中，变量methodName不同。这时，无论<em>被代理的原始类</em>和<em>被代理的接口</em>是谁，其对应的代理类，结构都非常类似，如下所示。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//代理，外界对实际主题访问的中介</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ProxyClassName</span> <span class="keyword">implements</span> <span class="title">SubjectInterfaceName</span> </span>&#123;</div><div class="line">	<span class="comment">//被代理类的全名称</span></div><div class="line">	String targetFullName;</div><div class="line">	</div><div class="line">	<span class="comment">//构造时绑定被代理类的全名称</span></div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="title">ProxyClassName</span><span class="params">(String targetFullName)</span> </span>&#123;</div><div class="line">		<span class="keyword">this</span>.targetFullName = targetFullName;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	<span class="comment">//一般化的代理类中的方法</span></div><div class="line">	<span class="function"><span class="keyword">public</span> ResultType <span class="title">methodName0</span><span class="params">(ParamType paramName0, ParamType paramName1...)</span> </span>&#123;</div><div class="line">		<span class="comment">//调用上边的通用方法</span></div><div class="line">		<span class="keyword">return</span> (ResultType) methodProxy(targetFullName, methodName0, <span class="keyword">new</span> Object[] &#123;</div><div class="line">							paramName0,</div><div class="line">							paramName1,</div><div class="line">							......</div><div class="line">		&#125;);</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	<span class="comment">//一般化的代理类中的方法</span></div><div class="line">	<span class="function"><span class="keyword">public</span> ResultType <span class="title">methodName1</span><span class="params">(ParamType paramName0, ParamType paramName1...)</span> </span>&#123;</div><div class="line">		<span class="comment">//调用上边的通用方法</span></div><div class="line">		<span class="keyword">return</span> (ResultType) methodProxy(targetFullName, methodName1, <span class="keyword">new</span> Object[] &#123;</div><div class="line">							paramName0,</div><div class="line">							paramName1,</div><div class="line">							......</div><div class="line">		&#125;);</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	<span class="comment">//......所有SubjectInterfaceName接口中定义的方法都有如上实现</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <p>前面我们已经针对<em>被代理的方法</em>中把变化的部分转化为动态可变的部分，通过反射实现了<em>被代理的方法</em>的改善，使得方法内重复的部分“一次编写，到处复用”。那么对于上边这个代理类的结构，你有没有觉得它也有很多重复冗余的地方呢？想象现在有很多个上边这种结构的代理类，它们不同的的部分有哪些呢：1.代理类的类名ProxyClassName；2.被代理类实现的接口名SubjectInterfaceName；3.内部各个方法签名methodName0(args)，methodName1(args)…；除此之外，所有的代码完全一样，那有没有什么办法能够像参照模版一样，根据给定不同的类名ProxyClassName，接口名SubjectInterfaceName自动生成如上结构的代理类代码呢？是的，你没听错，我们需要的是用代码生成代码的技术，像工厂一样批量生产代理类。可行吗？有这种技术吗？机智如你有没有想到<strong>字节码生成技术</strong>呢？完全可以按照上边的模版拼凑出我们需要的代理类，其中只需要提供需要实现的接口SubjectInterfaceName，类名ProxyClassName没有要求，我们可以自动生成，内部的所有方法名可以通过对接口进行反射获取。</p>
 <p>这时我们改善完成的代理模式就进化成了动态代理，只需要我们自己写methodProxy方法中的额外操作，然后指定一个接口，就得到了我们需要的代理类，简单方便，主要有两个组成部分：</p>
 <ol>
@@ -2164,9 +2161,9 @@
 <li>通用的代理方法；</li>
 </ol>
 <p>本来想继续用伪码的形式写出一个结构来，但不太好表达，我们还是直接看JDK的动态代理吧，有了上边的理解，你应该就能领会到JDK设计的巧妙了。</p>
-<h2 id="JDK的动态代理"><a href="#JDK的动态代理" class="headerlink" title="JDK的动态代理"></a>JDK的动态代理</h2><p>在JDK的动态代理实现中，对应上边工厂组件的是类Proxy，对应通用代理方法methodProxy的是接口InvocationHandler中的invoke方法。为什么是接口呢？因为这样我们可以通过实现该接口自定义需要的增强功能或额外操作，别忘了这才是目的。其中类Proxy中有一个InvocationHandler类型的成员变量h，然后类Proxy生成的代理类(extends Proxy implements SubjectInterfaceName)中，所有的方法调用，都会通过”super.h.invoke(Object, Method, object[])”这行代码委托到我们自定义的invoke方法中。下面我们使用JDK的动态代理实现最开始的登录功能，看看改进的效果。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//抽象主题，统一对外公开的方法</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">IUserService</span> </span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">login</span><span class="params">(String username)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//实际主题，对外是不可见的</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserServiceImpl</span> <span class="keyword">implements</span> <span class="title">IUserService</span> </span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">login</span><span class="params">(String username)</span> </span>&#123;</span><br><span class="line">		System.out.println(username + <span class="string">"登录成功"</span>);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//自定义的InvocationHandler实现类，主要用来定义通用调用方法中的额外操作</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyInvocationHandler</span> <span class="keyword">implements</span> <span class="title">InvocationHandler</span> </span>&#123;</span><br><span class="line">	<span class="comment">//被代理的目标类</span></span><br><span class="line">	<span class="keyword">public</span> Object target;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">//通过构造函数绑定目标类</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">MyInvocationHandler</span><span class="params">(Object target)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.target = target;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">//通用的调用方法</span></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> Object <span class="title">invoke</span><span class="params">(Object proxy, Method method, Object[] args)</span></span><br><span class="line">			<span class="keyword">throws</span> Throwable </span>&#123;</span><br><span class="line">		<span class="comment">//实际调用前</span></span><br><span class="line">		System.out.println(<span class="string">"之前的额外操作"</span>);</span><br><span class="line">		</span><br><span class="line">		<span class="comment">//调用代理类的方法</span></span><br><span class="line">		Object result = method.invoke(target, args);</span><br><span class="line">		</span><br><span class="line">		<span class="comment">//实际调用后</span></span><br><span class="line">		System.out.println(<span class="string">"之后的额外操作"</span>);</span><br><span class="line">		</span><br><span class="line">		<span class="comment">//返回调用结果</span></span><br><span class="line">		<span class="keyword">return</span> result;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">//通过Proxy类的静态方法获取代理类的实例</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> Object <span class="title">getProxy</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> Proxy.newProxyInstance(</span><br><span class="line">				<span class="comment">//当前线程上下文的类加载器</span></span><br><span class="line">				Thread.currentThread().getContextClassLoader(),  </span><br><span class="line">				<span class="comment">//目标类实现的所有接口</span></span><br><span class="line">				target.getClass().getInterfaces(), </span><br><span class="line">				<span class="comment">//当前类，主要用于调用invoke方法</span></span><br><span class="line">				<span class="keyword">this</span>);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//测试类</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">		<span class="comment">//绑定需要代理的类</span></span><br><span class="line">		MyInvocationHandler invocationHandler = <span class="keyword">new</span> MyInvocationHandler(<span class="keyword">new</span> UserServiceImpl());</span><br><span class="line">		</span><br><span class="line">		<span class="comment">//利用字节码生成技术生成代理类，并获取其实例(注意声明的类型是IUserService)</span></span><br><span class="line">		IUserService proxy = (IUserService) invocationHandler.getProxy();</span><br><span class="line">		</span><br><span class="line">		<span class="comment">//透明地调用对应的方法</span></span><br><span class="line">		proxy.login(<span class="string">"ksni88"</span>);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">执行结果：</span><br><span class="line">之前的额外操作</span><br><span class="line">ksni88登陆成功</span><br><span class="line">之后的额外操作</span><br></pre></td></tr></table></figure></p>
-<p>可以看到，使用动态代理时，我们根本不用自己写代理类，只用定义我们真正需要的额外操作，然后指定需要被代理的目标类，其他的一切工作都省掉了，相比静态代理可要高明高效的多。看到这里，你可能感觉还不太舒服，因为我们没有自己写代理类，不知道它到底是什么样子，需要看一眼才放心，对吧？我们可以在上边main()方法中加入下面这句：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">System.setProperty(<span class="string">"sun.misc.ProxyGenerator.saveGeneratedFiles"</span>, <span class="string">"true"</span>);</span><br></pre></td></tr></table></figure></p>
-<p>之后<strong>在项目目录下新建目录com\sun\proxy</strong>，然后再次运行程序，将在刚才目录下产生一个名为”$Proxy0.class”的代理类Class文件，这就是自动生成的代理类，可以使用<em><a href="http://jd.benow.ca/" target="_blank" rel="external">反编译工具</a></em>看一下它长什么样。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> $<span class="title">Proxy0</span></span><br><span class="line">  <span class="keyword">extends</span> <span class="title">Proxy</span></span><br><span class="line">  <span class="keyword">implements</span> <span class="title">IUserService</span></span><br><span class="line"></span>&#123;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">static</span> Method m1;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">static</span> Method m0;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">static</span> Method m3;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">static</span> Method m2;</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">public</span> $Proxy0(InvocationHandler paramInvocationHandler)</span><br><span class="line">    <span class="keyword">throws</span> </span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">super</span>(paramInvocationHandler);</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">equals</span><span class="params">(Object paramObject)</span></span><br><span class="line">    <span class="keyword">throws</span> </span><br><span class="line">  </span>&#123;</span><br><span class="line">    <span class="keyword">try</span></span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">return</span> ((Boolean)<span class="keyword">this</span>.h.invoke(<span class="keyword">this</span>, m1, <span class="keyword">new</span> Object[] &#123; paramObject &#125;)).booleanValue();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">catch</span> (Error|RuntimeException localError)</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">throw</span> localError;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">catch</span> (Throwable localThrowable)</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> UndeclaredThrowableException(localThrowable);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">hashCode</span><span class="params">()</span></span><br><span class="line">    <span class="keyword">throws</span> </span><br><span class="line">  </span>&#123;</span><br><span class="line">    <span class="keyword">try</span></span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">return</span> ((Integer)<span class="keyword">this</span>.h.invoke(<span class="keyword">this</span>, m0, <span class="keyword">null</span>)).intValue();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">catch</span> (Error|RuntimeException localError)</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">throw</span> localError;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">catch</span> (Throwable localThrowable)</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> UndeclaredThrowableException(localThrowable);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> **login**(String paramString)</span><br><span class="line">    <span class="keyword">throws</span> </span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">try</span></span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">this</span>.h.invoke(<span class="keyword">this</span>, m3, <span class="keyword">new</span> Object[] &#123; paramString &#125;);</span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">catch</span> (Error|RuntimeException localError)</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">throw</span> localError;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">catch</span> (Throwable localThrowable)</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> UndeclaredThrowableException(localThrowable);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> String <span class="title">toString</span><span class="params">()</span></span><br><span class="line">    <span class="keyword">throws</span> </span><br><span class="line">  </span>&#123;</span><br><span class="line">    <span class="keyword">try</span></span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">return</span> (String)<span class="keyword">this</span>.h.invoke(<span class="keyword">this</span>, m2, <span class="keyword">null</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">catch</span> (Error|RuntimeException localError)</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">throw</span> localError;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">catch</span> (Throwable localThrowable)</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> UndeclaredThrowableException(localThrowable);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">static</span></span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">try</span></span><br><span class="line">    &#123;</span><br><span class="line">      m1 = Class.forName(<span class="string">"java.lang.Object"</span>).getMethod(<span class="string">"equals"</span>, <span class="keyword">new</span> Class[] &#123; Class.forName(<span class="string">"java.lang.Object"</span>) &#125;);</span><br><span class="line">      m0 = Class.forName(<span class="string">"java.lang.Object"</span>).getMethod(<span class="string">"hashCode"</span>, <span class="keyword">new</span> Class[<span class="number">0</span>]);</span><br><span class="line">      m3 = Class.forName(<span class="string">"testProxy.IUserService"</span>).getMethod(<span class="string">"login"</span>, <span class="keyword">new</span> Class[] &#123; Class.forName(<span class="string">"java.lang.String"</span>) &#125;);</span><br><span class="line">      m2 = Class.forName(<span class="string">"java.lang.Object"</span>).getMethod(<span class="string">"toString"</span>, <span class="keyword">new</span> Class[<span class="number">0</span>]);</span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">catch</span> (NoSuchMethodException localNoSuchMethodException)</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> NoSuchMethodError(localNoSuchMethodException.getMessage());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">catch</span> (ClassNotFoundException localClassNotFoundException)</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> NoClassDefFoundError(localClassNotFoundException.getMessage());</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="JDK的动态代理"><a href="#JDK的动态代理" class="headerlink" title="JDK的动态代理"></a>JDK的动态代理</h2><p>在JDK的动态代理实现中，对应上边工厂组件的是类Proxy，对应通用代理方法methodProxy的是接口InvocationHandler中的invoke方法。为什么是接口呢？因为这样我们可以通过实现该接口自定义需要的增强功能或额外操作，别忘了这才是目的。其中类Proxy中有一个InvocationHandler类型的成员变量h，然后类Proxy生成的代理类(extends Proxy implements SubjectInterfaceName)中，所有的方法调用，都会通过”super.h.invoke(Object, Method, object[])”这行代码委托到我们自定义的invoke方法中。下面我们使用JDK的动态代理实现最开始的登录功能，看看改进的效果。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//抽象主题，统一对外公开的方法</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">IUserService</span> </span>&#123;</div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">login</span><span class="params">(String username)</span></span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">//实际主题，对外是不可见的</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserServiceImpl</span> <span class="keyword">implements</span> <span class="title">IUserService</span> </span>&#123;</div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">login</span><span class="params">(String username)</span> </span>&#123;</div><div class="line">		System.out.println(username + <span class="string">"登录成功"</span>);</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">//自定义的InvocationHandler实现类，主要用来定义通用调用方法中的额外操作</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyInvocationHandler</span> <span class="keyword">implements</span> <span class="title">InvocationHandler</span> </span>&#123;</div><div class="line">	<span class="comment">//被代理的目标类</span></div><div class="line">	<span class="keyword">public</span> Object target;</div><div class="line">	</div><div class="line">	<span class="comment">//通过构造函数绑定目标类</span></div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="title">MyInvocationHandler</span><span class="params">(Object target)</span> </span>&#123;</div><div class="line">		<span class="keyword">this</span>.target = target;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	<span class="comment">//通用的调用方法</span></div><div class="line">	<span class="meta">@Override</span></div><div class="line">	<span class="function"><span class="keyword">public</span> Object <span class="title">invoke</span><span class="params">(Object proxy, Method method, Object[] args)</span></span></div><div class="line">			<span class="keyword">throws</span> Throwable &#123;</div><div class="line">		<span class="comment">//实际调用前</span></div><div class="line">		System.out.println(<span class="string">"之前的额外操作"</span>);</div><div class="line">		</div><div class="line">		<span class="comment">//调用代理类的方法</span></div><div class="line">		Object result = method.invoke(target, args);</div><div class="line">		</div><div class="line">		<span class="comment">//实际调用后</span></div><div class="line">		System.out.println(<span class="string">"之后的额外操作"</span>);</div><div class="line">		</div><div class="line">		<span class="comment">//返回调用结果</span></div><div class="line">		<span class="keyword">return</span> result;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	<span class="comment">//通过Proxy类的静态方法获取代理类的实例</span></div><div class="line">	<span class="function"><span class="keyword">public</span> Object <span class="title">getProxy</span><span class="params">()</span> </span>&#123;</div><div class="line">		<span class="keyword">return</span> Proxy.newProxyInstance(</div><div class="line">				<span class="comment">//当前线程上下文的类加载器</span></div><div class="line">				Thread.currentThread().getContextClassLoader(),  </div><div class="line">				<span class="comment">//目标类实现的所有接口</span></div><div class="line">				target.getClass().getInterfaces(), </div><div class="line">				<span class="comment">//当前类，主要用于调用invoke方法</span></div><div class="line">				<span class="keyword">this</span>);</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">//测试类</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">		<span class="comment">//绑定需要代理的类</span></div><div class="line">		MyInvocationHandler invocationHandler = <span class="keyword">new</span> MyInvocationHandler(<span class="keyword">new</span> UserServiceImpl());</div><div class="line">		</div><div class="line">		<span class="comment">//利用字节码生成技术生成代理类，并获取其实例(注意声明的类型是IUserService)</span></div><div class="line">		IUserService proxy = (IUserService) invocationHandler.getProxy();</div><div class="line">		</div><div class="line">		<span class="comment">//透明地调用对应的方法</span></div><div class="line">		proxy.login(<span class="string">"ksni88"</span>);</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">执行结果：</div><div class="line">之前的额外操作</div><div class="line">ksni88登陆成功</div><div class="line">之后的额外操作</div></pre></td></tr></table></figure></p>
+<p>可以看到，使用动态代理时，我们根本不用自己写代理类，只用定义我们真正需要的额外操作，然后指定需要被代理的目标类，其他的一切工作都省掉了，相比静态代理可要高明高效的多。看到这里，你可能感觉还不太舒服，因为我们没有自己写代理类，不知道它到底是什么样子，需要看一眼才放心，对吧？我们可以在上边main()方法中加入下面这句：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">System.setProperty(<span class="string">"sun.misc.ProxyGenerator.saveGeneratedFiles"</span>, <span class="string">"true"</span>);</div></pre></td></tr></table></figure></p>
+<p>之后<strong>在项目目录下新建目录com\sun\proxy</strong>，然后再次运行程序，将在刚才目录下产生一个名为”$Proxy0.class”的代理类Class文件，这就是自动生成的代理类，可以使用<em><a href="http://jd.benow.ca/" target="_blank" rel="external">反编译工具</a></em>看一下它长什么样。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> $<span class="title">Proxy0</span></span></div><div class="line">  <span class="keyword">extends</span> <span class="title">Proxy</span></div><div class="line">  <span class="keyword">implements</span> <span class="title">IUserService</span></div><div class="line">&#123;</div><div class="line">  <span class="keyword">private</span> <span class="keyword">static</span> Method m1;</div><div class="line">  <span class="keyword">private</span> <span class="keyword">static</span> Method m0;</div><div class="line">  <span class="keyword">private</span> <span class="keyword">static</span> Method m3;</div><div class="line">  <span class="keyword">private</span> <span class="keyword">static</span> Method m2;</div><div class="line">  </div><div class="line">  <span class="keyword">public</span> $Proxy0(InvocationHandler paramInvocationHandler)</div><div class="line">    <span class="keyword">throws</span> </div><div class="line">  &#123;</div><div class="line">    <span class="keyword">super</span>(paramInvocationHandler);</div><div class="line">  &#125;</div><div class="line">  </div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">equals</span><span class="params">(Object paramObject)</span></span></div><div class="line">    <span class="keyword">throws</span> </div><div class="line">  &#123;</div><div class="line">    <span class="keyword">try</span></div><div class="line">    &#123;</div><div class="line">      <span class="keyword">return</span> ((Boolean)<span class="keyword">this</span>.h.invoke(<span class="keyword">this</span>, m1, <span class="keyword">new</span> Object[] &#123; paramObject &#125;)).booleanValue();</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">catch</span> (Error|RuntimeException localError)</div><div class="line">    &#123;</div><div class="line">      <span class="keyword">throw</span> localError;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">catch</span> (Throwable localThrowable)</div><div class="line">    &#123;</div><div class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> UndeclaredThrowableException(localThrowable);</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">  </div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">hashCode</span><span class="params">()</span></span></div><div class="line">    <span class="keyword">throws</span> </div><div class="line">  &#123;</div><div class="line">    <span class="keyword">try</span></div><div class="line">    &#123;</div><div class="line">      <span class="keyword">return</span> ((Integer)<span class="keyword">this</span>.h.invoke(<span class="keyword">this</span>, m0, <span class="keyword">null</span>)).intValue();</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">catch</span> (Error|RuntimeException localError)</div><div class="line">    &#123;</div><div class="line">      <span class="keyword">throw</span> localError;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">catch</span> (Throwable localThrowable)</div><div class="line">    &#123;</div><div class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> UndeclaredThrowableException(localThrowable);</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">  </div><div class="line">  <span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> **login**(String paramString)</div><div class="line">    <span class="keyword">throws</span> </div><div class="line">  &#123;</div><div class="line">    <span class="keyword">try</span></div><div class="line">    &#123;</div><div class="line">      <span class="keyword">this</span>.h.invoke(<span class="keyword">this</span>, m3, <span class="keyword">new</span> Object[] &#123; paramString &#125;);</div><div class="line">      <span class="keyword">return</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">catch</span> (Error|RuntimeException localError)</div><div class="line">    &#123;</div><div class="line">      <span class="keyword">throw</span> localError;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">catch</span> (Throwable localThrowable)</div><div class="line">    &#123;</div><div class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> UndeclaredThrowableException(localThrowable);</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">  </div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> String <span class="title">toString</span><span class="params">()</span></span></div><div class="line">    <span class="keyword">throws</span> </div><div class="line">  &#123;</div><div class="line">    <span class="keyword">try</span></div><div class="line">    &#123;</div><div class="line">      <span class="keyword">return</span> (String)<span class="keyword">this</span>.h.invoke(<span class="keyword">this</span>, m2, <span class="keyword">null</span>);</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">catch</span> (Error|RuntimeException localError)</div><div class="line">    &#123;</div><div class="line">      <span class="keyword">throw</span> localError;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">catch</span> (Throwable localThrowable)</div><div class="line">    &#123;</div><div class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> UndeclaredThrowableException(localThrowable);</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">  </div><div class="line">  <span class="keyword">static</span></div><div class="line">  &#123;</div><div class="line">    <span class="keyword">try</span></div><div class="line">    &#123;</div><div class="line">      m1 = Class.forName(<span class="string">"java.lang.Object"</span>).getMethod(<span class="string">"equals"</span>, <span class="keyword">new</span> Class[] &#123; Class.forName(<span class="string">"java.lang.Object"</span>) &#125;);</div><div class="line">      m0 = Class.forName(<span class="string">"java.lang.Object"</span>).getMethod(<span class="string">"hashCode"</span>, <span class="keyword">new</span> Class[<span class="number">0</span>]);</div><div class="line">      m3 = Class.forName(<span class="string">"testProxy.IUserService"</span>).getMethod(<span class="string">"login"</span>, <span class="keyword">new</span> Class[] &#123; Class.forName(<span class="string">"java.lang.String"</span>) &#125;);</div><div class="line">      m2 = Class.forName(<span class="string">"java.lang.Object"</span>).getMethod(<span class="string">"toString"</span>, <span class="keyword">new</span> Class[<span class="number">0</span>]);</div><div class="line">      <span class="keyword">return</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">catch</span> (NoSuchMethodException localNoSuchMethodException)</div><div class="line">    &#123;</div><div class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> NoSuchMethodError(localNoSuchMethodException.getMessage());</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">catch</span> (ClassNotFoundException localClassNotFoundException)</div><div class="line">    &#123;</div><div class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> NoClassDefFoundError(localClassNotFoundException.getMessage());</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <p>通过以上反编译得到的代码，可以观察到自动生成的代理类有以下几个特点：</p>
 <ol>
 <li>该代理类继承Proxy类，实现了<em>被代理类实现的接口</em>；</li>
@@ -2247,7 +2244,7 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-04-14T13:43:03+08:00" content="2016-04-14">
+            <time itemprop="dateCreated" datetime="2016-04-14T00:00:00+08:00" content="2016-04-14">
               2016-04-14
             </time>
           </span>
@@ -2306,14 +2303,14 @@
 <p>简单介绍一下项目内容：该项目数据库相关的主要是每天定时定期地从6个新闻门户网站上爬取定量的新闻存储到数据库中，以供后期的查取。由于当时需求方要求不高，自己的水平和要求也不高，所以当时既没有使用索引，也没有定期删除过期的新闻数据，结果就造成news新闻表中的数据随着时间的推移无限量增长，两个月前谢帆做iOS版本用接口取数据时更是要等五到十分钟才有反应，当时通过自增id得知表数据近百万了，但由于已经交付大半年了，没有理由主动联系对方，也就无能为力了。这几天对方主动联系做一些小改动，这才下决心学习一下索引，全面改善一下。</p>
 <h2 id="预备知识"><a href="#预备知识" class="headerlink" title="预备知识"></a>预备知识</h2><p>在搜狐面试结束以后，我查过一些关于索引的资料，简单了解了索引的分类、结构、原理等，这么多的内容我也没有进行系统全面的学习，但其中最重要最基础的就是<em><a href="http://www.cnblogs.com/oldhorse/archive/2009/11/16/1604009.html" target="_blank" rel="external">B+树</a></em>了，了解了什么是B+树以后，最好再了解一下<em><a href="http://blog.csdn.net/v_JULY_v/article/details/6530142/" target="_blank" rel="external">索引对B+树的应用</a></em>，看完觉得不过瘾还可以接着看一下<em><a href="http://www.cnblogs.com/hustcat/archive/2009/10/28/1591648.html" target="_blank" rel="external">MySQL索引的原理</a></em>，最后一篇一开始就看可能会不太懂，但只用先记住其中最重要的一条规则：最左前缀原则，经过实践再回头看就柳暗花明了。</p>
 <h2 id="索引实践"><a href="#索引实践" class="headerlink" title="索引实践"></a>索引实践</h2><p>先贴出进行实践的数据表结构，非常简单。<br><img src="http://cevxd.img47.wal8.com/img47/542077_20160404152451/146139846939.jpg" alt="表结构"></p>
-<h3 id="建立索引"><a href="#建立索引" class="headerlink" title="建立索引"></a>建立索引</h3><p>先找到需要使用索引的SQL，功能很简单，就是分页获取指定类别的最新新闻的id和title，具体做法是按照date对指定category_id的新闻进行排序，然后按照分页参数选取数据，下面是具体的示例代码。<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="keyword">id</span>, title</span><br><span class="line"><span class="keyword">from</span> news_copy</span><br><span class="line"><span class="keyword">where</span> category_id=<span class="number">1</span></span><br><span class="line"><span class="keyword">order</span> <span class="keyword">by</span> <span class="built_in">date</span> <span class="keyword">desc</span></span><br><span class="line"><span class="keyword">limit</span> <span class="number">1000</span>,<span class="number">10</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="建立索引"><a href="#建立索引" class="headerlink" title="建立索引"></a>建立索引</h3><p>先找到需要使用索引的SQL，功能很简单，就是分页获取指定类别的最新新闻的id和title，具体做法是按照date对指定category_id的新闻进行排序，然后按照分页参数选取数据，下面是具体的示例代码。<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">select</span> <span class="keyword">id</span>, title</div><div class="line"><span class="keyword">from</span> news_copy</div><div class="line"><span class="keyword">where</span> category_id=<span class="number">1</span></div><div class="line"><span class="keyword">order</span> <span class="keyword">by</span> <span class="built_in">date</span> <span class="keyword">desc</span></div><div class="line"><span class="keyword">limit</span> <span class="number">1000</span>,<span class="number">10</span></div></pre></td></tr></table></figure></p>
 <p>病急乱投医，按照<em><a href="http://my.oschina.net/leejun2005/blog/96867" target="_blank" rel="external">此文</a></em>给的建议：</p>
 <blockquote>
 <p>如果对于有where条件，又想走索引用limit的，必须设计一个索引，将where放第一位，limit用到的主键放第2位，而且只能select主键。</p>
 </blockquote>
 <p>我在该表上建立了联合索引category_id_date=(category_id, date)，这句话是相当精简正确的，但我当时注意力全放在怎么建索引了，没有在意最后一句话，这也造成了后面一些困惑，先且接着往下看。</p>
 <h3 id="造大量假数据"><a href="#造大量假数据" class="headerlink" title="造大量假数据"></a>造大量假数据</h3><p>建立完索引，就需要造大量假数据进行测试了，我找到去年开发时的news表，里边存有5000多条数据，然后通过存储过程把该表数据循环添加到另一张结构一样的news_copy表中，循环100次，下图是添加后的数据量。<br><img src="http://cevxd.img47.wal8.com/img47/542077_20160404152451/146139846866.jpg" alt="数据量"><br>可以看到有近60W条数据，下边分别是建索引前后的效果图：<br><img src="http://cevxd.img47.wal8.com/img47/542077_20160404152451/146139847119.jpg" alt="建索引前"><br><img src="http://cevxd.img47.wal8.com/img47/542077_20160404152451/146139847069.jpg" alt="建索引后"><br>可以看到效率相差10倍，而且这个差距肯定会随着数据量的增加而变大。然而，虽然建立索引大大增加了查询效率，但建索引后的查询效率还是不能让我们满意。这时我们就该回头关注SQL本身了，能不能进行优化呢？</p>
-<h3 id="SQL优化"><a href="#SQL优化" class="headerlink" title="SQL优化"></a>SQL优化</h3><p>依然是病急乱投医(不过通过实践遇到问题就解决是最快的学习途径，只是不够系统全面)，查了一通SQL优化以后，在繁杂的搜索结果里有一篇<em><a href="http://www.111cn.net/database/mysql/46425.htm" target="_blank" rel="external">博文</a></em>让我相见恨晚，像是捡了宝一样赶紧按照他说的改了一下SQL：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> n.<span class="keyword">id</span>, title <span class="keyword">from</span> news_copy n</span><br><span class="line"><span class="keyword">inner</span> <span class="keyword">join</span></span><br><span class="line">(<span class="keyword">select</span> <span class="keyword">id</span> <span class="keyword">from</span> news_copy </span><br><span class="line"><span class="keyword">where</span> category_id=<span class="number">1</span></span><br><span class="line"><span class="keyword">order</span> <span class="keyword">by</span> <span class="built_in">date</span> <span class="keyword">desc</span></span><br><span class="line"><span class="keyword">limit</span> <span class="number">1000</span>,<span class="number">10</span>) t</span><br><span class="line"><span class="keyword">on</span> n.<span class="keyword">id</span>=t.<span class="keyword">id</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="SQL优化"><a href="#SQL优化" class="headerlink" title="SQL优化"></a>SQL优化</h3><p>依然是病急乱投医(不过通过实践遇到问题就解决是最快的学习途径，只是不够系统全面)，查了一通SQL优化以后，在繁杂的搜索结果里有一篇<em><a href="http://www.111cn.net/database/mysql/46425.htm" target="_blank" rel="external">博文</a></em>让我相见恨晚，像是捡了宝一样赶紧按照他说的改了一下SQL：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">select</span> n.id, title <span class="keyword">from</span> news_copy n</div><div class="line"><span class="keyword">inner</span> <span class="keyword">join</span></div><div class="line">(<span class="keyword">select</span> <span class="keyword">id</span> <span class="keyword">from</span> news_copy </div><div class="line"><span class="keyword">where</span> category_id=<span class="number">1</span></div><div class="line"><span class="keyword">order</span> <span class="keyword">by</span> <span class="built_in">date</span> <span class="keyword">desc</span></div><div class="line"><span class="keyword">limit</span> <span class="number">1000</span>,<span class="number">10</span>) t</div><div class="line"><span class="keyword">on</span> n.id=t.id</div></pre></td></tr></table></figure></p>
 <p>执行结果如下：<br><img src="http://cevxd.img47.wal8.com/img47/542077_20160404152451/146139847016.jpg" alt="SQL优化后"><br>是不是惊到了？竟然相差近百倍。这又是为什么呢？这里就要引出另外一个概念了：覆盖索引。</p>
 <h3 id="覆盖索引"><a href="#覆盖索引" class="headerlink" title="覆盖索引"></a>覆盖索引</h3><p>索引一般用来快速定位想要查询的数据的位置，然后据此精确读取，所以有两步读取操作，第一步读索引，第二步根据索引读数据并返回。换句话说，索引只是用来定位数据，而不是直接返回数据。然而覆盖索引就是一个特例，下面是覆盖索引的概念：</p>
 <blockquote>
@@ -2330,7 +2327,7 @@
 <li>输出查询结果;</li>
 </ol>
 <p>这里需要注意的是第3步，这一步是SQL语句真正开始执行的开始，如果没有可用索引，就会进行全表扫描，读取所有记录的<strong>所有字段</strong>；而如果有可用索引，会先扫描索引，然后根据索引读取对应记录的<strong>所有字段</strong>。注意我说的是<strong>所有字段</strong>，而不只是select的字段，至于具体的过程，继续往下看。</p>
-<h4 id="SQL的具体先后顺序"><a href="#SQL的具体先后顺序" class="headerlink" title="SQL的具体先后顺序"></a>SQL的具体先后顺序</h4><p>上边讲得是把SQL语句作为一个整体看，这里是深入SQL语句内部，讨论各个SQL关键字的执行先后顺序（参考：<em><a href="http://www.jellythink.com/archives/924" target="_blank" rel="external">博文</a></em>）：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">(7)     <span class="keyword">SELECT</span> </span><br><span class="line">(<span class="number">8</span>)     <span class="keyword">DISTINCT</span> &lt;select_list&gt;</span><br><span class="line">(<span class="number">1</span>)     <span class="keyword">FROM</span> &lt;left_table&gt;</span><br><span class="line">(<span class="number">3</span>)     &lt;join_type&gt; <span class="keyword">JOIN</span> &lt;right_table&gt;</span><br><span class="line">(<span class="number">2</span>)     <span class="keyword">ON</span> &lt;join_condition&gt;</span><br><span class="line">(<span class="number">4</span>)     <span class="keyword">WHERE</span> &lt;where_condition&gt;</span><br><span class="line">(<span class="number">5</span>)     <span class="keyword">GROUP</span> <span class="keyword">BY</span> &lt;group_by_list&gt;</span><br><span class="line">(<span class="number">6</span>)     <span class="keyword">HAVING</span> &lt;having_condition&gt;</span><br><span class="line">(<span class="number">9</span>)     <span class="keyword">ORDER</span> <span class="keyword">BY</span> &lt;order_by_condition&gt;</span><br><span class="line">(<span class="number">10</span>)    <span class="keyword">LIMIT</span> &lt;limit_number&gt;</span><br></pre></td></tr></table></figure></p>
+<h4 id="SQL的具体先后顺序"><a href="#SQL的具体先后顺序" class="headerlink" title="SQL的具体先后顺序"></a>SQL的具体先后顺序</h4><p>上边讲得是把SQL语句作为一个整体看，这里是深入SQL语句内部，讨论各个SQL关键字的执行先后顺序（参考：<em><a href="http://www.jellythink.com/archives/924" target="_blank" rel="external">博文</a></em>）：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">(7)     <span class="keyword">SELECT</span> </div><div class="line">(<span class="number">8</span>)     <span class="keyword">DISTINCT</span> &lt;select_list&gt;</div><div class="line">(<span class="number">1</span>)     <span class="keyword">FROM</span> &lt;left_table&gt;</div><div class="line">(<span class="number">3</span>)     &lt;join_type&gt; <span class="keyword">JOIN</span> &lt;right_table&gt;</div><div class="line">(<span class="number">2</span>)     <span class="keyword">ON</span> &lt;join_condition&gt;</div><div class="line">(<span class="number">4</span>)     <span class="keyword">WHERE</span> &lt;where_condition&gt;</div><div class="line">(<span class="number">5</span>)     <span class="keyword">GROUP</span> <span class="keyword">BY</span> &lt;group_by_list&gt;</div><div class="line">(<span class="number">6</span>)     <span class="keyword">HAVING</span> &lt;having_condition&gt;</div><div class="line">(<span class="number">9</span>)     <span class="keyword">ORDER</span> <span class="keyword">BY</span> &lt;order_by_condition&gt;</div><div class="line">(<span class="number">10</span>)    <span class="keyword">LIMIT</span> &lt;limit_number&gt;</div></pre></td></tr></table></figure></p>
 <p><em>前边的数字表示该行SQL被执行的次序。</em></p>
 <p>SQL执行的开始是FROM语句，查看目标表是否有可用索引（见上），然后取<strong>所有字段</strong>，然后根据WHERE查询条件<strong>选取</strong>满足条件的记录，然后根据SELECT语句<strong>选取</strong>需要的字段，最后根据LIMIT语句<strong>选取</strong>并返回需要的数据结果。所以不要天真地认为每次查询只会读取SELECT指定的字段，查询不是一个从<em>零</em>挑选增加成结果的过程，而是从<em>满</em>筛选去除成结果的过程（其实道理很简单，因为我们需要把所有数据读到内存中进行处理，而不能在文件层面有选择的读取）。</p>
 <h4 id="优化后的SQL为什么快"><a href="#优化后的SQL为什么快" class="headerlink" title="优化后的SQL为什么快"></a>优化后的SQL为什么快</h4><p>现在我们终于可以分析一下我们的SQL优化前后具体有什么区别了，先记住一个数据再继续看：表news_copy中category_id=1的记录共5W多条。</p>
@@ -2405,7 +2402,7 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-04-10T13:37:23+08:00" content="2016-04-10">
+            <time itemprop="dateCreated" datetime="2016-04-10T00:00:00+08:00" content="2016-04-10">
               2016-04-10
             </time>
           </span>
@@ -2483,20 +2480,20 @@
 <blockquote>
 <p>volatile只能保证被修饰变量的可见性，不保证对其操作的原子性，对其所有的操作都和普通变量一样是非线程安全的。  </p>
 </blockquote>
-<p>volatile对变量的影响仅仅只是可见性，这是我们一直强调的一点，如果你已经理解了什么是可见性，但当可见性和原子性这两个概念放在一起时有点晕的话，看了下边的例子可能就清楚多了。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">volatile</span> <span class="keyword">int</span> num;</span><br><span class="line">num++;</span><br></pre></td></tr></table></figure></p>
+<p>volatile对变量的影响仅仅只是可见性，这是我们一直强调的一点，如果你已经理解了什么是可见性，但当可见性和原子性这两个概念放在一起时有点晕的话，看了下边的例子可能就清楚多了。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">static</span> <span class="keyword">volatile</span> <span class="keyword">int</span> num;</div><div class="line">num++;</div></pre></td></tr></table></figure></p>
 <p>如果volatile能保证变量操作的原子性，那上边num++这个操作应该是原子操作，即它应该是一个细不可分的、不会被“中途打断”的操作，但稍微清醒一点的你也会意识到这是不可能的。这个操作最起码要分成三个原子操作才能完成：</p>
 <ol>
 <li>读取num当前值；</li>
 <li>对num当前值进行加1运算；</li>
 <li>回写运算后的num值；  </li>
 </ol>
-<p>在多线程环境下，任一个正在进行num++操作的线程，都有可能在上边三个原子操作之间的任一点被切换上下文。这也是可以通过Javap反汇编印证的，下边是num++反汇编对应的字节码指令：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">getstatic</span><br><span class="line">iconst_1</span><br><span class="line">iadd</span><br><span class="line">pustatic</span><br></pre></td></tr></table></figure></p>
+<p>在多线程环境下，任一个正在进行num++操作的线程，都有可能在上边三个原子操作之间的任一点被切换上下文。这也是可以通过Javap反汇编印证的，下边是num++反汇编对应的字节码指令：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">getstatic</div><div class="line">iconst_1</div><div class="line">iadd</div><div class="line">pustatic</div></pre></td></tr></table></figure></p>
 <p>可以清楚的看到num++操作被编译成了四条字节码指令，所以可见性和原子性之间并没有什么必然联系，而volatile只保证变量的可见性，对于num++这个操作而言，volatile的唯一作用是，当且仅当putstatic指令执行完以后，任一线程通过getstatic指令读取到的num值都是最新的。(这里用字节码来说明原子性不是很严谨，因为即使编译出来只有一条字节码指令，也并不意味着执行这条指令就是一个原子操作，因为一条字节码指令在真正被执行时可能会转化为多条本地机器码指令，所以通过汇编代码而非字节码指令会更严谨一些，但此处使用字节码就已经能说明问题了)。</p>
 <h3 id="volatile的两个作用"><a href="#volatile的两个作用" class="headerlink" title="volatile的两个作用"></a>volatile的两个作用</h3><p>前边我们一直在讲volatile能保证可见性，其实这只是它的作用之一，它还有另外一个作用就是禁止指令重排序优化。</p>
 <blockquote>
 <p>从硬件架构上讲，指令重排序是指CPU采用了允许将多条指令不按程序规定的顺序分开发送给各相应电路单元处理。但并不是说指令任意重排，CPU需要能正确处理指令依赖情况以保障程序能得出正确的执行结果。 </p>
 </blockquote>
-<p>可以结合CPU流水线理解上边的概念。那指令重排序对程序的并发执行又有什么影响呢？为什么volatile要禁止指令重排序呢？下边通过DCL单例模式的代码来说明。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Singleton</span> </span>&#123;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">static</span> Singleton instance;</span><br><span class="line">	</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Singleton <span class="title">getInstance</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span>(instance == <span class="keyword">null</span>) &#123;</span><br><span class="line">			<span class="keyword">synchronized</span> (Singleton.class) &#123;</span><br><span class="line">				<span class="keyword">if</span>(instance == <span class="keyword">null</span>)</span><br><span class="line">					instance = <span class="keyword">new</span> Singleton();</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> instance;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="title">Singleton</span><span class="params">()</span></span>&#123;&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doSomething</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="comment">//do something</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>可以结合CPU流水线理解上边的概念。那指令重排序对程序的并发执行又有什么影响呢？为什么volatile要禁止指令重排序呢？下边通过DCL单例模式的代码来说明。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Singleton</span> </span>&#123;</div><div class="line">	<span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">static</span> Singleton instance;</div><div class="line">	</div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Singleton <span class="title">getInstance</span><span class="params">()</span> </span>&#123;</div><div class="line">		<span class="keyword">if</span>(instance == <span class="keyword">null</span>) &#123;</div><div class="line">			<span class="keyword">synchronized</span> (Singleton.class) &#123;</div><div class="line">				<span class="keyword">if</span>(instance == <span class="keyword">null</span>)</div><div class="line">					instance = <span class="keyword">new</span> Singleton();</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">		<span class="keyword">return</span> instance;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	<span class="function"><span class="keyword">private</span> <span class="title">Singleton</span><span class="params">()</span></span>&#123;&#125;</div><div class="line">	</div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doSomething</span><span class="params">()</span> </span>&#123;</div><div class="line">		<span class="comment">//do something</span></div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <p>如果instance没有使用volatile修饰，那么instance = new Singleton()对应的指令就有可能被重排序。该行代码起码有三个步骤需要完成：</p>
 <ol>
 <li>在Java堆中分配一块内存用来存储Singleton实例；</li>
@@ -2516,7 +2513,7 @@
 <blockquote>
 <p>with lock prefix, memory related instructions are processed specially to act as a memory barrier, similar to mfence instruction. Dave Dice explains in his blog that they benchmarked the 2 kinds of barrier, and the lock add seems the most efficient one on today’s architecture. So this barrier ensures that there is no reordering before and after this instruction and also drains all instructions pending into Store Buffer. After executing these instructions, all writes are visible to all other threads through cache subsystem or main memory. This costs some latency to wait for this drain.  </p>
 </blockquote>
-<h3 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h3><p>之前刚接触volatile时，看到过一个说法，volatile只适合简单的get和set方法，当时不太懂。这次在查内存屏障时，不知道在哪看到一句话，意思是对于volatile变量，单独的读操作和单独的写操作是原子操作，但任意的读写操作的组合不再是原子操作，这句话像是戳破了最后一张纸一样，一句话解释清楚了之前num++不是原子操作的原因，并给出了言简意赅的结论。这时再回头去查之前那个说法时才恍然大悟，看<em><a href="http://www.blogjava.net/bolo/archive/2014/06/20/414971.html" target="_blank" rel="external">下面代码</a></em>：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">int</span> i = <span class="number">0</span>;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">get</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> i;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">set</span><span class="params">(<span class="keyword">int</span> i)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">this</span>.i = i;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h3><p>之前刚接触volatile时，看到过一个说法，volatile只适合简单的get和set方法，当时不太懂。这次在查内存屏障时，不知道在哪看到一句话，意思是对于volatile变量，单独的读操作和单独的写操作是原子操作，但任意的读写操作的组合不再是原子操作，这句话像是戳破了最后一张纸一样，一句话解释清楚了之前num++不是原子操作的原因，并给出了言简意赅的结论。这时再回头去查之前那个说法时才恍然大悟，看<em><a href="http://www.blogjava.net/bolo/archive/2014/06/20/414971.html" target="_blank" rel="external">下面代码</a></em>：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">int</span> i = <span class="number">0</span>;</div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">get</span><span class="params">()</span> </span>&#123;</div><div class="line">	<span class="keyword">return</span> i;</div><div class="line">&#125;</div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">set</span><span class="params">(<span class="keyword">int</span> i)</span> </span>&#123;</div><div class="line">	<span class="keyword">this</span>.i = i;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <p>如果我说，上边的get和set方法对于变量i的操作，不但是原子操作，而且两个方法之间还是同步的，即此处volatile的作用完全等同于synchronized的作用，你是不是需要思考一会？这么神奇吗？</p>
 <p>先来解释为什么是同步的，我们可以先用熟悉的synchronized想一下同步效果是什么样。如果两个方法是synchronized修饰的，那多线程环境下，任一时刻只有一个线程在执行get和set方法，其他线程都处于阻塞排队状态，则，任一时刻，任一线程通过get方法得到的，一定是变量i此刻的最新值。这就是synchronized在此处达到的同步效果，是不是很熟悉？这不就是保证了变量i的可见性嘛。再来看此处volatile达到的同步效果，由于volatile语义使然，同样的，任一时刻，任一线程通过get方法得到的，一定是变量i此刻的最新值。</p>
 <p>再来解释原子性，这时我们可以考虑一下如果变量i没有使用volatile修饰，结合我们上边说的内存模型，当一个线程A执行this.i=i时，其实至少是有两步的：1.对工作内存中的i进行写操作；2.把工作内存中的i同步回写到主内存中；那么当在这两步之间进行上下文切换至其他线程时，通过get方法将看不到i的最新值。而volatile可以保证this.i=i这行代码的原子性。此处的原子性可能和我们通常理解的原子性不太一样，因为我们之前遇到的原子性都是在机器码的层面上，而这里是由于JAVA的内存模型导致的。</p>
