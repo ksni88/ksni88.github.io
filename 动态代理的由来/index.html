@@ -63,12 +63,12 @@
 <meta property="og:url" content="http://ksni88.github.io/动态代理的由来/index.html">
 <meta property="og:site_name" content="栖静林">
 <meta property="og:description" content="我们在学习的过程中一直会遇到各种高大上的技术名词或缩写，其中动态代理就是其中之一。之前只是了解过动态代理是代理模式的一种实现，其中JDK的动态代理是基于接口的，CGlib(Code Generation Library)的动态代理是基于类的，通过动态代理可以在原本实现的基础上做到一些增强功能或额外操作，等等，可以说得头头是道，但还是不能做到知根知底，一清二楚。比如基于接口是什么意思？基于类又是什么">
-<meta property="og:image" content="http://cevxd.img47.wal8.com/img47/542077_20160404152451/14622571186.png">
-<meta property="og:updated_time" content="2016-09-20T02:58:17.593Z">
+<meta property="og:image" content="http://obd791hyv.bkt.clouddn.com/hexo/dynamicproxy/%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86UML.png">
+<meta property="og:updated_time" content="2016-09-26T07:58:50.333Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="动态代理的由来">
 <meta name="twitter:description" content="我们在学习的过程中一直会遇到各种高大上的技术名词或缩写，其中动态代理就是其中之一。之前只是了解过动态代理是代理模式的一种实现，其中JDK的动态代理是基于接口的，CGlib(Code Generation Library)的动态代理是基于类的，通过动态代理可以在原本实现的基础上做到一些增强功能或额外操作，等等，可以说得头头是道，但还是不能做到知根知底，一清二楚。比如基于接口是什么意思？基于类又是什么">
-<meta name="twitter:image" content="http://cevxd.img47.wal8.com/img47/542077_20160404152451/14622571186.png">
+<meta name="twitter:image" content="http://obd791hyv.bkt.clouddn.com/hexo/dynamicproxy/%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86UML.png">
 
 
 
@@ -238,7 +238,7 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-05-01T00:00:00+08:00" content="2016-05-01">
+            <time itemprop="dateCreated" datetime="2016-05-01T16:47:55+08:00" content="2016-05-01">
               2016-05-01
             </time>
           </span>
@@ -297,7 +297,7 @@
 <p><strong>代理模式</strong><br>    为其他对象提供一种代理以控制对这个对象的访问。<br><strong>Proxy Pattern</strong><br>    Provide a surrogate or placeholder for another object to control access to it.  </p>
 </blockquote>
 <p>通俗点讲，在代理模式中，至少有两个角色：代理类proxy和被代理类real，外界对real的访问都是通过proxy传达完成的。可以说real对外界是不可见的或者透明的，因为他们对外公开的方法是一模一样的（通过实现相同的接口或继承相同的类保证）。这时proxy相当于一个中介，在外界调用真正到达real时，proxy可以做一些额外操作，比如安全验证、记录访问日志等。下面通过具体的UML图来解释。</p>
-<h3 id="模式的组成结构"><a href="#模式的组成结构" class="headerlink" title="模式的组成结构"></a>模式的组成结构</h3><p>这里以基于接口为例来讲，下面是代理模式的UML图。<br><img src="http://cevxd.img47.wal8.com/img47/542077_20160404152451/14622571186.png" alt="UML图"><br>代理模式包括三种角色：</p>
+<h3 id="模式的组成结构"><a href="#模式的组成结构" class="headerlink" title="模式的组成结构"></a>模式的组成结构</h3><p>这里以基于接口为例来讲，下面是代理模式的UML图。<br><img src="http://obd791hyv.bkt.clouddn.com/hexo/dynamicproxy/%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86UML.png" alt="UML图"><br>代理模式包括三种角色：</p>
 <ul>
 <li>抽象主题(Subject)：抽象主题是一个接口，该接口是对象和它的代理所共用的接口，即是RealSubject和Proxy所实现的接口。</li>
 <li>实际主题(RealSubject)：实际主题是实现抽象主题接口的类。实际主题的实例是代理角色实例所要代理的对象。</li>
@@ -399,6 +399,25 @@
 
     <div class="post-spread">
       
+        <div class="ds-share flat" data-thread-key="动态代理的由来/"
+     data-title="动态代理的由来"
+     data-content=""
+     data-url="http://ksni88.github.io/动态代理的由来/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
     </div>
   </div>
 
@@ -456,7 +475,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">12</span>
+              <span class="site-state-item-count">14</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -464,7 +483,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-count">5</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -473,7 +492,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">21</span>
+                <span class="site-state-item-count">22</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

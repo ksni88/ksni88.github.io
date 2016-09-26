@@ -65,16 +65,16 @@
 <meta property="og:site_name" content="栖静林">
 <meta property="og:description" content="对于线程池，我在项目中只是简单的使用，大概知道JDK有四种线程池，但对于具体的实现和原理并不是很清楚，所以本文是在对线程池有一些了解之后，结合源码全面总结并讲解JDK线程池的实现和原理。但在开写之前呢，并没有预想到线程池有这么大的内容量，本想一下午看完，结果看了两三天，笔记也是越写越长，显得有些杂乱，可以根据目录按需选看。
 为什么要使用线程池？诸如 Web 服务器、数据库服务器、文件服务器或邮件服">
-<meta property="og:image" content="http://cevxd.img47.wal8.com/img47/542077_20160404152451/145975477752.png">
-<meta property="og:image" content="http://cevxd.img47.wal8.com/img47/542077_20160404152451/145975630954.png">
-<meta property="og:image" content="http://cevxd.img47.wal8.com/img47/542077_20160404152451/145975826897.png">
-<meta property="og:image" content="http://cevxd.img47.wal8.com/img47/542077_20160404152451/145975832373.png">
-<meta property="og:updated_time" content="2016-09-20T03:04:29.495Z">
+<meta property="og:image" content="http://obd791hyv.bkt.clouddn.com/hexo/threadpool/%E7%BA%BF%E7%A8%8B%E6%B1%A0UML.png">
+<meta property="og:image" content="http://obd791hyv.bkt.clouddn.com/hexo/threadpool/%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B.png">
+<meta property="og:image" content="http://obd791hyv.bkt.clouddn.com/hexo/threadpool/processWorkExit%E6%B5%81%E7%A8%8B%E5%9B%BE.png">
+<meta property="og:image" content="http://obd791hyv.bkt.clouddn.com/hexo/threadpool/keepAliveTime.png">
+<meta property="og:updated_time" content="2016-09-26T08:04:19.521Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="线程池全面解析">
 <meta name="twitter:description" content="对于线程池，我在项目中只是简单的使用，大概知道JDK有四种线程池，但对于具体的实现和原理并不是很清楚，所以本文是在对线程池有一些了解之后，结合源码全面总结并讲解JDK线程池的实现和原理。但在开写之前呢，并没有预想到线程池有这么大的内容量，本想一下午看完，结果看了两三天，笔记也是越写越长，显得有些杂乱，可以根据目录按需选看。
 为什么要使用线程池？诸如 Web 服务器、数据库服务器、文件服务器或邮件服">
-<meta name="twitter:image" content="http://cevxd.img47.wal8.com/img47/542077_20160404152451/145975477752.png">
+<meta name="twitter:image" content="http://obd791hyv.bkt.clouddn.com/hexo/threadpool/%E7%BA%BF%E7%A8%8B%E6%B1%A0UML.png">
 
 
 
@@ -244,7 +244,7 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-04-04T15:53:24+08:00" content="2016-04-04">
+            <time itemprop="dateCreated" datetime="2016-04-04T15:09:33+08:00" content="2016-04-04">
               2016-04-04
             </time>
           </span>
@@ -306,7 +306,7 @@
 <li>提高线程的可管理性：线程是稀缺资源，如果无限制的创建，不仅会消耗系统资源，还会降低系统的稳定性，使用线程池可以进行统一的分配，调优和监控。</li>
 </ol>
 <h2 id="最简单的线程池模型"><a href="#最简单的线程池模型" class="headerlink" title="最简单的线程池模型"></a>最简单的线程池模型</h2><p>至少要有两个集合，其中一个集合用来存放线程，另一个集合用来存放等待执行的任务。针对线程的个数控制、任务执行的顺序、没有可用线程或任务满了以后对应的策略，JDK提供了几种常用的、实现好的线程池供我们使用，下面详细讲解JDK的线程池（这里先抛出一个重要的问题，对于这个简单模型，我只说了它静态的存储结构，但它的动态操作，比如把任务交给线程来执行这个动作是怎么完成的？线程执行完以后又怎么达到线程复用的？在讲解完JDK的四种线程池以后，我会在此文最后通过源码来回答这些问题）。</p>
-<h2 id="JDK提供的线程池"><a href="#JDK提供的线程池" class="headerlink" title="JDK提供的线程池"></a>JDK提供的线程池</h2><h3 id="UML图："><a href="#UML图：" class="headerlink" title="UML图："></a>UML图：</h3><p><img src="http://cevxd.img47.wal8.com/img47/542077_20160404152451/145975477752.png" alt="JDK线程池UML"></p>
+<h2 id="JDK提供的线程池"><a href="#JDK提供的线程池" class="headerlink" title="JDK提供的线程池"></a>JDK提供的线程池</h2><h3 id="UML图："><a href="#UML图：" class="headerlink" title="UML图："></a>UML图：</h3><p><img src="http://obd791hyv.bkt.clouddn.com/hexo/threadpool/%E7%BA%BF%E7%A8%8B%E6%B1%A0UML.png" alt="JDK线程池UML"></p>
 <p>标记一下比较重要的类：<table><tr><td>ExecutorService</td><td>真正的线程池接口</td></tr><tr><td>ScheduledExecutorService</td><td>能和Timer/TimerTask类似，解决那些需要任务重复执行的问题</td></tr><tr><td>ThreadPoolExecutor</td><td>ExecutorService的默认实现</td></tr><tr><td>ScheduledThreadPoolExecutor</td><td>继承ThreadPoolExecutor的ScheduledExecutorService接口实现，周期性任务调度的类实现</td></tr></table></p>
 <h3 id="ThreadPoolExecutor构造参数"><a href="#ThreadPoolExecutor构造参数" class="headerlink" title="ThreadPoolExecutor构造参数"></a>ThreadPoolExecutor构造参数</h3><p>对于我们上边提到的JDK提供的几种常用的线程池，其实都是通过ThreadPoolExecutor构造的，只是构造参数不同导致各个线程池的特性不同，所以在介绍那几种具体的线程池之前，先来了解一下ThreadPoolExecutor各个构造参数的含义，下边是其构造函数代码：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="title">ThreadPoolExecutor</span><span class="params">(<span class="keyword">int</span> corePoolSize,</span></span></div><div class="line">					  <span class="keyword">int</span> maximumPoolSize,</div><div class="line">					  <span class="keyword">long</span> keepAliveTime,</div><div class="line">					  TimeUnit unit,</div><div class="line">					  BlockingQueue&lt;Runnable&gt; workQueue,</div><div class="line">					  ThreadFactory threadFactory,</div><div class="line">					  RejectedExecutionHandler handler) &#123;</div><div class="line"><span class="keyword">if</span> (corePoolSize &lt; <span class="number">0</span> ||</div><div class="line">	maximumPoolSize &lt;= <span class="number">0</span> ||</div><div class="line">	maximumPoolSize &lt; corePoolSize ||</div><div class="line">	keepAliveTime &lt; <span class="number">0</span>)</div><div class="line">	<span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException();</div><div class="line"><span class="keyword">if</span> (workQueue == <span class="keyword">null</span> || threadFactory == <span class="keyword">null</span> || handler == <span class="keyword">null</span>)</div><div class="line">	<span class="keyword">throw</span> <span class="keyword">new</span> NullPointerException();</div><div class="line"><span class="keyword">this</span>.corePoolSize = corePoolSize;</div><div class="line"><span class="keyword">this</span>.maximumPoolSize = maximumPoolSize;</div><div class="line"><span class="keyword">this</span>.workQueue = workQueue;</div><div class="line"><span class="keyword">this</span>.keepAliveTime = unit.toNanos(keepAliveTime);</div><div class="line"><span class="keyword">this</span>.threadFactory = threadFactory;</div><div class="line"><span class="keyword">this</span>.handler = handler;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
@@ -351,7 +351,7 @@
 </ul>
 </li>
 </ol>
-<h3 id="线程池的处理流程"><a href="#线程池的处理流程" class="headerlink" title="线程池的处理流程"></a>线程池的处理流程</h3><p><img src="http://cevxd.img47.wal8.com/img47/542077_20160404152451/145975630954.png" alt="线程池的处理流程"><br>如上图所示，大体流程依次如下：</p>
+<h3 id="线程池的处理流程"><a href="#线程池的处理流程" class="headerlink" title="线程池的处理流程"></a>线程池的处理流程</h3><p><img src="http://obd791hyv.bkt.clouddn.com/hexo/threadpool/%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B.png" alt="线程池的处理流程"><br>如上图所示，大体流程依次如下：</p>
 <ol>
 <li><strong>第一步</strong> 是 看线程池是否关闭 &amp;&amp; corePoolSize是否满了；</li>
 <li>corePoolSize满了以后，<strong>第二步</strong> 是看 线程池是否关闭 &amp;&amp; 队列是否满了（判断队列是否已满用的是上表中的offer(e)方法），此处对线程池的状态检查是double check，即添加到队列以后，会再次检查状态，如果此时线程池是关闭状态，则回滚刚才的添加动作。</li>
@@ -410,10 +410,10 @@
 <li>通过参数completedAbruptly的注释我们可以知道它==true时表示用户任务是由于用户代码抛出异常而终止的（这和runWorker方法中对其赋值是对应的），该方法做的第一件事是判断任务结束的原因，如果是因为用户代码抛出异常，那此时执行该任务的线程已经因为异常而终止了，接着decrementWorkerCount()是通过CAS执行线程个数减1操作；</li>
 <li>该方法做的第二件事，加锁，把该Worker完成的任务个数，汇总到整个线程池完成的任务个数上（开个小岔，这么做难道不会造成监控参数completedTaskCount的准确性延迟吗？其实并不会，因为当我们通过get方法获取该参数时，会加锁遍历所有的Worker汇总已完成的任务个数），然后从工作线程集合HashSet中去除该Worker。是的！这里没有判断是否超时，直接删了，而且要注意，这里是通过HashSet的remove方法删的，并没有对线程个数进行修改！先别急，接着往下看；</li>
 <li>该方法做的第三件事，tryTerminate()，通过该方法的注释可以了解到，这是一个任何牵扯到线程个数减少或从队列中取任务的操作都要做的保险措施，不是重点，接着往下看；</li>
-<li>第四件事才是关于线程个数维护的，首先检查线程池状态，如果没有关闭，接下来的分支很有意思：a)如果用户任务是因为异常终止的，就直接通过addWorker添加一个没有任务的工作线程顶替因异常挂掉的线程；b)如果用户任务是正常运行结束的，就根据allowCoreThreadTimeOut设置最少线程个数，然后检查当前是否少于最少个数，不少的话方法就结束了，否则通过addWorker添加一个没有任务的工作线程。这里可以再回顾一下上边addWorker方法的源码，该方法新建包装了一个工作线程，然后start线程开始通过runWorker方法执行任务，但这里任务是空的，也就是runWorker方法里while循环直接结束了，然后又会回到这里，如果一直没有新任务到来的话，线程池就是这样，循环往复的创建线程，删除线程来维护线程个数的。<br>看到这，如果上边讲得你已经理解消化了，你可能还会有疑问：如果我们在线程池空闲时，在它删除一个线程之后，创建充数的线程之前，获取这个时刻的线程个数的话，会不会少于corePoolSize呢？答案是不会的！该方法唯一一处对线程个数有操作的是，当线程是异常终止时，对线程个数减1操作。其他所有情况，空闲时只是不断的创建和删除线程实体，但并没有修改线程个数。<br>这个方法看似分支很少，其实处理了很多种情况，可以通过下边的流程图梳理一下：<br><img src="http://cevxd.img47.wal8.com/img47/542077_20160404152451/145975826897.png" alt="processWorkerExit流程图"></li>
+<li>第四件事才是关于线程个数维护的，首先检查线程池状态，如果没有关闭，接下来的分支很有意思：a)如果用户任务是因为异常终止的，就直接通过addWorker添加一个没有任务的工作线程顶替因异常挂掉的线程；b)如果用户任务是正常运行结束的，就根据allowCoreThreadTimeOut设置最少线程个数，然后检查当前是否少于最少个数，不少的话方法就结束了，否则通过addWorker添加一个没有任务的工作线程。这里可以再回顾一下上边addWorker方法的源码，该方法新建包装了一个工作线程，然后start线程开始通过runWorker方法执行任务，但这里任务是空的，也就是runWorker方法里while循环直接结束了，然后又会回到这里，如果一直没有新任务到来的话，线程池就是这样，循环往复的创建线程，删除线程来维护线程个数的。<br>看到这，如果上边讲得你已经理解消化了，你可能还会有疑问：如果我们在线程池空闲时，在它删除一个线程之后，创建充数的线程之前，获取这个时刻的线程个数的话，会不会少于corePoolSize呢？答案是不会的！该方法唯一一处对线程个数有操作的是，当线程是异常终止时，对线程个数减1操作。其他所有情况，空闲时只是不断的创建和删除线程实体，但并没有修改线程个数。<br>这个方法看似分支很少，其实处理了很多种情况，可以通过下边的流程图梳理一下：<br><img src="http://obd791hyv.bkt.clouddn.com/hexo/threadpool/processWorkExit%E6%B5%81%E7%A8%8B%E5%9B%BE.png" alt="processWorkerExit流程图"></li>
 </ol>
 </li>
-<li><p>看到这里的时候，你如果还记得我们一开始的问题，应该会反应过来，这个processWorkerExit方法只是单纯的控制线程个数，但并没有依据keepAliveTime指定的空闲时间来裁决线程的去留啊！！我一开始也是笃定时间判断控制是在这里的！如果不在这里，那究竟在哪里呢？直接查看都有哪些方法调用过keepAliveTime参数就知道了：<br><img src="http://cevxd.img47.wal8.com/img47/542077_20160404152451/145975832373.png" alt="keepAliveTime调用"><br>通过排除法我们可以确定，原来是在被我们忽视的getTask()方法里！！真是没想到啊！这个方法其他的源码我们可以不看，只用看一行我们就什么都明白了：</p>
+<li><p>看到这里的时候，你如果还记得我们一开始的问题，应该会反应过来，这个processWorkerExit方法只是单纯的控制线程个数，但并没有依据keepAliveTime指定的空闲时间来裁决线程的去留啊！！我一开始也是笃定时间判断控制是在这里的！如果不在这里，那究竟在哪里呢？直接查看都有哪些方法调用过keepAliveTime参数就知道了：<br><img src="http://obd791hyv.bkt.clouddn.com/hexo/threadpool/keepAliveTime.png" alt="keepAliveTime调用"><br>通过排除法我们可以确定，原来是在被我们忽视的getTask()方法里！！真是没想到啊！这个方法其他的源码我们可以不看，只用看一行我们就什么都明白了：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">Runnable r = timed ?</div><div class="line">	workQueue.poll(keepAliveTime, TimeUnit.NANOSECONDS) :</div><div class="line">	workQueue.take();</div></pre></td></tr></table></figure>
 <p>原来是在从队列中取任务的时候做到时间控制的！一开始我们可能是想不到的，但看到这里，仔细一想，放在这里真是再合适不过了：当一个线程在取任务的时候，说明这个线程是空闲的，当它从队列中取任务超时而失败的时候，它就已经超过了空闲时间上限了，这时候的流程是：runWorker方法中的while循环条件失败，走进processWorkerExit方法做最后的线程个数控制，简直完美！</p>
 </li>
@@ -483,6 +483,25 @@
 
     <div class="post-spread">
       
+        <div class="ds-share flat" data-thread-key="线程池全面解析/"
+     data-title="线程池全面解析"
+     data-content=""
+     data-url="http://ksni88.github.io/线程池全面解析/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
     </div>
   </div>
 
@@ -540,7 +559,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">12</span>
+              <span class="site-state-item-count">14</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -548,7 +567,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-count">5</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -557,7 +576,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">21</span>
+                <span class="site-state-item-count">22</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

@@ -65,14 +65,14 @@
 <meta property="og:site_name" content="栖静林">
 <meta property="og:description" content="本文是在读了周志明老师的《深入理解Java虚拟机》之后写得，算是读书笔记吧，部分讲解思路和图均出自此书，因为我想不出比这种讲解思路更容易理解的讲法。
 在接触volatile之前，我们只知道“原子性”，原子性很好理解，这里也不再啰嗦。但当volatile引出“可见性”的时候，就不像原子性那样可以一两句说清楚说明白了。上网一查还总是让我们先学一下Java的内存模型，难道就不能像原子性那样简单直白的说明">
-<meta property="og:image" content="http://cevxd.img47.wal8.com/img47/542077_20160404152451/146027091076.png">
-<meta property="og:image" content="http://cevxd.img47.wal8.com/img47/542077_20160404152451/14602709108.png">
-<meta property="og:updated_time" content="2016-09-20T02:57:51.129Z">
+<meta property="og:image" content="http://obd791hyv.bkt.clouddn.com/hexo/volatile/CPU%20&%20Cache.png">
+<meta property="og:image" content="http://obd791hyv.bkt.clouddn.com/hexo/volatile/Java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B.png">
+<meta property="og:updated_time" content="2016-09-26T08:02:31.591Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="volatile和Java内存模型">
 <meta name="twitter:description" content="本文是在读了周志明老师的《深入理解Java虚拟机》之后写得，算是读书笔记吧，部分讲解思路和图均出自此书，因为我想不出比这种讲解思路更容易理解的讲法。
 在接触volatile之前，我们只知道“原子性”，原子性很好理解，这里也不再啰嗦。但当volatile引出“可见性”的时候，就不像原子性那样可以一两句说清楚说明白了。上网一查还总是让我们先学一下Java的内存模型，难道就不能像原子性那样简单直白的说明">
-<meta name="twitter:image" content="http://cevxd.img47.wal8.com/img47/542077_20160404152451/146027091076.png">
+<meta name="twitter:image" content="http://obd791hyv.bkt.clouddn.com/hexo/volatile/CPU%20&%20Cache.png">
 
 
 
@@ -242,7 +242,7 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-04-10T00:00:00+08:00" content="2016-04-10">
+            <time itemprop="dateCreated" datetime="2016-04-10T13:37:23+08:00" content="2016-04-10">
               2016-04-10
             </time>
           </span>
@@ -297,7 +297,7 @@
       
         <p><em>本文是在读了周志明老师的《深入理解Java虚拟机》之后写得，算是读书笔记吧，部分讲解思路和图均出自此书，因为我想不出比这种讲解思路更容易理解的讲法。</em></p>
 <p>在接触volatile之前，我们只知道“原子性”，原子性很好理解，这里也不再啰嗦。但当volatile引出“可见性”的时候，就不像原子性那样可以一两句说清楚说明白了。上网一查还总是让我们先学一下Java的内存模型，难道就不能像原子性那样简单直白的说明白吗？其实我们可以回想一下第一次接触“原子性”的时候是怎么去理解的，原子性就是它的字面意思，一个操作像原子(虽然物理上的原子还是可分的，引用东哥的话说，不要在意这些细节)那样是细不可分的，最小的操作。但我们真正理解和明白原子性，是通过知道了汇编语言和机器语言之后的事。因为正是由于高级语言要编译成汇编语言，最后对应于机器语言才能执行的这个过程，造成了高级语言存在非原子性操作的问题。同样的，可以说是Java的内存模型造成了可见性这个问题，所以如果想从原理上，而不只是字面上去理解“可见性”，确实需要先学一下Java的内存模型，其实是很简单的一个东西。</p>
-<h2 id="Java内存模型"><a href="#Java内存模型" class="headerlink" title="Java内存模型"></a>Java内存模型</h2><p>为了更容易地理解Java内存模型，我们可以参考一下本科学过的硬件上的缓存设计。为了协调存储设备和处理器之间的速度差距，所以引入了高速缓存Cache：将运算需要使用到的数据复制到Cache中，在运算过程中CPU只在Cache上进行存取，在运算结束以后再把Cache中的数据同步写回到内存中，这样避免了CPU等待相对缓慢的内存读写，交互关系如下图：<br><img src="http://cevxd.img47.wal8.com/img47/542077_20160404152451/146027091076.png" alt="处理器、高速缓存、主内存间的交互关系"><br><em>上图中的缓存一致性协议不是重点，重点是这种结构设计。</em><br>类似的，Java内存模型规定，所有的变量(不包括局部变量和方法参数这种线程私有的，不会被共享的变量)都存储在主内存中(此处的主内存是虚拟机内存的一部分)，每条线程还有自己的工作内存(可与上边的Cache类比)，线程的工作内存中保存了该线程使用到的变量的主内存副本拷贝，线程对变量的所有操作都必须在工作内存中进行，而不能直接读写主内存中的变量。不同线程之间也无法直接访问对方的工作内存，线程间的变量传递均通过主内存完成，交互关系如下图：<br><img src="http://cevxd.img47.wal8.com/img47/542077_20160404152451/14602709108.png" alt="线程、工作内存、主内存间的交互关系"><br><em>同样的，上图中的交互操作不是重点，重点是这种结构设计。</em><br><strong>需要注意的是，这里所讲的主内存、工作内存，均是虚拟机内存的一部分，它们和JVM内存区域中的Java堆、栈、方法区等不是同一个层次的内存划分，前者更偏向逻辑上的划分，后者更偏向物理上的划分，如果要强行对应的话，主内存主要对应于Java堆中的对象实例数据部分，工作内存主要对应于栈中的部分区域。</strong></p>
+<h2 id="Java内存模型"><a href="#Java内存模型" class="headerlink" title="Java内存模型"></a>Java内存模型</h2><p>为了更容易地理解Java内存模型，我们可以参考一下本科学过的硬件上的缓存设计。为了协调存储设备和处理器之间的速度差距，所以引入了高速缓存Cache：将运算需要使用到的数据复制到Cache中，在运算过程中CPU只在Cache上进行存取，在运算结束以后再把Cache中的数据同步写回到内存中，这样避免了CPU等待相对缓慢的内存读写，交互关系如下图：<br><img src="http://obd791hyv.bkt.clouddn.com/hexo/volatile/CPU%20&amp;%20Cache.png" alt="处理器、高速缓存、主内存间的交互关系"><br><em>上图中的缓存一致性协议不是重点，重点是这种结构设计。</em><br>类似的，Java内存模型规定，所有的变量(不包括局部变量和方法参数这种线程私有的，不会被共享的变量)都存储在主内存中(此处的主内存是虚拟机内存的一部分)，每条线程还有自己的工作内存(可与上边的Cache类比)，线程的工作内存中保存了该线程使用到的变量的主内存副本拷贝，线程对变量的所有操作都必须在工作内存中进行，而不能直接读写主内存中的变量。不同线程之间也无法直接访问对方的工作内存，线程间的变量传递均通过主内存完成，交互关系如下图：<br><img src="http://obd791hyv.bkt.clouddn.com/hexo/volatile/Java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B.png" alt="线程、工作内存、主内存间的交互关系"><br><em>同样的，上图中的交互操作不是重点，重点是这种结构设计。</em><br><strong>需要注意的是，这里所讲的主内存、工作内存，均是虚拟机内存的一部分，它们和JVM内存区域中的Java堆、栈、方法区等不是同一个层次的内存划分，前者更偏向逻辑上的划分，后者更偏向物理上的划分，如果要强行对应的话，主内存主要对应于Java堆中的对象实例数据部分，工作内存主要对应于栈中的部分区域。</strong></p>
 <h2 id="可见性"><a href="#可见性" class="headerlink" title="可见性"></a>可见性</h2><p>在了解了Java内存模型以后，我们再去理解“可见性”时，就清楚明白多了。正因为工作内存的存在，所以某些线程正在操作的共享变量可能不是最新值，这就造成了“不可见性”问题。所以</p>
 <blockquote>
 <p>可见性是指当一个线程修改了共享变量的值，其他线程能够立即得知这个修改。  </p>
@@ -420,6 +420,25 @@
 
     <div class="post-spread">
       
+        <div class="ds-share flat" data-thread-key="valotile和Java内存模型/"
+     data-title="volatile和Java内存模型"
+     data-content=""
+     data-url="http://ksni88.github.io/valotile和Java内存模型/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
     </div>
   </div>
 
@@ -477,7 +496,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">12</span>
+              <span class="site-state-item-count">14</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -485,7 +504,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-count">5</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -494,7 +513,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">21</span>
+                <span class="site-state-item-count">22</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

@@ -223,6 +223,347 @@
             
               
                 
+                <a class="post-title-link" href="/初探MySQL索引/" itemprop="url">
+                  初探MySQL索引
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-04-14T13:43:03+08:00" content="2016-04-14">
+              2016-04-14
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/MySQL/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/初探MySQL索引/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="初探MySQL索引/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>在上个月搜狐面试中，面试官看我有很多项目都用到了MySQL，于是问我有没有用过索引，我说没有，然后他诧异地问我遇到过的最大的单表数据量有多大，我赶紧掩饰说没多大也就上万吧，然后就没有然后了。。想来也是羞愧万分，用了这么久的MySQL竟然没有接触过索引，这几天正好需要维护一个去年暑假的项目，跑了大半年数据量已经很大了，借此机会学习实践一下索引。先把最大的体会放出来：对于索引，只能说，不用不知道，用了离不了！</p>
+<p>简单介绍一下项目内容：该项目数据库相关的主要是每天定时定期地从6个新闻门户网站上爬取定量的新闻存储到数据库中，以供后期的查取。由于当时需求方要求不高，自己的水平和要求也不高，所以当时既没有使用索引，也没有定期删除过期的新闻数据，结果就造成news新闻表中的数据随着时间的推移无限量增长，两个月前谢帆做iOS版本用接口取数据时更是要等五到十分钟才有反应，当时通过自增id得知表数据近百万了，但由于已经交付大半年了，没有理由主动联系对方，也就无能为力了。这几天对方主动联系做一些小改动，这才下决心学习一下索引，全面改善一下。</p>
+<h2 id="预备知识"><a href="#预备知识" class="headerlink" title="预备知识"></a>预备知识</h2><p>在搜狐面试结束以后，我查过一些关于索引的资料，简单了解了索引的分类、结构、原理等，这么多的内容我也没有进行系统全面的学习，但其中最重要最基础的就是<em><a href="http://www.cnblogs.com/oldhorse/archive/2009/11/16/1604009.html" target="_blank" rel="external">B+树</a></em>了，了解了什么是B+树以后，最好再了解一下<em><a href="http://blog.csdn.net/v_JULY_v/article/details/6530142/" target="_blank" rel="external">索引对B+树的应用</a></em>，看完觉得不过瘾还可以接着看一下<em><a href="http://www.cnblogs.com/hustcat/archive/2009/10/28/1591648.html" target="_blank" rel="external">MySQL索引的原理</a></em>，最后一篇一开始就看可能会不太懂，但只用先记住其中最重要的一条规则：最左前缀原则，经过实践再回头看就柳暗花明了。</p>
+<h2 id="索引实践"><a href="#索引实践" class="headerlink" title="索引实践"></a>索引实践</h2><p>先贴出进行实践的数据表结构，非常简单。<br><img src="http://obd791hyv.bkt.clouddn.com/hexo/mysql_index/news%E8%A1%A8%E7%BB%93%E6%9E%84.JPG" alt="表结构"></p>
+<h3 id="建立索引"><a href="#建立索引" class="headerlink" title="建立索引"></a>建立索引</h3><p>先找到需要使用索引的SQL，功能很简单，就是分页获取指定类别的最新新闻的id和title，具体做法是按照date对指定category_id的新闻进行排序，然后按照分页参数选取数据，下面是具体的示例代码。<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">select</span> <span class="keyword">id</span>, title</div><div class="line"><span class="keyword">from</span> news_copy</div><div class="line"><span class="keyword">where</span> category_id=<span class="number">1</span></div><div class="line"><span class="keyword">order</span> <span class="keyword">by</span> <span class="built_in">date</span> <span class="keyword">desc</span></div><div class="line"><span class="keyword">limit</span> <span class="number">1000</span>,<span class="number">10</span></div></pre></td></tr></table></figure></p>
+<p>病急乱投医，按照<em><a href="http://my.oschina.net/leejun2005/blog/96867" target="_blank" rel="external">此文</a></em>给的建议：</p>
+<blockquote>
+<p>如果对于有where条件，又想走索引用limit的，必须设计一个索引，将where放第一位，limit用到的主键放第2位，而且只能select主键。</p>
+</blockquote>
+<p>我在该表上建立了联合索引category_id_date=(category_id, date)，这句话是相当精简正确的，但我当时注意力全放在怎么建索引了，没有在意最后一句话，这也造成了后面一些困惑，先且接着往下看。</p>
+<h3 id="造大量假数据"><a href="#造大量假数据" class="headerlink" title="造大量假数据"></a>造大量假数据</h3><p>建立完索引，就需要造大量假数据进行测试了，我找到去年开发时的news表，里边存有5000多条数据，然后通过存储过程把该表数据循环添加到另一张结构一样的news_copy表中，循环100次，下图是添加后的数据量。<br><img src="http://obd791hyv.bkt.clouddn.com/hexo/mysql_index/news_copy%E8%A1%A8%E6%95%B0%E6%8D%AE%E9%87%8F.JPG" alt="数据量"><br>可以看到有近60W条数据，下边分别是建索引前后的效果图：<br><img src="http://obd791hyv.bkt.clouddn.com/hexo/mysql_index/%E5%BB%BA%E7%B4%A2%E5%BC%95%E5%89%8D.JPG" alt="建索引前"><br><img src="http://obd791hyv.bkt.clouddn.com/hexo/mysql_index/%E5%BB%BA%E7%B4%A2%E5%BC%95%E5%90%8E.JPG" alt="建索引后"><br>可以看到效率相差10倍，而且这个差距肯定会随着数据量的增加而变大。然而，虽然建立索引大大增加了查询效率，但建索引后的查询效率还是不能让我们满意。这时我们就该回头关注SQL本身了，能不能进行优化呢？</p>
+<h3 id="SQL优化"><a href="#SQL优化" class="headerlink" title="SQL优化"></a>SQL优化</h3><p>依然是病急乱投医(不过通过实践遇到问题就解决是最快的学习途径，只是不够系统全面)，查了一通SQL优化以后，在繁杂的搜索结果里有一篇<em><a href="http://www.111cn.net/database/mysql/46425.htm" target="_blank" rel="external">博文</a></em>让我相见恨晚，像是捡了宝一样赶紧按照他说的改了一下SQL：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">select</span> n.id, title <span class="keyword">from</span> news_copy n</div><div class="line"><span class="keyword">inner</span> <span class="keyword">join</span></div><div class="line">(<span class="keyword">select</span> <span class="keyword">id</span> <span class="keyword">from</span> news_copy </div><div class="line"><span class="keyword">where</span> category_id=<span class="number">1</span></div><div class="line"><span class="keyword">order</span> <span class="keyword">by</span> <span class="built_in">date</span> <span class="keyword">desc</span></div><div class="line"><span class="keyword">limit</span> <span class="number">1000</span>,<span class="number">10</span>) t</div><div class="line"><span class="keyword">on</span> n.id=t.id</div></pre></td></tr></table></figure></p>
+<p>执行结果如下：<br><img src="http://obd791hyv.bkt.clouddn.com/hexo/mysql_index/SQL%E4%BC%98%E5%8C%96%E5%90%8E.JPG" alt="SQL优化后"><br>是不是惊到了？竟然相差近百倍。这又是为什么呢？这里就要引出另外一个概念了：覆盖索引。</p>
+<h3 id="覆盖索引"><a href="#覆盖索引" class="headerlink" title="覆盖索引"></a>覆盖索引</h3><p>索引一般用来快速定位想要查询的数据的位置，然后据此精确读取，所以有两步读取操作，第一步读索引，第二步根据索引读数据并返回。换句话说，索引只是用来定位数据，而不是直接返回数据。然而覆盖索引就是一个特例，下面是覆盖索引的概念：</p>
+<blockquote>
+<p>A covering index is a special case where the index itself contains the required data field(s) and can return the data.  </p>
+</blockquote>
+<p>其实覆盖索引并不是一个“强概念”，而更像一个简单的名称：当索引字段包含所有需要查询的字段时，可以只读取一次索引就能返回查询结果，这种特例使用到的索引叫做覆盖索引。显而易见，当使用覆盖索引时查询是飞快的（因为不用回表查询）。</p>
+<p>读到这里你应该还是不太明白优化后的SQL它具体因为什么变快了，它的执行过程和优化前有什么区别啊？对！你需要了解具体的执行过程才能彻底明白，但在解释两者的执行过程之前，你还需要了解一下SQL语句一般情况下的执行过程和先后顺序（你是不是发现预备知识有点多呢？不要骂娘，谁让我们是半路出家，确实需要一些上下文信息才能理解得清楚明白，我也是顺藤摸瓜，需要什么学什么）。</p>
+<h4 id="SQL的整体执行过程"><a href="#SQL的整体执行过程" class="headerlink" title="SQL的整体执行过程"></a>SQL的整体执行过程</h4><p>这里说的执行过程是一个宏观上的，把整个SQL语句当作一个整体，看一下这个整体从执行开始到返回结果都经历了哪些过程（参考：<em><a href="http://www.2cto.com/database/201310/249273.html" target="_blank" rel="external">博文</a></em>）：</p>
+<ol>
+<li>应用通过MySQL API把查询命令发送给MySQL服务器，然后被解析;</li>
+<li>检查权限、MySQL optimizer进行优化，经过解析和优化后的查询命令被编译为CPU可运行的二进制形式的查询计划（query plan），并可以被缓存;</li>
+<li>如果存在索引，那么先扫描索引，如果数据被索引覆盖，那么不需要额外的查找，如果不是，根据索引查找和读取对应的记录;</li>
+<li>如果有关联查询，查询次序是扫描第一张表找到满足条件的记录，按照第一张表和第二张表的关联键值，扫描第二张表查找满足条件的记录，按此顺序循环;</li>
+<li>输出查询结果;</li>
+</ol>
+<p>这里需要注意的是第3步，这一步是SQL语句真正开始执行的开始，如果没有可用索引，就会进行全表扫描，读取所有记录的<strong>所有字段</strong>；而如果有可用索引，会先扫描索引，然后根据索引读取对应记录的<strong>所有字段</strong>。注意我说的是<strong>所有字段</strong>，而不只是select的字段，至于具体的过程，继续往下看。</p>
+<h4 id="SQL的具体先后顺序"><a href="#SQL的具体先后顺序" class="headerlink" title="SQL的具体先后顺序"></a>SQL的具体先后顺序</h4><p>上边讲得是把SQL语句作为一个整体看，这里是深入SQL语句内部，讨论各个SQL关键字的执行先后顺序（参考：<em><a href="http://www.jellythink.com/archives/924" target="_blank" rel="external">博文</a></em>）：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">(7)     <span class="keyword">SELECT</span> </div><div class="line">(<span class="number">8</span>)     <span class="keyword">DISTINCT</span> &lt;select_list&gt;</div><div class="line">(<span class="number">1</span>)     <span class="keyword">FROM</span> &lt;left_table&gt;</div><div class="line">(<span class="number">3</span>)     &lt;join_type&gt; <span class="keyword">JOIN</span> &lt;right_table&gt;</div><div class="line">(<span class="number">2</span>)     <span class="keyword">ON</span> &lt;join_condition&gt;</div><div class="line">(<span class="number">4</span>)     <span class="keyword">WHERE</span> &lt;where_condition&gt;</div><div class="line">(<span class="number">5</span>)     <span class="keyword">GROUP</span> <span class="keyword">BY</span> &lt;group_by_list&gt;</div><div class="line">(<span class="number">6</span>)     <span class="keyword">HAVING</span> &lt;having_condition&gt;</div><div class="line">(<span class="number">9</span>)     <span class="keyword">ORDER</span> <span class="keyword">BY</span> &lt;order_by_condition&gt;</div><div class="line">(<span class="number">10</span>)    <span class="keyword">LIMIT</span> &lt;limit_number&gt;</div></pre></td></tr></table></figure></p>
+<p><em>前边的数字表示该行SQL被执行的次序。</em></p>
+<p>SQL执行的开始是FROM语句，查看目标表是否有可用索引（见上），然后取<strong>所有字段</strong>，然后根据WHERE查询条件<strong>选取</strong>满足条件的记录，然后根据SELECT语句<strong>选取</strong>需要的字段，最后根据LIMIT语句<strong>选取</strong>并返回需要的数据结果。所以不要天真地认为每次查询只会读取SELECT指定的字段，查询不是一个从<em>零</em>挑选增加成结果的过程，而是从<em>满</em>筛选去除成结果的过程（其实道理很简单，因为我们需要把所有数据读到内存中进行处理，而不能在文件层面有选择的读取）。</p>
+<h4 id="优化后的SQL为什么快"><a href="#优化后的SQL为什么快" class="headerlink" title="优化后的SQL为什么快"></a>优化后的SQL为什么快</h4><p>现在我们终于可以分析一下我们的SQL优化前后具体有什么区别了，先记住一个数据再继续看：表news_copy中category_id=1的记录共5W多条。</p>
+<ol>
+<li>优化前的执行过程：根据where语句从表news_copy中选出所有category_id=1的记录：这一步因为where字段category_id满足使用索引的最左前缀条件，所以这里是先利用索引读取所有category_id=1的5W多条记录的id（为什么索引里存有主键呢？不明白的可以再仔细看看这篇<em><a href="http://www.cnblogs.com/hustcat/archive/2009/10/28/1591648.html" target="_blank" rel="external">博文</a></em>里的聚簇索引了，前边推荐过），然后根据这5W多个id<strong>回表查询5W多条记录的所有字段</strong>，然后根据order by对这些记录排序（这里可以利用索引），然后根据limit选取从第1000条记录开始的10条记录，然后根据select筛选字段id和title并返回。<br><strong>说明</strong>：上边排序时利用到的了<em><a href="http://dev.mysql.com/doc/refman/5.6/en/limit-optimization.html" target="_blank" rel="external">limit和order by组合使用时的优化</a></em>，所以上边排序时并不是对5W多条记录全排序，而是在前1010条记录排好序后就停止了排序。</li>
+<li>现在再来看优化后的执行过程：先执行子查询t，同样利用索引读取5W多个id，但注意这里select只有id字段，所以利用到了覆盖索引，所以这里<strong>不再回表查询5W多条记录的所有字段</strong>，而是直接在索引中完成剩下的order by和limit语句，然后子查询返回了1010条id，这时外查询进行连接查询，<strong>只用根据这1010个id读取1010条记录的所有字段</strong>，然后筛选id和title字段并返回。</li>
+</ol>
+<p>所以两者的主要差别在于IO读取的数据量，前者高达5W多条，后者只有1010条。<br>对于上边的解释，你可能还会疑问，我怎么知道SQL有没有利用覆盖索引呢？对于平常的SQL，怎么查看SQL的执行效率呢？这就需要神命令EXPLAIN来帮忙了。</p>
+<h3 id="explain-amp-show-profile"><a href="#explain-amp-show-profile" class="headerlink" title="explain &amp; show profile"></a>explain &amp; show profile</h3><p>在写这篇博文时，我也想知道我的SQL到底有没有用覆盖索引，网上查了一下发现可以使用explain命令来查看，使用简单方便，可以看下图：<br><img src="http://obd791hyv.bkt.clouddn.com/hexo/mysql_index/explain%E4%BC%98%E5%8C%96%E5%89%8D.JPG" alt="explain优化前"><br><img src="http://obd791hyv.bkt.clouddn.com/hexo/mysql_index/explain%E4%BC%98%E5%8C%96%E5%90%8E.JPG" alt="explain优化后"><br>可以看到输出有很多参数列，其中如果使用了覆盖索引，在最后的Extra列中就会显示“Using index”，否则不会。这里可以清楚的看到优化后的子查询使用到了覆盖索引。其中rows列表示查询可能读取的记录行数，也可以清楚的看到，优化后的SQL在子查询中有5W多行，即5W多个id，然后外查询只有1020行。而优化前的SQL涉及5W多行，不止id，而是所有字段。所以通过explain命令，我们可以大概知道我们的SQL会涉及多大的数据量，会不会使用覆盖索引等信息，其实explain还可以提供给我们更多的信息，前提是你对explain命令的输出足够熟悉，这里不再过多介绍，感兴趣可以看<em><a href="http://dev.mysql.com/doc/refman/5.6/en/explain.html" target="_blank" rel="external">explain命令说明</a></em>和<em><a href="http://dev.mysql.com/doc/refman/5.6/en/explain-output.html" target="_blank" rel="external">explain命令输出参数说明</a></em>。</p>
+<p>另外，如果你还想知道SQL在执行的各个阶段的耗时，比如CPU、IO等详细信息，可以看一下<em><a href="http://dev.mysql.com/doc/refman/5.6/en/show-profile.html" target="_blank" rel="external">show profile</a></em>命令，但该命令在版本5.6.7中被弃用了，转而被<em><a href="http://dev.mysql.com/doc/refman/5.6/en/performance-schema-query-profiling.html" target="_blank" rel="external">Performance Schema</a></em>替代。</p>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>对于这个项目的维护，<a href="http://moonfacex.github.io/blog/" target="_blank" rel="external">梦非</a>早就催我让我改善一下，但我总是推脱，既不想费心维护一个已经交付的项目，也不想费力去学习索引，而一直拖到该项目又有改动时才动手学习。平时我们可能有很多这种情况，给自己找各种不动手学习的借口：索引？哪来那么多数据让我测啊？分布式？哪来那么多机器让我试啊？而又总是在关键时刻方恨少。其实只要我们下定决心，稍微推动自己一下下，就能获益匪浅，而对于学习掌握的知识，一定是有用的，只是时间早晚而已。这篇博文我是14号开始着手整理写得，写一半的时候，17号腾讯面试就又问了索引，基本把博文讲了一遍，当时简直庆幸自己刚学过索引。另外关于写博客本身，也是获益匪浅，写的过程就是把自己的理解和思路表达出来的过程，不仅能加深自己的理解，发现盲点，还能锻炼自己的表达沟通能力，现在我写一篇博文大概要一周时间，举步维艰，相信坚持下去会有提高。</p>
+
+          
+        
+      
+    </div>
+    
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/valotile和Java内存模型/" itemprop="url">
+                  volatile和Java内存模型
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-04-10T13:37:23+08:00" content="2016-04-10">
+              2016-04-10
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/valotile和Java内存模型/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="valotile和Java内存模型/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p><em>本文是在读了周志明老师的《深入理解Java虚拟机》之后写得，算是读书笔记吧，部分讲解思路和图均出自此书，因为我想不出比这种讲解思路更容易理解的讲法。</em></p>
+<p>在接触volatile之前，我们只知道“原子性”，原子性很好理解，这里也不再啰嗦。但当volatile引出“可见性”的时候，就不像原子性那样可以一两句说清楚说明白了。上网一查还总是让我们先学一下Java的内存模型，难道就不能像原子性那样简单直白的说明白吗？其实我们可以回想一下第一次接触“原子性”的时候是怎么去理解的，原子性就是它的字面意思，一个操作像原子(虽然物理上的原子还是可分的，引用东哥的话说，不要在意这些细节)那样是细不可分的，最小的操作。但我们真正理解和明白原子性，是通过知道了汇编语言和机器语言之后的事。因为正是由于高级语言要编译成汇编语言，最后对应于机器语言才能执行的这个过程，造成了高级语言存在非原子性操作的问题。同样的，可以说是Java的内存模型造成了可见性这个问题，所以如果想从原理上，而不只是字面上去理解“可见性”，确实需要先学一下Java的内存模型，其实是很简单的一个东西。</p>
+<h2 id="Java内存模型"><a href="#Java内存模型" class="headerlink" title="Java内存模型"></a>Java内存模型</h2><p>为了更容易地理解Java内存模型，我们可以参考一下本科学过的硬件上的缓存设计。为了协调存储设备和处理器之间的速度差距，所以引入了高速缓存Cache：将运算需要使用到的数据复制到Cache中，在运算过程中CPU只在Cache上进行存取，在运算结束以后再把Cache中的数据同步写回到内存中，这样避免了CPU等待相对缓慢的内存读写，交互关系如下图：<br><img src="http://obd791hyv.bkt.clouddn.com/hexo/volatile/CPU%20&amp;%20Cache.png" alt="处理器、高速缓存、主内存间的交互关系"><br><em>上图中的缓存一致性协议不是重点，重点是这种结构设计。</em><br>类似的，Java内存模型规定，所有的变量(不包括局部变量和方法参数这种线程私有的，不会被共享的变量)都存储在主内存中(此处的主内存是虚拟机内存的一部分)，每条线程还有自己的工作内存(可与上边的Cache类比)，线程的工作内存中保存了该线程使用到的变量的主内存副本拷贝，线程对变量的所有操作都必须在工作内存中进行，而不能直接读写主内存中的变量。不同线程之间也无法直接访问对方的工作内存，线程间的变量传递均通过主内存完成，交互关系如下图：<br><img src="http://obd791hyv.bkt.clouddn.com/hexo/volatile/Java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B.png" alt="线程、工作内存、主内存间的交互关系"><br><em>同样的，上图中的交互操作不是重点，重点是这种结构设计。</em><br><strong>需要注意的是，这里所讲的主内存、工作内存，均是虚拟机内存的一部分，它们和JVM内存区域中的Java堆、栈、方法区等不是同一个层次的内存划分，前者更偏向逻辑上的划分，后者更偏向物理上的划分，如果要强行对应的话，主内存主要对应于Java堆中的对象实例数据部分，工作内存主要对应于栈中的部分区域。</strong></p>
+<h2 id="可见性"><a href="#可见性" class="headerlink" title="可见性"></a>可见性</h2><p>在了解了Java内存模型以后，我们再去理解“可见性”时，就清楚明白多了。正因为工作内存的存在，所以某些线程正在操作的共享变量可能不是最新值，这就造成了“不可见性”问题。所以</p>
+<blockquote>
+<p>可见性是指当一个线程修改了共享变量的值，其他线程能够立即得知这个修改。  </p>
+</blockquote>
+<p>那要怎么保证可见性呢？很简单，只要消除造成“不可见性”的原因————工作内存就好了，是的，如果能够跳过工作内存，直接操作主内存，那就一定是可见的，但这样就破坏了这种结构设计。所以正常的，也是Java volatile关键字采用的，用以下两条规则保证可见性：</p>
+<ol>
+<li>在每次修改该变量后，<strong>立即</strong>从工作内存同步写回到主内存中；</li>
+<li>在每次使用该变量前，<strong>立即</strong>从主内存中再读取到工作内存中；  </li>
+</ol>
+<p><strong>要注意的是，volatile变量也是有工作内存副本的，它并没有破环这种结构设计，它与普通变量的区别仅仅是以上两条规则，即读取和写回的及时性。</strong></p>
+<h3 id="Java中保证可见性的关键字"><a href="#Java中保证可见性的关键字" class="headerlink" title="Java中保证可见性的关键字"></a>Java中保证可见性的关键字</h3><p>在Java中，一共有三个关键字可以保证可见性：</p>
+<ol>
+<li>volatile：通过上边两条规则保证；</li>
+<li>final：初始化后不可变，不存在修改的情况；</li>
+<li>synchronized：通过内存交互规则之一保证，“对一个变量执行unlock操作之前，必须先把此变量同步回主内存中”，注意此处说的并不是同步块中的操作，而单单是指被synchronized修饰的变量本身。</li>
+</ol>
+<h2 id="volatile"><a href="#volatile" class="headerlink" title="volatile"></a>volatile</h2><h3 id="对volatile的误解"><a href="#对volatile的误解" class="headerlink" title="对volatile的误解"></a>对volatile的误解</h3><p>至于具体的误解是什么，我就不说了，因为在我身上经常发生本来记得很对的概念，看了一眼反例就再也分不清了的蠢事。所以这里只把结论放出来，并解释为什么会这样。</p>
+<blockquote>
+<p>volatile只能保证被修饰变量的可见性，不保证对其操作的原子性，对其所有的操作都和普通变量一样是非线程安全的。  </p>
+</blockquote>
+<p>volatile对变量的影响仅仅只是可见性，这是我们一直强调的一点，如果你已经理解了什么是可见性，但当可见性和原子性这两个概念放在一起时有点晕的话，看了下边的例子可能就清楚多了。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">static</span> <span class="keyword">volatile</span> <span class="keyword">int</span> num;</div><div class="line">num++;</div></pre></td></tr></table></figure></p>
+<p>如果volatile能保证变量操作的原子性，那上边num++这个操作应该是原子操作，即它应该是一个细不可分的、不会被“中途打断”的操作，但稍微清醒一点的你也会意识到这是不可能的。这个操作最起码要分成三个原子操作才能完成：</p>
+<ol>
+<li>读取num当前值；</li>
+<li>对num当前值进行加1运算；</li>
+<li>回写运算后的num值；  </li>
+</ol>
+<p>在多线程环境下，任一个正在进行num++操作的线程，都有可能在上边三个原子操作之间的任一点被切换上下文。这也是可以通过Javap反汇编印证的，下边是num++反汇编对应的字节码指令：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">getstatic</div><div class="line">iconst_1</div><div class="line">iadd</div><div class="line">pustatic</div></pre></td></tr></table></figure></p>
+<p>可以清楚的看到num++操作被编译成了四条字节码指令，所以可见性和原子性之间并没有什么必然联系，而volatile只保证变量的可见性，对于num++这个操作而言，volatile的唯一作用是，当且仅当putstatic指令执行完以后，任一线程通过getstatic指令读取到的num值都是最新的。(这里用字节码来说明原子性不是很严谨，因为即使编译出来只有一条字节码指令，也并不意味着执行这条指令就是一个原子操作，因为一条字节码指令在真正被执行时可能会转化为多条本地机器码指令，所以通过汇编代码而非字节码指令会更严谨一些，但此处使用字节码就已经能说明问题了)。</p>
+<h3 id="volatile的两个作用"><a href="#volatile的两个作用" class="headerlink" title="volatile的两个作用"></a>volatile的两个作用</h3><p>前边我们一直在讲volatile能保证可见性，其实这只是它的作用之一，它还有另外一个作用就是禁止指令重排序优化。</p>
+<blockquote>
+<p>从硬件架构上讲，指令重排序是指CPU采用了允许将多条指令不按程序规定的顺序分开发送给各相应电路单元处理。但并不是说指令任意重排，CPU需要能正确处理指令依赖情况以保障程序能得出正确的执行结果。 </p>
+</blockquote>
+<p>可以结合CPU流水线理解上边的概念。那指令重排序对程序的并发执行又有什么影响呢？为什么volatile要禁止指令重排序呢？下边通过DCL单例模式的代码来说明。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Singleton</span> </span>&#123;</div><div class="line">	<span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">static</span> Singleton instance;</div><div class="line">	</div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Singleton <span class="title">getInstance</span><span class="params">()</span> </span>&#123;</div><div class="line">		<span class="keyword">if</span>(instance == <span class="keyword">null</span>) &#123;</div><div class="line">			<span class="keyword">synchronized</span> (Singleton.class) &#123;</div><div class="line">				<span class="keyword">if</span>(instance == <span class="keyword">null</span>)</div><div class="line">					instance = <span class="keyword">new</span> Singleton();</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">		<span class="keyword">return</span> instance;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	<span class="function"><span class="keyword">private</span> <span class="title">Singleton</span><span class="params">()</span></span>&#123;&#125;</div><div class="line">	</div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doSomething</span><span class="params">()</span> </span>&#123;</div><div class="line">		<span class="comment">//do something</span></div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>如果instance没有使用volatile修饰，那么instance = new Singleton()对应的指令就有可能被重排序。该行代码起码有三个步骤需要完成：</p>
+<ol>
+<li>在Java堆中分配一块内存用来存储Singleton实例；</li>
+<li>在该内存块上初始化Singleton实例；</li>
+<li>将该内存块对应的地址引用赋值给instance；</li>
+</ol>
+<p>现在假设有线程A调用了Singleton.getInstance()，当执行到instance = new Singleton()这行代码时，经过指令重排序，上边第3个步骤被重排序到第2个步骤之前，并在执行了第3个步骤以后，将要执行第2个步骤之前，进行上下文切换至线程B，线程B再调用Singleton.getInstance()方法时，instance已经不等于null了，这时再继续调用doSomething()方法时，由于还没有初始化，所以会出现异常。虽然这种情况非常极端，但不是没有可能，所以只有使用volatile修饰instance的DCL单例模式才是线程安全的(在JDK1.5之前volatile还不能完全屏蔽指令重排序，所以即使使用volatile也不能保证DCL单例模式的线程安全，但在JDK1.5修复此问题之后完全是线程安全的)。</p>
+<h3 id="volatile的底层实现原理"><a href="#volatile的底层实现原理" class="headerlink" title="volatile的底层实现原理"></a>volatile的底层实现原理</h3><p>这里所说的实现原理，即JVM是怎么实现volatile的可见性和禁止指令重排序这两个特性的。这时我们可以对比观察使用volatile和不使用volatile关键字时所生成汇编代码的差别，具体的代码不再贴出(纯汇编，贴出来意义不大不是重点)，感兴趣可以自行实验。其中一个明显的差别是，在volatile变量每次赋值指令之后，都会紧随一条“lock add1 $0x0,(%esp)”指令(不一定是ESP寄存器，也可能是其他寄存器，取决于栈指针的指向)。这个操作就相当于传说中的<strong>内存屏障</strong>，以下引用《深入理解Java虚拟机》中的原话来说明该指令是如何保证可见性的：</p>
+<blockquote>
+<p>当只有一个CPU访问内存时，并不需要内存屏障，但如果有两个或更多CPU访问同一块内存，且其中有一个在观测另一个，就需要内存屏障来保证一致性了。这条指令中的“add1 $0x0,(%esp)”(把ESP寄存器的值加0)显然是一个空操作(采用这个空操作而不是空操作指令nop是因为IA32手册规定lock前缀不允许配合nop指令使用)，关键在于lock前缀，查询IA32手册，它的作用是<strong>使得本CPU的Cache写入了内存，该写入动作也会引起别的CPU或者别的内核无效化其Cache</strong>，所以通过这样一个空操作，可让前面volatile变量的修改对其他CPU立即可见。  </p>
+</blockquote>
+<p>这段引用的重点在于后半句，关于lock前缀的解释，也就是volatile是使用硬件指令来保证可见性的。那lock前缀又是怎么保证禁止指令重排序呢？依然通过引用《深入理解Java虚拟机》中的原话来说明：</p>
+<blockquote>
+<p>从硬件架构上讲，指令重排序是指CPU采用了允许将多条指令不按程序规定的顺序分开发送给各相应电路单元处理。但并不是说指令任意重排，CPU需要能正确处理指令依赖情况以保障程序能得出正确的执行结果。譬如指令1把地址A中的值加10，指令2把地址A中的值乘以2，指令3把地址B中的值减去3，这时指令1和指令2是有依赖的，它们之间的顺序不能重排————(A+10)*2与A*2+10显然不相等，但指令3可以重排到指令1、2之前或者中间，只要保证CPU执行后面依赖到A、B值的操作时能获取到正确的A和B值即可。所以在本内CPU中，重排序看起来依然是有序的。因此，lock add1 $0x0,(%esp)指令把修改同步到内存时，意味着所有之前的操作都已经执行完成，这样便形成了“指令重排序无法越过内存屏障”的效果。  </p>
+</blockquote>
+<p>看了上边的引用，你可能还是一头雾水，这个解释给人的感觉像是只可意会不可言传一样，而且关于内存屏障，《深入理解Java虚拟机》一书并没有过多介绍，只说“重排序时不能把后面的指令重排序到内存屏障之前的位置”，但这个限制显然是不够的，难道屏障之前的代码就可以重排序了？那DCL单例模式依然是有问题的。应该有更严格的限制才对，比如绝对禁止屏障前后的代码重排序。经过进一步google，也找到一些说明，但由于太偏向底层，我也没有太深究，引用一篇<em><a href="http://jpbempel.blogspot.com/2013/05/volatile-and-memory-barriers.html" target="_blank" rel="external">博文</a></em>中的话简单说明一下内存屏障：</p>
+<blockquote>
+<p>with lock prefix, memory related instructions are processed specially to act as a memory barrier, similar to mfence instruction. Dave Dice explains in his blog that they benchmarked the 2 kinds of barrier, and the lock add seems the most efficient one on today’s architecture. So this barrier ensures that there is no reordering before and after this instruction and also drains all instructions pending into Store Buffer. After executing these instructions, all writes are visible to all other threads through cache subsystem or main memory. This costs some latency to wait for this drain.  </p>
+</blockquote>
+<h3 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h3><p>之前刚接触volatile时，看到过一个说法，volatile只适合简单的get和set方法，当时不太懂。这次在查内存屏障时，不知道在哪看到一句话，意思是对于volatile变量，单独的读操作和单独的写操作是原子操作，但任意的读写操作的组合不再是原子操作，这句话像是戳破了最后一张纸一样，一句话解释清楚了之前num++不是原子操作的原因，并给出了言简意赅的结论。这时再回头去查之前那个说法时才恍然大悟，看<em><a href="http://www.blogjava.net/bolo/archive/2014/06/20/414971.html" target="_blank" rel="external">下面代码</a></em>：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">int</span> i = <span class="number">0</span>;</div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">get</span><span class="params">()</span> </span>&#123;</div><div class="line">	<span class="keyword">return</span> i;</div><div class="line">&#125;</div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">set</span><span class="params">(<span class="keyword">int</span> i)</span> </span>&#123;</div><div class="line">	<span class="keyword">this</span>.i = i;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>如果我说，上边的get和set方法对于变量i的操作，不但是原子操作，而且两个方法之间还是同步的，即此处volatile的作用完全等同于synchronized的作用，你是不是需要思考一会？这么神奇吗？</p>
+<p>先来解释为什么是同步的，我们可以先用熟悉的synchronized想一下同步效果是什么样。如果两个方法是synchronized修饰的，那多线程环境下，任一时刻只有一个线程在执行get和set方法，其他线程都处于阻塞排队状态，则，任一时刻，任一线程通过get方法得到的，一定是变量i此刻的最新值。这就是synchronized在此处达到的同步效果，是不是很熟悉？这不就是保证了变量i的可见性嘛。再来看此处volatile达到的同步效果，由于volatile语义使然，同样的，任一时刻，任一线程通过get方法得到的，一定是变量i此刻的最新值。</p>
+<p>再来解释原子性，这时我们可以考虑一下如果变量i没有使用volatile修饰，结合我们上边说的内存模型，当一个线程A执行this.i=i时，其实至少是有两步的：1.对工作内存中的i进行写操作；2.把工作内存中的i同步回写到主内存中；那么当在这两步之间进行上下文切换至其他线程时，通过get方法将看不到i的最新值。而volatile可以保证this.i=i这行代码的原子性。此处的原子性可能和我们通常理解的原子性不太一样，因为我们之前遇到的原子性都是在机器码的层面上，而这里是由于JAVA的内存模型导致的。</p>
+<p>这时我们不妨回头想一下当看到“两个方法之间还是同步的，即此处volatile的作用完全等同于synchronized的作用”这句话时为什么会有点诧异呢？因为我们通常理解的“同步”，更多的关注点在于“原子性”上，因为我们通常需要同步的操作不像上边的代码只有一行，而是一系列相关的操作。而此处的“同步”，更多的关注点在于“可见性”上，所以只能说我们对于“同步”的认识还不够深。</p>
+<p>关于volatile的正确用法，还有很多需要学习，这里推荐一篇很好的博文<em><a href="http://www.ibm.com/developerworks/cn/java/j-jtp06197.html" target="_blank" rel="external">《正确使用 Volatile 变量》</a></em>，值得一看。最后通过引用《深入理解Java虚拟机》书中的话来结束此文，既作为对内存模型的总结，更作为对“同步”的正确认识和理解。</p>
+<blockquote>
+<p>Java内存模型是围绕着并发过程中如何处理原子性、可见性和有序性这3个特征来建立的。<br>有序性：Java程序中天然的有序性可以总结为一句话：如果在线程内观察，所有的操作都是有序的；如果在一个线程中观察另一个线程，所有的操作都是无序的。前半句是指“线程内表现为串行的语义”，后半句是指“指令重排序”现象和“工作内存与主内存同步延迟”现象。</p>
+</blockquote>
+
+          
+        
+      
+    </div>
+    
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/线程池全面解析/" itemprop="url">
                   线程池全面解析
                 </a>
@@ -237,7 +578,7 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-04-04T15:53:24+08:00" content="2016-04-04">
+            <time itemprop="dateCreated" datetime="2016-04-04T15:09:33+08:00" content="2016-04-04">
               2016-04-04
             </time>
           </span>
@@ -301,7 +642,7 @@
 <li>提高线程的可管理性：线程是稀缺资源，如果无限制的创建，不仅会消耗系统资源，还会降低系统的稳定性，使用线程池可以进行统一的分配，调优和监控。</li>
 </ol>
 <h2 id="最简单的线程池模型"><a href="#最简单的线程池模型" class="headerlink" title="最简单的线程池模型"></a>最简单的线程池模型</h2><p>至少要有两个集合，其中一个集合用来存放线程，另一个集合用来存放等待执行的任务。针对线程的个数控制、任务执行的顺序、没有可用线程或任务满了以后对应的策略，JDK提供了几种常用的、实现好的线程池供我们使用，下面详细讲解JDK的线程池（这里先抛出一个重要的问题，对于这个简单模型，我只说了它静态的存储结构，但它的动态操作，比如把任务交给线程来执行这个动作是怎么完成的？线程执行完以后又怎么达到线程复用的？在讲解完JDK的四种线程池以后，我会在此文最后通过源码来回答这些问题）。</p>
-<h2 id="JDK提供的线程池"><a href="#JDK提供的线程池" class="headerlink" title="JDK提供的线程池"></a>JDK提供的线程池</h2><h3 id="UML图："><a href="#UML图：" class="headerlink" title="UML图："></a>UML图：</h3><p><img src="http://cevxd.img47.wal8.com/img47/542077_20160404152451/145975477752.png" alt="JDK线程池UML"></p>
+<h2 id="JDK提供的线程池"><a href="#JDK提供的线程池" class="headerlink" title="JDK提供的线程池"></a>JDK提供的线程池</h2><h3 id="UML图："><a href="#UML图：" class="headerlink" title="UML图："></a>UML图：</h3><p><img src="http://obd791hyv.bkt.clouddn.com/hexo/threadpool/%E7%BA%BF%E7%A8%8B%E6%B1%A0UML.png" alt="JDK线程池UML"></p>
 <p>标记一下比较重要的类：<table><tr><td>ExecutorService</td><td>真正的线程池接口</td></tr><tr><td>ScheduledExecutorService</td><td>能和Timer/TimerTask类似，解决那些需要任务重复执行的问题</td></tr><tr><td>ThreadPoolExecutor</td><td>ExecutorService的默认实现</td></tr><tr><td>ScheduledThreadPoolExecutor</td><td>继承ThreadPoolExecutor的ScheduledExecutorService接口实现，周期性任务调度的类实现</td></tr></table></p>
 <h3 id="ThreadPoolExecutor构造参数"><a href="#ThreadPoolExecutor构造参数" class="headerlink" title="ThreadPoolExecutor构造参数"></a>ThreadPoolExecutor构造参数</h3><p>对于我们上边提到的JDK提供的几种常用的线程池，其实都是通过ThreadPoolExecutor构造的，只是构造参数不同导致各个线程池的特性不同，所以在介绍那几种具体的线程池之前，先来了解一下ThreadPoolExecutor各个构造参数的含义，下边是其构造函数代码：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="title">ThreadPoolExecutor</span><span class="params">(<span class="keyword">int</span> corePoolSize,</span></span></div><div class="line">					  <span class="keyword">int</span> maximumPoolSize,</div><div class="line">					  <span class="keyword">long</span> keepAliveTime,</div><div class="line">					  TimeUnit unit,</div><div class="line">					  BlockingQueue&lt;Runnable&gt; workQueue,</div><div class="line">					  ThreadFactory threadFactory,</div><div class="line">					  RejectedExecutionHandler handler) &#123;</div><div class="line"><span class="keyword">if</span> (corePoolSize &lt; <span class="number">0</span> ||</div><div class="line">	maximumPoolSize &lt;= <span class="number">0</span> ||</div><div class="line">	maximumPoolSize &lt; corePoolSize ||</div><div class="line">	keepAliveTime &lt; <span class="number">0</span>)</div><div class="line">	<span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException();</div><div class="line"><span class="keyword">if</span> (workQueue == <span class="keyword">null</span> || threadFactory == <span class="keyword">null</span> || handler == <span class="keyword">null</span>)</div><div class="line">	<span class="keyword">throw</span> <span class="keyword">new</span> NullPointerException();</div><div class="line"><span class="keyword">this</span>.corePoolSize = corePoolSize;</div><div class="line"><span class="keyword">this</span>.maximumPoolSize = maximumPoolSize;</div><div class="line"><span class="keyword">this</span>.workQueue = workQueue;</div><div class="line"><span class="keyword">this</span>.keepAliveTime = unit.toNanos(keepAliveTime);</div><div class="line"><span class="keyword">this</span>.threadFactory = threadFactory;</div><div class="line"><span class="keyword">this</span>.handler = handler;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
@@ -346,7 +687,7 @@
 </ul>
 </li>
 </ol>
-<h3 id="线程池的处理流程"><a href="#线程池的处理流程" class="headerlink" title="线程池的处理流程"></a>线程池的处理流程</h3><p><img src="http://cevxd.img47.wal8.com/img47/542077_20160404152451/145975630954.png" alt="线程池的处理流程"><br>如上图所示，大体流程依次如下：</p>
+<h3 id="线程池的处理流程"><a href="#线程池的处理流程" class="headerlink" title="线程池的处理流程"></a>线程池的处理流程</h3><p><img src="http://obd791hyv.bkt.clouddn.com/hexo/threadpool/%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B.png" alt="线程池的处理流程"><br>如上图所示，大体流程依次如下：</p>
 <ol>
 <li><strong>第一步</strong> 是 看线程池是否关闭 &amp;&amp; corePoolSize是否满了；</li>
 <li>corePoolSize满了以后，<strong>第二步</strong> 是看 线程池是否关闭 &amp;&amp; 队列是否满了（判断队列是否已满用的是上表中的offer(e)方法），此处对线程池的状态检查是double check，即添加到队列以后，会再次检查状态，如果此时线程池是关闭状态，则回滚刚才的添加动作。</li>
@@ -405,10 +746,10 @@
 <li>通过参数completedAbruptly的注释我们可以知道它==true时表示用户任务是由于用户代码抛出异常而终止的（这和runWorker方法中对其赋值是对应的），该方法做的第一件事是判断任务结束的原因，如果是因为用户代码抛出异常，那此时执行该任务的线程已经因为异常而终止了，接着decrementWorkerCount()是通过CAS执行线程个数减1操作；</li>
 <li>该方法做的第二件事，加锁，把该Worker完成的任务个数，汇总到整个线程池完成的任务个数上（开个小岔，这么做难道不会造成监控参数completedTaskCount的准确性延迟吗？其实并不会，因为当我们通过get方法获取该参数时，会加锁遍历所有的Worker汇总已完成的任务个数），然后从工作线程集合HashSet中去除该Worker。是的！这里没有判断是否超时，直接删了，而且要注意，这里是通过HashSet的remove方法删的，并没有对线程个数进行修改！先别急，接着往下看；</li>
 <li>该方法做的第三件事，tryTerminate()，通过该方法的注释可以了解到，这是一个任何牵扯到线程个数减少或从队列中取任务的操作都要做的保险措施，不是重点，接着往下看；</li>
-<li>第四件事才是关于线程个数维护的，首先检查线程池状态，如果没有关闭，接下来的分支很有意思：a)如果用户任务是因为异常终止的，就直接通过addWorker添加一个没有任务的工作线程顶替因异常挂掉的线程；b)如果用户任务是正常运行结束的，就根据allowCoreThreadTimeOut设置最少线程个数，然后检查当前是否少于最少个数，不少的话方法就结束了，否则通过addWorker添加一个没有任务的工作线程。这里可以再回顾一下上边addWorker方法的源码，该方法新建包装了一个工作线程，然后start线程开始通过runWorker方法执行任务，但这里任务是空的，也就是runWorker方法里while循环直接结束了，然后又会回到这里，如果一直没有新任务到来的话，线程池就是这样，循环往复的创建线程，删除线程来维护线程个数的。<br>看到这，如果上边讲得你已经理解消化了，你可能还会有疑问：如果我们在线程池空闲时，在它删除一个线程之后，创建充数的线程之前，获取这个时刻的线程个数的话，会不会少于corePoolSize呢？答案是不会的！该方法唯一一处对线程个数有操作的是，当线程是异常终止时，对线程个数减1操作。其他所有情况，空闲时只是不断的创建和删除线程实体，但并没有修改线程个数。<br>这个方法看似分支很少，其实处理了很多种情况，可以通过下边的流程图梳理一下：<br><img src="http://cevxd.img47.wal8.com/img47/542077_20160404152451/145975826897.png" alt="processWorkerExit流程图"></li>
+<li>第四件事才是关于线程个数维护的，首先检查线程池状态，如果没有关闭，接下来的分支很有意思：a)如果用户任务是因为异常终止的，就直接通过addWorker添加一个没有任务的工作线程顶替因异常挂掉的线程；b)如果用户任务是正常运行结束的，就根据allowCoreThreadTimeOut设置最少线程个数，然后检查当前是否少于最少个数，不少的话方法就结束了，否则通过addWorker添加一个没有任务的工作线程。这里可以再回顾一下上边addWorker方法的源码，该方法新建包装了一个工作线程，然后start线程开始通过runWorker方法执行任务，但这里任务是空的，也就是runWorker方法里while循环直接结束了，然后又会回到这里，如果一直没有新任务到来的话，线程池就是这样，循环往复的创建线程，删除线程来维护线程个数的。<br>看到这，如果上边讲得你已经理解消化了，你可能还会有疑问：如果我们在线程池空闲时，在它删除一个线程之后，创建充数的线程之前，获取这个时刻的线程个数的话，会不会少于corePoolSize呢？答案是不会的！该方法唯一一处对线程个数有操作的是，当线程是异常终止时，对线程个数减1操作。其他所有情况，空闲时只是不断的创建和删除线程实体，但并没有修改线程个数。<br>这个方法看似分支很少，其实处理了很多种情况，可以通过下边的流程图梳理一下：<br><img src="http://obd791hyv.bkt.clouddn.com/hexo/threadpool/processWorkExit%E6%B5%81%E7%A8%8B%E5%9B%BE.png" alt="processWorkerExit流程图"></li>
 </ol>
 </li>
-<li><p>看到这里的时候，你如果还记得我们一开始的问题，应该会反应过来，这个processWorkerExit方法只是单纯的控制线程个数，但并没有依据keepAliveTime指定的空闲时间来裁决线程的去留啊！！我一开始也是笃定时间判断控制是在这里的！如果不在这里，那究竟在哪里呢？直接查看都有哪些方法调用过keepAliveTime参数就知道了：<br><img src="http://cevxd.img47.wal8.com/img47/542077_20160404152451/145975832373.png" alt="keepAliveTime调用"><br>通过排除法我们可以确定，原来是在被我们忽视的getTask()方法里！！真是没想到啊！这个方法其他的源码我们可以不看，只用看一行我们就什么都明白了：</p>
+<li><p>看到这里的时候，你如果还记得我们一开始的问题，应该会反应过来，这个processWorkerExit方法只是单纯的控制线程个数，但并没有依据keepAliveTime指定的空闲时间来裁决线程的去留啊！！我一开始也是笃定时间判断控制是在这里的！如果不在这里，那究竟在哪里呢？直接查看都有哪些方法调用过keepAliveTime参数就知道了：<br><img src="http://obd791hyv.bkt.clouddn.com/hexo/threadpool/keepAliveTime.png" alt="keepAliveTime调用"><br>通过排除法我们可以确定，原来是在被我们忽视的getTask()方法里！！真是没想到啊！这个方法其他的源码我们可以不看，只用看一行我们就什么都明白了：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">Runnable r = timed ?</div><div class="line">	workQueue.poll(keepAliveTime, TimeUnit.NANOSECONDS) :</div><div class="line">	workQueue.take();</div></pre></td></tr></table></figure>
 <p>原来是在从队列中取任务的时候做到时间控制的！一开始我们可能是想不到的，但看到这里，仔细一想，放在这里真是再合适不过了：当一个线程在取任务的时候，说明这个线程是空闲的，当它从队列中取任务超时而失败的时候，它就已经超过了空闲时间上限了，这时候的流程是：runWorker方法中的while循环条件失败，走进processWorkerExit方法做最后的线程个数控制，简直完美！</p>
 </li>
@@ -483,7 +824,7 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-04-04T00:00:00+08:00" content="2016-04-04">
+            <time itemprop="dateCreated" datetime="2016-04-04T15:03:15+08:00" content="2016-04-04">
               2016-04-04
             </time>
           </span>
@@ -601,7 +942,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">12</span>
+              <span class="site-state-item-count">14</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -609,7 +950,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-count">5</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -618,7 +959,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">21</span>
+                <span class="site-state-item-count">22</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

@@ -65,15 +65,15 @@
 <meta property="og:site_name" content="栖静林">
 <meta property="og:description" content="Hadoop2OnWindows本文主要是讲如何在Windows系统下编译、安装部署单机模式的Hadoop。
 下载Hadoop源码当前比较流行的Hadoop源代码版本有两个：Apache Hadoop和Cloudera DistributedHadoop（简称 CDH） 。Apache Hadoop是由雅虎、Cloudera、Facebook等公司组成的Hadoop社区共同研发的， 它属于最原始的">
-<meta property="og:image" content="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146994994572.png">
-<meta property="og:image" content="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146994994661.png">
-<meta property="og:image" content="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146994994625.png">
-<meta property="og:updated_time" content="2016-09-20T02:59:17.006Z">
+<meta property="og:image" content="http://obd791hyv.bkt.clouddn.com/hexo/hadoop/WindowsSDK%E5%AE%89%E8%A3%85%E9%94%99%E8%AF%AF.PNG">
+<meta property="og:image" content="http://obd791hyv.bkt.clouddn.com/hexo/hadoop/mvn_package.PNG">
+<meta property="og:image" content="http://obd791hyv.bkt.clouddn.com/hexo/hadoop/mvn_protoc%E9%94%99%E8%AF%AF.PNG">
+<meta property="og:updated_time" content="2016-09-26T08:15:04.618Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="从零爬Hadoop系列_6-Hadoop2OnWindows">
 <meta name="twitter:description" content="Hadoop2OnWindows本文主要是讲如何在Windows系统下编译、安装部署单机模式的Hadoop。
 下载Hadoop源码当前比较流行的Hadoop源代码版本有两个：Apache Hadoop和Cloudera DistributedHadoop（简称 CDH） 。Apache Hadoop是由雅虎、Cloudera、Facebook等公司组成的Hadoop社区共同研发的， 它属于最原始的">
-<meta name="twitter:image" content="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146994994572.png">
+<meta name="twitter:image" content="http://obd791hyv.bkt.clouddn.com/hexo/hadoop/WindowsSDK%E5%AE%89%E8%A3%85%E9%94%99%E8%AF%AF.PNG">
 
 
 
@@ -243,7 +243,7 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-07-31T00:00:00+08:00" content="2016-07-31">
+            <time itemprop="dateCreated" datetime="2016-07-31T15:29:36+08:00" content="2016-07-31">
               2016-07-31
             </time>
           </span>
@@ -301,7 +301,7 @@
 <p>YARN属于Hadoop 2.0的一个分支，此处我使用的是<a href="http://hadoop.apache.org/" target="_blank" rel="external">Apache版本</a>的2.7.2。</p>
 <h2 id="环境说明"><a href="#环境说明" class="headerlink" title="环境说明"></a>环境说明</h2><p>为什么把环境说明放在第二步呢？因为所需环境在源码文件里有明确说明。把刚才下载的源码解压到合适的路径下，然后在源码根目录下有一个<strong>BUILDING.txt</strong>文件，该文件依次列出了<code>Unix</code>和<code>Windows</code>的所需环境。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">----------------------------------------------------------------------------------</div><div class="line"></div><div class="line">Building on Windows</div><div class="line"></div><div class="line">----------------------------------------------------------------------------------</div><div class="line">Requirements:</div><div class="line"></div><div class="line">* Windows System</div><div class="line">* JDK 1.7+</div><div class="line">* Maven 3.0 or later</div><div class="line">* Findbugs 1.3.9 (if running findbugs)</div><div class="line">* ProtocolBuffer 2.5.0</div><div class="line">* CMake 2.6 or newer</div><div class="line">* Windows SDK 7.1 or Visual Studio 2010 Professional</div><div class="line">* Windows SDK 8.1 (if building CPU rate control for the container executor)</div><div class="line">* zlib headers (if building native code bindings for zlib)</div><div class="line">* Internet connection for first build (to fetch all Maven and Hadoop dependencies)</div><div class="line">* Unix command-line tools from GnuWin32: sh, mkdir, rm, cp, tar, gzip. These</div><div class="line">  tools must be present on your PATH.</div></pre></td></tr></table></figure></p>
 <p>按照上边的说明(如果你下的版本和我不一样，就看你的BUILDING文件)，依次下载配置好环境变量，其中Protocol只是一个exe编译器，把路径配到PATH中即可，其他环境的安装配置不再详述(对于<code>if</code>的可选项，我都没配，按需选配)。</p>
-<h3 id="Windows-SDK安装错误"><a href="#Windows-SDK安装错误" class="headerlink" title="Windows SDK安装错误"></a>Windows SDK安装错误</h3><p>如果你和我一样，在安装Windows SDK 7.1时出现如下图的错误：<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146994994572.png" alt="image"><br>具体错误原因我也没查到，我的解决方法是：</p>
+<h3 id="Windows-SDK安装错误"><a href="#Windows-SDK安装错误" class="headerlink" title="Windows SDK安装错误"></a>Windows SDK安装错误</h3><p>如果你和我一样，在安装Windows SDK 7.1时出现如下图的错误：<br><img src="http://obd791hyv.bkt.clouddn.com/hexo/hadoop/WindowsSDK%E5%AE%89%E8%A3%85%E9%94%99%E8%AF%AF.PNG" alt="Windows_SDK_install_error"><br>具体错误原因我也没查到，我的解决方法是：</p>
 <ol>
 <li>卸载当前系统中非4.0的<code>.Net</code></li>
 <li>下载安装<code>.Net 4.0</code></li>
@@ -316,10 +316,10 @@
 <li>如果是64位系统，执行命令：<code>set Platform=x64</code>(注意大小写)</li>
 <li>然后执行命令：<code>mvn package -Pdist,native-win -DskipTests -Dtar</code>  </li>
 </ol>
-<p><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146994994661.png" alt="image"><br>然后就等着编译和下载需要的依赖包吧（<code>-DskipTests</code>是为了省去对Test的编译）。</p>
+<p><img src="http://obd791hyv.bkt.clouddn.com/hexo/hadoop/mvn_package.PNG" alt="mvn_package"><br>然后就等着编译和下载需要的依赖包吧（<code>-DskipTests</code>是为了省去对Test的编译）。</p>
 <h3 id="编译错误"><a href="#编译错误" class="headerlink" title="编译错误"></a>编译错误</h3><ol>
 <li>如果编译失败，首先检查上边说的环境是否都配好了，都已经写进PATH环境变量；其次检查命令参数，注意不要想当然的把Win32写成x32，或者把x64写成Win64，set Platform要一字不差，大小写也不能错</li>
-<li>如果在编译期间出现如下图的错误，这是因为没有准备Protocol Buffers环境，下载加进<code>PATH</code>即可解决（记得重新打开<code>Windows SDK command prompt</code>命令行，不然不会使用新的<code>PATH</code>变量）。<br><img src="http://cevxd.img48.wal8.com/img48/542077_20160404152451/146994994625.png" alt="image">  </li>
+<li>如果在编译期间出现如下图的错误，这是因为没有准备Protocol Buffers环境，下载加进<code>PATH</code>即可解决（记得重新打开<code>Windows SDK command prompt</code>命令行，不然不会使用新的<code>PATH</code>变量）。<br><img src="http://obd791hyv.bkt.clouddn.com/hexo/hadoop/mvn_protoc%E9%94%99%E8%AF%AF.PNG" alt="protoc_error">  </li>
 <li>还有一种错误，当时没有截图，记得是在编译hadoop-common包时出现的，具体错误信息不记得了，原因是因为CMake版本太低，重新下载最新版本配好环境即可解决</li>
 </ol>
 <h3 id="免编译走捷径"><a href="#免编译走捷径" class="headerlink" title="免编译走捷径"></a>免编译走捷径</h3><p>如果你在以上步骤中步履维艰，出错不断，你也可以参考<a href="http://toodey.com/2015/08/10/hadoop-installation-on-windows-without-cygwin-in-10-mints/" target="_blank" rel="external">这个网址</a>中的“Step 3”步骤中的说明。其做法是下载他已经编译好的，Windows系统下需要的文件，然后直接替换掉官网上的Unix发布版中的<code>bin</code>文件即可。所以捷径只需两步：</p>
@@ -398,13 +398,17 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/从零爬Hadoop系列_5-《Hadoop技术内幕2》计算框架/" rel="next" title="从零爬Hadoop系列_5-《Hadoop技术内幕2》计算框架">
-                <i class="fa fa-chevron-left"></i> 从零爬Hadoop系列_5-《Hadoop技术内幕2》计算框架
+              <a href="/从零爬Hadoop系列_4-《Hadoop技术内幕2》NodeManager/" rel="next" title="从零爬Hadoop系列_4-《Hadoop技术内幕2》NodeManager">
+                <i class="fa fa-chevron-left"></i> 从零爬Hadoop系列_4-《Hadoop技术内幕2》NodeManager
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/从零爬Hadoop系列_7-Linux突击笔记/" rel="prev" title="从零爬Hadoop系列_7-Linux突击笔记">
+                从零爬Hadoop系列_7-Linux突击笔记 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -418,6 +422,25 @@
 
 
     <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="从零爬Hadoop系列_6-Hadoop2OnWindows/"
+     data-title="从零爬Hadoop系列_6-Hadoop2OnWindows"
+     data-content=""
+     data-url="http://ksni88.github.io/从零爬Hadoop系列_6-Hadoop2OnWindows/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
       
     </div>
   </div>
@@ -476,7 +499,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">12</span>
+              <span class="site-state-item-count">14</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -484,7 +507,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-count">5</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -493,7 +516,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">21</span>
+                <span class="site-state-item-count">22</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

@@ -1,0 +1,790 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.5.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Linux," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/uploads/head.png?v=0.5.0" />
+
+
+
+
+
+
+<meta name="description" content="虽然在Windows上也能跑Hadoop，但总不是那个味，而且学计算机的没接触过Linux，更不是那个味，所以借此机会学一些简单的Linux基础。但并不是系统性的学习Linux，只是为了能在Linux环境下跑Hadoop，所以只看了两天，现学现用。本文主要是一些基本命令的练习和《鸟哥的Linux私房菜》中的基础知识，类似于学习笔记，好记性不如烂笔头嘛。
+Linux简介Linux简介遍地都是，想详细">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从零爬Hadoop系列_7-Linux突击笔记">
+<meta property="og:url" content="http://ksni88.github.io/从零爬Hadoop系列_7-Linux突击笔记/index.html">
+<meta property="og:site_name" content="栖静林">
+<meta property="og:description" content="虽然在Windows上也能跑Hadoop，但总不是那个味，而且学计算机的没接触过Linux，更不是那个味，所以借此机会学一些简单的Linux基础。但并不是系统性的学习Linux，只是为了能在Linux环境下跑Hadoop，所以只看了两天，现学现用。本文主要是一些基本命令的练习和《鸟哥的Linux私房菜》中的基础知识，类似于学习笔记，好记性不如烂笔头嘛。
+Linux简介Linux简介遍地都是，想详细">
+<meta property="og:updated_time" content="2016-09-26T07:34:59.803Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="从零爬Hadoop系列_7-Linux突击笔记">
+<meta name="twitter:description" content="虽然在Windows上也能跑Hadoop，但总不是那个味，而且学计算机的没接触过Linux，更不是那个味，所以借此机会学一些简单的Linux基础。但并不是系统性的学习Linux，只是为了能在Linux环境下跑Hadoop，所以只看了两天，现学现用。本文主要是一些基本命令的练习和《鸟哥的Linux私房菜》中的基础知识，类似于学习笔记，好记性不如烂笔头嘛。
+Linux简介Linux简介遍地都是，想详细">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 6269574853532059000,
+      author: '博主'
+    }
+  };
+</script>
+
+  <title> 从零爬Hadoop系列_7-Linux突击笔记 | 栖静林 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?dc8c3422caa41521411bcb96984a10f6";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">栖静林</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">不忘初心，方得始终</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th fa-fw"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                从零爬Hadoop系列_7-Linux突击笔记
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-09-26T15:34:36+08:00" content="2016-09-26">
+              2016-09-26
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index">
+                    <span itemprop="name">Linux</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/从零爬Hadoop系列_7-Linux突击笔记/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="从零爬Hadoop系列_7-Linux突击笔记/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>虽然在Windows上也能跑Hadoop，但总不是那个味，而且学计算机的没接触过Linux，更不是那个味，所以借此机会学一些简单的Linux基础。但并不是系统性的学习Linux，只是为了能在Linux环境下跑Hadoop，所以只看了两天，现学现用。本文主要是一些基本命令的练习和《鸟哥的Linux私房菜》中的基础知识，类似于学习笔记，好记性不如烂笔头嘛。</p>
+<h2 id="Linux简介"><a href="#Linux简介" class="headerlink" title="Linux简介"></a>Linux简介</h2><p>Linux简介遍地都是，想详细了解的可以深入查询了解，此处只是写一下凭自己看书留下的主要印象。</p>
+<ol>
+<li><strong>诞生</strong>：在早期电脑还只是大型机用于军事、科研等时，只能同时支撑30个左右的终端，贝尔实验室要开发一个操作系统，目标是支持300个终端，开发了四年宣告失败，实验室内部的一个员工为了方便个人档案管理，抽取失败的项目开发成Unix，慢慢在实验室内部流行开来，且有更多人来开发维护。</li>
+<li><strong>发展</strong>：到了90年代个人电脑流行开时，芬兰的大学生Linus通过GNU接触到Unix，把当时只能用于大型机的Unix改写移植到个人x86电脑上使用，借助GNU流行至今。</li>
+<li><strong>理解</strong>：操作系统从上到下依次为：用户、应用程序、内核、硬件，四者中只有内核不好理解。说得简单点，操作系统就相当于一个介于用户和硬件的中介，只有通过操作系统，用户才能使用比较统一的操作或命令来使用五花八门的硬件为我们工作，而完成这项任务的重要角色其实是内核，一个很小的东西(Windows之所以那么大是因为有那么繁杂的界面和功能)。所以在Windows下，我们和内核之间还有一个中介，而在Linux下使用命令行可以和内核直接交互，越过了层层封装，可以完成更多底层操作和功能，当然也需要相应的知识学习。</li>
+<li><strong>优点</strong>：Linux之所以可以流行至今，并且作为服务器的首选，主要因为以下优点：硬件要求低、开源、免费、稳定、安全、真正的多人多任务。简单点讲，就是硬件成本够低，够安全(因为开源)，够稳定，反正服务器主要用来常年跑服务，不需要GUI，这不就是为服务器量身定做的吗？</li>
+<li><strong>缺点</strong>：命令行操作需要学习成本。虽然有GUI，但其本质还是Linux上的一个应用，不如直接操作Linux系统。</li>
+</ol>
+<p>虽然当前有很多版本，但内核是一样的，所以本质上是一样的。</p>
+<h2 id="档案"><a href="#档案" class="headerlink" title="档案"></a>档案</h2><p>档案相当于Linux下我们理解的文件和文件夹的统称，只由一位属性做区分。</p>
+<h3 id="档案属性"><a href="#档案属性" class="headerlink" title="档案属性"></a>档案属性</h3><p>档案属性共十位，如drwxrwxrwx，若下标记为0-9，则：</p>
+<ol>
+<li>0位：档案类型<ul>
+<li>d：目录</li>
+<li>-：常规档案</li>
+<li>l：连结档，link file</li>
+<li>b：区块（block）设备档，装置文件里面的可供存储的接口设备；</li>
+<li>c：字符（character）设备档，装置文件里面的串行端口设备，例如键盘、鼠标；</li>
+</ul>
+</li>
+<li>123位：拥有人的权限<ul>
+<li>r：可读，数值4</li>
+<li>w：可写，数值2</li>
+<li>x：可执行，数值1（同win下的.exe等扩展名的标示作用，在Linux下是否可执行仅靠该标注。另外当0位为d时，表示是否可以在此目录下执行命令）</li>
+</ul>
+</li>
+<li>456位：与拥有人同群组的权限：同上</li>
+<li>789位：非同群组的权限：同上</li>
+<li>注意点：当文档类型为d即目录时，要特别注意权限x，例如drwxr–r–，此时除了拥有者外，其他人均不能查看该目录，为什么呢？虽然有r权限，但没有x权限，即不能在该目录下执行任何命令，如ls，也就无法查看，相当于没有进入该目录。</li>
+</ol>
+<h3 id="连结档link-file"><a href="#连结档link-file" class="headerlink" title="连结档link file"></a>连结档link file</h3><ol>
+<li><code>inode table</code>：inode中存储着档案的属性，及该档案放置在哪一个block中等信息</li>
+<li><code>block area</code>：真正存储数据的地方，所以访问档案时，先查inode table，再到对应的block操作数据</li>
+<li>对于【目录】文件本身，只有对应的inode，没有对应的block</li>
+<li><code>Hard Links</code>：新建立一个inode指向档案的block区块，即它允许一个档案有多个不同的路径名，可以防止误删（因为删除操作只是删除对应的inode，类似于JVM的GC）<ul>
+<li>缺点1：不能跨filesystem，因为不同的filesystem有不同的inode table</li>
+<li>缺点2：不能link目录</li>
+</ul>
+</li>
+<li><code>Symbolic Links</code>：新建立一个特殊的档案文件，通过保存真正的档案位置从而把操作导向真正的档案，类似于Windows的快捷方式，如果源文档被删除，该link会打不开</li>
+<li><code>ln [-s] [src] [des]</code>：创建连结档，<code>s</code>：symbolic，即默认为hard link</li>
+<li><p><code>ll</code>和连结档</p>
+<ul>
+<li><code>ll</code>共7列，分别是：<code>属性</code>、<code>link个数</code>、<code>拥有者</code>、<code>群组</code>、<code>修改时间</code>、<code>文件名</code>；</li>
+<li><p>假设当前目录下有一个test.txt档案，在分别建立其一个硬链接hard.txt和软连接soft.txt之后，<code>ll</code>命令结果如下：</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">total 8</div><div class="line">-rw-r--r-- 2 root root 77 Jul 1 15:15 hard.txt</div><div class="line">lrwxrwxrwx 2 root root  8 Jul 1 15:21 soft.txt -&gt; test.txt</div><div class="line">-rw-r--r-- 2 root root 77 Jul 1 15:15 test.txt</div></pre></td></tr></table></figure>
+</li>
+<li><p>可以发现有一下几个注意点：</p>
+<ol>
+<li>硬链接的属性首位并非l，而是普通的-，软连接才是l</li>
+<li>源文件和硬链接的link数都为2，而且此时两文件出了命名不同外，其他全部一模一样，已经不分“真假”了，都是真的</li>
+<li>软连接和源文件还是能分辨出“真假”的，软连接的link数为1，而且软连接的命名有指向源文件的说明</li>
+<li>软连接的访问权限全开了</li>
+</ol>
+</li>
+</ul>
+</li>
+</ol>
+<h3 id="常见目录的大致内容"><a href="#常见目录的大致内容" class="headerlink" title="常见目录的大致内容"></a>常见目录的大致内容</h3><ol>
+<li><code>/bin</code>：存放一般用户常用的执行档，如<code>ls</code>，<code>rm</code>，<code>mkdir</code>，<code>rmdir</code>等</li>
+<li><code>/boot</code>：存放Linux核心，以及和开机相关的档案，重要！</li>
+<li><code>/dev</code>：即device，Linux将设备视为档案，如硬盘、软盘、光驱等</li>
+<li><code>/etc</code>：存放系统在开机过程中需要读取的档案，重要！</li>
+<li><code>/home</code>：系统使用者的家目录</li>
+<li><code>/lib</code>：存放Linux执行或编译一些程序时使用到的一些库</li>
+<li><code>/list+found</code>：系统不正常产生错误时，会将一些遗失的片段存在此目录下，通常会自动出现在dev目录下，如加装一个硬盘于/disk中，则会产生/disk/lost+found目录</li>
+<li><code>/mnt</code>：软盘和光盘预设挂载点，通常软盘挂在/mnt/floppy下，光盘挂在/mnt/cdrom下，不过不是定死的</li>
+<li><code>/proc</code>：系统核心及执行程序的一些信息。该目录在系统启动时自动被挂上，且不占用硬盘空间，因为里面都是内存内的数据</li>
+<li><code>/root</code>：系统管理员的家目录</li>
+<li><code>/sbin</code>：存放系统管理员常用的执行档，如：fdisk等</li>
+<li><code>/tmp</code>：暂时存放档案的地方，要定期清理，不存重要数据</li>
+<li><code>/usr</code>：存放相当多的系统信息，内有许多目录，存放程序和指令等等，类似windows下的program files，重要!</li>
+<li><code>/var</code>：重要！所有服务的登录文件或log files都在/var/log目录下，数据库如MySQL的数据库则在/var/lib目录下，其他目录如邮件等也在这里</li>
+</ol>
+<h2 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h2><h3 id="档案-1"><a href="#档案-1" class="headerlink" title="档案"></a>档案</h3><ol>
+<li><code>df -h</code>：<ul>
+<li>df：<strong>D</strong>isk <strong>F</strong>ilesystem</li>
+<li>h：<strong>H</strong>uman readable</li>
+</ul>
+</li>
+<li><code>du -sh</code>：<ul>
+<li>du：<strong>D</strong>isk <strong>U</strong>sage</li>
+<li>s：<strong>S</strong>ummarize</li>
+<li>h：<strong>H</strong>uman readable</li>
+</ul>
+</li>
+<li><code>ll</code>：ls -l的别名<ul>
+<li>ls：<strong>L</strong>ist directory contents</li>
+<li>l：<strong>L</strong>ong Listing format</li>
+</ul>
+</li>
+<li><code>ls [dir]</code>：<strong>l</strong>i<strong>s</strong>t，列出指定目录下所有文件(默认当前路径)</li>
+<li><code>mv</code>：<strong>m</strong>o<strong>v</strong>e</li>
+<li><code>cp</code>：<strong>c</strong>o<strong>p</strong>y</li>
+<li><code>scp</code>：<strong>s</strong>ecure <strong>c</strong>o<strong>p</strong>y（remote file copy program）</li>
+<li><code>rm</code>：<strong>r</strong>e<strong>m</strong>ove</li>
+<li><code>find -name</code></li>
+<li><code>ls [-l]</code>：</li>
+<li><code>cd [dir]</code>：<strong>C</strong>hange <strong>D</strong>irectory，切换到指定路径<ul>
+<li>目录符号<ul>
+<li><code>.</code>：当前目录；</li>
+<li><code>..</code>：上级目录；</li>
+<li><code>~</code>：当前用户的家目录；</li>
+<li><code>~user</code>：user这个用户的家目录</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>pwd</code>：<strong>P</strong>rint <strong>W</strong>orking <strong>D</strong>irectory，显示当前目录</li>
+<li><code>mkdir [-m(权限)/p(递归全建)] [name]</code>：新建一个目录</li>
+<li><code>rmdir [-p(递归全删)] [name]</code>：删除一个空目录</li>
+<li>查看档案内容<ul>
+<li><code>cat</code>：con<strong>cat</strong>，打印档案的全部内容</li>
+<li><code>tac</code>：从最后一行往前显示，和cat相反</li>
+<li><code>more</code>：分页显示</li>
+<li><code>less</code>：分页显示，可以往前翻页</li>
+<li><code>head</code>：头10行</li>
+<li><code>tail</code>：最后10行</li>
+<li><code>tailf</code>：同<code>tail --follow=[name]</code>，常用于跟踪日志文件</li>
+</ul>
+</li>
+<li><code>vi</code>：使用vim编辑</li>
+<li><code>grep [text]</code>：<strong>G</strong>lobally search a <strong>R</strong>egular <strong>E</strong>xpression and <strong>P</strong>rint，文本搜索</li>
+<li><code>find [filename]</code>：相当于Windows下文件管理器的搜索</li>
+</ol>
+<h3 id="进程"><a href="#进程" class="headerlink" title="进程"></a>进程</h3><ol>
+<li><code>ps -ef | grep &lt;pid&gt;</code>：<ul>
+<li>ps：<strong>P</strong>rocesses <strong>S</strong>napshot</li>
+<li>e：同A，All</li>
+<li>f：<strong>F</strong>ull-Format list</li>
+<li>grep：<strong>G</strong>lobally search a <strong>R</strong>egular <strong>E</strong>xpression and <strong>P</strong>rint</li>
+</ul>
+</li>
+<li><code>top -p &lt;pid&gt;</code>：<ul>
+<li>top：display Linux Tasks</li>
+<li>p：<strong>P</strong>rocess</li>
+</ul>
+</li>
+<li><code>kill &lt;pid&gt;</code></li>
+</ol>
+<h3 id="网络"><a href="#网络" class="headerlink" title="网络"></a>网络</h3><ol>
+<li><code>lsof -i:&lt;port&gt;</code>：<ul>
+<li>lsof：<strong>L</strong>ist <strong>O</strong>pen <strong>F</strong>ile</li>
+<li>i：<strong>I</strong>nternet，最多100个参数</li>
+</ul>
+</li>
+<li>ifconfig：network <strong>I</strong>nter<strong>f</strong>ace <strong>config</strong>ure</li>
+<li>netstat -anp | grep <port>：<ul>
+<li>netstat：<strong>net</strong>work <strong>stat</strong>istics</li>
+<li>a：All，both listening and non-listening sockets</li>
+<li>n：Numerical addresses</li>
+<li>p：show the PID and name of the Program to which each socket belongs</li>
+</ul>
+</port></li>
+<li>ethtool <ethx>：网卡工具，查看或设置网卡参数。可以配合ifconfig使用。</ethx></li>
+<li>ping</li>
+</ol>
+
+      
+    </div>
+    
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Linux/" rel="tag">#Linux</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/从零爬Hadoop系列_6-Hadoop2OnWindows/" rel="next" title="从零爬Hadoop系列_6-Hadoop2OnWindows">
+                <i class="fa fa-chevron-left"></i> 从零爬Hadoop系列_6-Hadoop2OnWindows
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/从零爬Hadoop系列_8-Hadoop2OnLinuxCluster/" rel="prev" title="从零爬Hadoop系列_8-Hadoop2OnLinuxCluster">
+                从零爬Hadoop系列_8-Hadoop2OnLinuxCluster <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="从零爬Hadoop系列_7-Linux突击笔记/"
+     data-title="从零爬Hadoop系列_7-Linux突击笔记"
+     data-content=""
+     data-url="http://ksni88.github.io/从零爬Hadoop系列_7-Linux突击笔记/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="从零爬Hadoop系列_7-Linux突击笔记/"
+           data-title="从零爬Hadoop系列_7-Linux突击笔记" data-url="http://ksni88.github.io/从零爬Hadoop系列_7-Linux突击笔记/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/head.png"
+               alt="ksni88" />
+          <p class="site-author-name" itemprop="name">ksni88</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">14</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">22</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        <div class="links-of-blogroll motion-element">
+          
+            <div class="links-of-blogroll-title">Links</div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://cruise1008.github.io/" target="_blank">海神</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://moonfacex.github.io/blog/" target="_blank">杭城梦少</a>
+                </li>
+              
+            </ul>
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux简介"><span class="nav-number">1.</span> <span class="nav-text">Linux简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#档案"><span class="nav-number">2.</span> <span class="nav-text">档案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#档案属性"><span class="nav-number">2.1.</span> <span class="nav-text">档案属性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#连结档link-file"><span class="nav-number">2.2.</span> <span class="nav-text">连结档link file</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#常见目录的大致内容"><span class="nav-number">2.3.</span> <span class="nav-text">常见目录的大致内容</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#常用命令"><span class="nav-number">3.</span> <span class="nav-text">常用命令</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#档案-1"><span class="nav-number">3.1.</span> <span class="nav-text">档案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#进程"><span class="nav-number">3.2.</span> <span class="nav-text">进程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#网络"><span class="nav-number">3.3.</span> <span class="nav-text">网络</span></a></li></ol></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ksni88</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+
+  
+
+
+
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=0.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=0.5.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=0.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=0.5.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=0.5.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=0.5.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=0.5.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"ksni88"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+      <script src="/vendors/ua-parser-js/dist/ua-parser.min.js"></script>
+      <script src="/js/src/hook-duoshuo.js"></script>
+    
+  
+
+
+
+
+
+  
+  
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,682 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.5.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hadoop,Linux," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/uploads/head.png?v=0.5.0" />
+
+
+
+
+
+
+<meta name="description" content="Hadoop2OnLinuxCluster本文主要是讲如何在Linux系统下安装部署Hadoop集群。  
+环境说明
+三台Linux机器（SUSE）  
+JDK1.8（提前下载好对应的tar.gz）  
+Hadoop2.7.2（提前下载好对应的tar.gz）  
+
+以下所有配置需要在每个主机上都进行，但按照本文配置，可以配置一个以后复制过去，不用任何修改。另外，本文是精简配置，如果想了解更多配置参">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从零爬Hadoop系列_8-Hadoop2OnLinuxCluster">
+<meta property="og:url" content="http://ksni88.github.io/从零爬Hadoop系列_8-Hadoop2OnLinuxCluster/index.html">
+<meta property="og:site_name" content="栖静林">
+<meta property="og:description" content="Hadoop2OnLinuxCluster本文主要是讲如何在Linux系统下安装部署Hadoop集群。  
+环境说明
+三台Linux机器（SUSE）  
+JDK1.8（提前下载好对应的tar.gz）  
+Hadoop2.7.2（提前下载好对应的tar.gz）  
+
+以下所有配置需要在每个主机上都进行，但按照本文配置，可以配置一个以后复制过去，不用任何修改。另外，本文是精简配置，如果想了解更多配置参">
+<meta property="og:updated_time" content="2016-09-26T07:49:51.509Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="从零爬Hadoop系列_8-Hadoop2OnLinuxCluster">
+<meta name="twitter:description" content="Hadoop2OnLinuxCluster本文主要是讲如何在Linux系统下安装部署Hadoop集群。  
+环境说明
+三台Linux机器（SUSE）  
+JDK1.8（提前下载好对应的tar.gz）  
+Hadoop2.7.2（提前下载好对应的tar.gz）  
+
+以下所有配置需要在每个主机上都进行，但按照本文配置，可以配置一个以后复制过去，不用任何修改。另外，本文是精简配置，如果想了解更多配置参">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 6269574853532059000,
+      author: '博主'
+    }
+  };
+</script>
+
+  <title> 从零爬Hadoop系列_8-Hadoop2OnLinuxCluster | 栖静林 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?dc8c3422caa41521411bcb96984a10f6";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">栖静林</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">不忘初心，方得始终</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th fa-fw"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                从零爬Hadoop系列_8-Hadoop2OnLinuxCluster
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-09-26T15:35:36+08:00" content="2016-09-26">
+              2016-09-26
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Hadoop/" itemprop="url" rel="index">
+                    <span itemprop="name">Hadoop</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/从零爬Hadoop系列_8-Hadoop2OnLinuxCluster/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="从零爬Hadoop系列_8-Hadoop2OnLinuxCluster/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Hadoop2OnLinuxCluster"><a href="#Hadoop2OnLinuxCluster" class="headerlink" title="Hadoop2OnLinuxCluster"></a>Hadoop2OnLinuxCluster</h1><p>本文主要是讲如何在Linux系统下安装部署Hadoop集群。  </p>
+<h2 id="环境说明"><a href="#环境说明" class="headerlink" title="环境说明"></a>环境说明</h2><ol>
+<li>三台Linux机器（SUSE）  </li>
+<li>JDK1.8（提前下载好对应的tar.gz）  </li>
+<li>Hadoop2.7.2（提前下载好对应的tar.gz）  </li>
+</ol>
+<p><em>以下所有配置需要在每个主机上都进行，但按照本文配置，可以配置一个以后复制过去，不用任何修改。另外，本文是精简配置，如果想了解更多配置参数，可参考另一篇博文或查看<a href="http://hadoop.apache.org/docs/current" target="_blank" rel="external">官网</a>左下角的配置文件。</em>  </p>
+<h2 id="1-同步时间"><a href="#1-同步时间" class="headerlink" title="1. 同步时间"></a>1. 同步时间</h2><p>集群上的机器需要进行时间同步，不然运行MR任务时会报错。一般集群机器不能联网，手动修改每台机器时间。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">1. 查看本机时间和时区：`date`</div><div class="line">2. 设置时区：</div><div class="line">    * 执行tzselect命令查找适合于本地的时区</div><div class="line">    * 执行cp /usr/share/zoneinfo/Aisa/Shanghai /etc/localtime</div><div class="line">3. 修改日期：date –s 15/07/2015</div><div class="line">4. 修改时间：date –s 16:18:52</div><div class="line">5. 将系统时间同步到硬件时间：hwclock -w</div></pre></td></tr></table></figure></p>
+<h2 id="2-关闭防火墙"><a href="#2-关闭防火墙" class="headerlink" title="2. 关闭防火墙"></a>2. 关闭防火墙</h2><p>如果机器上正在运行防火墙，需要把它关上。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">停止防火墙：service iptables stop(启动防火墙：service iptables start)</div></pre></td></tr></table></figure></p>
+<p>但以上命令只会当次机器运行有效，机器重启又会无效，如需要，可使用如下命令：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">chkconfig iptables on</div><div class="line">chkconfig iptables off</div></pre></td></tr></table></figure></p>
+<h2 id="3-配置Host文件"><a href="#3-配置Host文件" class="headerlink" title="3. 配置Host文件"></a>3. 配置Host文件</h2><p>首先，要先给所有机器分配好IP和hostname，hadoop会根据主机名去/etc/hosts文件中查找对应的ip。<strong>注意此处的ip和hostname，切记全文替换为自己的。</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">1. 查看/修改当前机器的主机名</div><div class="line">   cat/vim /etc/HOSTNAME</div><div class="line">2. 如果修改了，通过如下命令使其立即生效</div><div class="line">   /etc/rc.d/boot.localnet start</div><div class="line">3. 在每台机器的/etc/hosts文件末尾加上下面三行(替换相应的ip和hostname，此处假设hostname分别为m1，m2，m3)：</div><div class="line">   &#123;ip1&#125; m1</div><div class="line">   &#123;ip2&#125; m2</div><div class="line">   &#123;ip3&#125; m3</div></pre></td></tr></table></figure></p>
+<h2 id="4-配置SSH互信"><a href="#4-配置SSH互信" class="headerlink" title="4. 配置SSH互信"></a>4. 配置SSH互信</h2><p>为了使集群之间无密码访问（为了以后集群通信时不用每次都输入密码），需要在机器之间配置互信（只要确保能从master无密码访问slave就好了）。配置互信前请确保已经安装并启动了ssh服务。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">1. 生成密钥并配置ssh无密码登录主机(master主机)</div><div class="line">   * ssh-keygen -t dsa -P &apos;&apos; -f ~/.ssh/id_dsa</div><div class="line">   * cat ~/.ssh/id_dsa.pub &gt;&gt; ~/.ssh/authorized_keys</div><div class="line">2. 将authorized.keys文件拷贝到其他两台slave主机</div><div class="line">   * scp authorized_keys m2:~/.ssh</div><div class="line">   * scp authorized_keys m3:~/.ssh</div><div class="line">3. 验证是否可以从master无密码登录slave主机</div><div class="line">   * ssh m2（在master主机输入）登录成功则配置成功，exit退出登录返回Master</div></pre></td></tr></table></figure></p>
+<h2 id="5-安装JDK和Hadoop"><a href="#5-安装JDK和Hadoop" class="headerlink" title="5. 安装JDK和Hadoop"></a>5. 安装JDK和Hadoop</h2><p>Hadoop是用java开发的，Hadoop的编译和MR的运行都需要使用JDK，所以JDK是必须安装的。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">1. 在安装目录下（如/usr/java）解压JDK（解压后可删除tar.gz以节省空间）</div><div class="line">   tar -zxvf java.tar.gz</div><div class="line">2. 在安装目录下(如/usr/hadoop)解压Hadoop文件（解压后可删除tar.gz以节省空间）</div><div class="line">   tar -zxvf hadoop.tar.gz</div><div class="line">3. 配置环境变量（vim /etc/profile末尾添加）</div><div class="line">   export JAVA_HOME=/usr/java/jdk1.8.0_19</div><div class="line">   export CALSSPATH=.:$JAVA_HOME/lib/tools.jar</div><div class="line">   export HADOOP_HOME=/usr/hadoop</div><div class="line">   export PATH=$PATH:$JAVA_HOME/bin:$HADOOP_HOME/bin</div><div class="line">4. 使其立即生效</div><div class="line">   source /etc/profile</div><div class="line">5. 验证JDK是否成功</div><div class="line">   java -version</div><div class="line">6. 验证HADOOP是否成功</div><div class="line">   hadoop version</div></pre></td></tr></table></figure></p>
+<h2 id="6-修改Hadoop配置文件"><a href="#6-修改Hadoop配置文件" class="headerlink" title="6. 修改Hadoop配置文件"></a>6. 修改Hadoop配置文件</h2><p>配置文件都在${HADOOP_HOME}/etc/hadoop目录下。</p>
+<h3 id="6-1-配置slave文件"><a href="#6-1-配置slave文件" class="headerlink" title="6.1 配置slave文件"></a>6.1 配置slave文件</h3><p><code>vim slave</code>，写入ip或hostname。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">m1</div><div class="line">m2</div><div class="line">m3</div></pre></td></tr></table></figure></p>
+<h3 id="6-2-配置hadoop-env-sh"><a href="#6-2-配置hadoop-env-sh" class="headerlink" title="6.2 配置hadoop-env.sh"></a>6.2 配置hadoop-env.sh</h3><p>检查并确认该文件中有如下配置：<code>export JAVA_HOME=${JAVA_HOME}</code>，但有时<code>${JAVA_HOME}</code>并不能生效，可<strong>选择性</strong>修改为对应的目录。</p>
+<h3 id="6-3-配置core-site-xml"><a href="#6-3-配置core-site-xml" class="headerlink" title="6.3 配置core-site.xml"></a>6.3 配置core-site.xml</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">configuration</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">property</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">name</span>&gt;</span>fs.default.name<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">value</span>&gt;</span>hdfs://m1:9000<span class="tag">&lt;/<span class="name">value</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">property</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">property</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">name</span>&gt;</span>hadoop.tmp.dir<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">value</span>&gt;</span>/mnt/tmp<span class="tag">&lt;/<span class="name">value</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">property</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></div></pre></td></tr></table></figure>
+<h3 id="6-4-配置hdfs-site-xml"><a href="#6-4-配置hdfs-site-xml" class="headerlink" title="6.4 配置hdfs-site.xml"></a>6.4 配置hdfs-site.xml</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">configuration</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">property</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">name</span>&gt;</span>dfs.name.dir<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">value</span>&gt;</span>/usr/local/hadoop/name<span class="tag">&lt;/<span class="name">value</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">property</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">property</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">name</span>&gt;</span>dfs.data.dir<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">value</span>&gt;</span>/mnt/m1/data,/mnt/m2/data,/mnt/m3/data<span class="tag">&lt;/<span class="name">value</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">property</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">property</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">name</span>&gt;</span>dfs.replication<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">value</span>&gt;</span>3<span class="tag">&lt;/<span class="name">value</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">property</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></div></pre></td></tr></table></figure>
+<h3 id="6-5-配置mapred-site-xml"><a href="#6-5-配置mapred-site-xml" class="headerlink" title="6.5 配置mapred-site.xml"></a>6.5 配置mapred-site.xml</h3><p>将mapred-site.xml.template重命名为mapred-site.xml，然后修改。<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">configuration</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">property</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">name</span>&gt;</span>mapreduce.framework.name<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">value</span>&gt;</span>yarn<span class="tag">&lt;/<span class="name">value</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">property</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<h3 id="6-6-配置yarn-site-xml"><a href="#6-6-配置yarn-site-xml" class="headerlink" title="6.6 配置yarn-site.xml"></a>6.6 配置yarn-site.xml</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">configuration</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">property</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">name</span>&gt;</span>yarn.nodemanager.aux-services<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">value</span>&gt;</span>mapreduce_shuffle<span class="tag">&lt;/<span class="name">value</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">property</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">property</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">name</span>&gt;</span>yarn.nodemanager.address<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">value</span>&gt;</span>$&#123;yarn.nodemanager.hostname&#125;:8041<span class="tag">&lt;/<span class="name">value</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">property</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">property</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">name</span>&gt;</span>yarn.resourcemanager.hostname<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">value</span>&gt;</span>m1<span class="tag">&lt;/<span class="name">value</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">property</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></div></pre></td></tr></table></figure>
+<h2 id="7-配置其他节点"><a href="#7-配置其他节点" class="headerlink" title="7. 配置其他节点"></a>7. 配置其他节点</h2><p>至此，master节点上必要的配置完成，这时可以复制到其他两个机器上。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">1. 把所有配置文件打包，便于传输</div><div class="line">   tar -zcvf /hadoop.tar.gz /usr/hadoop/etc/hadoop</div><div class="line">2. 复制到m2、m3节点</div><div class="line">   scp /hadoop.tar.gz m2:/usr/hadoop/etc/</div><div class="line">   scp /hadoop.tar.gz m3:/usr/hadoop/etc/</div><div class="line"></div><div class="line">3. 切换到m2主机，或直接ssh登录过去</div><div class="line">   sh m2</div><div class="line">4. 解压打包的配置文件到/usr/hadoop/etc/目录下(自动替换原文件)</div><div class="line">   tar -zxvf /hadoop.tar.gz -C /usr/hadoop/etc/</div><div class="line"></div><div class="line">6. 对m3做同样的操作</div></pre></td></tr></table></figure></p>
+<h2 id="8-启动验证"><a href="#8-启动验证" class="headerlink" title="8. 启动验证"></a>8. 启动验证</h2><p>至此，所有配置完成，可以启动Hadoop了。</p>
+<p>在第一次启动前，必须先格式化namenode：<br><code>hadoop namenode -format</code>。</p>
+<p>然后，通过<code>${HADDDOP_HOME}/sbin/start-all.sh</code>启动Hadoop。</p>
+<p>之后，通过<code>jsp</code>在master节点上，应该可以看到以下五个进程：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">ResourceManager</div><div class="line">NodeManager</div><div class="line">NameNode</div><div class="line">SecondrayNameNode</div><div class="line">DataNode</div></pre></td></tr></table></figure></p>
+<p>在slave节点上，应该可以看到以下两个进程：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">NodeManager</div><div class="line">DataNode</div></pre></td></tr></table></figure></p>
+<p>以上进程缺一不可，缺少的说明启动失败，可以通过查看日志查明失败原因进行修正。</p>
+<p>正常启动以后，还可以通过Web UI查看相应的UI界面。</p>
+<ol>
+<li>RM的Web UI：<code>http://${RM节点IP}:8088</code>，即Master节点</li>
+<li>NM的Web UI：<code>http://${NM节点IP}:50070</code>，所有节点都有</li>
+</ol>
+<p>以上列出的Web UI访问地址，是默认的配置地址，具体的配置详解、各组件的命令和UI使用，参见下一篇<a href="">博文</a>。</p>
+
+      
+    </div>
+    
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Hadoop/" rel="tag">#Hadoop</a>
+          
+            <a href="/tags/Linux/" rel="tag">#Linux</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/从零爬Hadoop系列_7-Linux突击笔记/" rel="next" title="从零爬Hadoop系列_7-Linux突击笔记">
+                <i class="fa fa-chevron-left"></i> 从零爬Hadoop系列_7-Linux突击笔记
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/从零爬Hadoop系列_9-各组件相关命令和WebUI使用/" rel="prev" title="从零爬Hadoop系列_9-各组件相关命令和WebUI使用">
+                从零爬Hadoop系列_9-各组件相关命令和WebUI使用 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="从零爬Hadoop系列_8-Hadoop2OnLinuxCluster/"
+     data-title="从零爬Hadoop系列_8-Hadoop2OnLinuxCluster"
+     data-content=""
+     data-url="http://ksni88.github.io/从零爬Hadoop系列_8-Hadoop2OnLinuxCluster/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="从零爬Hadoop系列_8-Hadoop2OnLinuxCluster/"
+           data-title="从零爬Hadoop系列_8-Hadoop2OnLinuxCluster" data-url="http://ksni88.github.io/从零爬Hadoop系列_8-Hadoop2OnLinuxCluster/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/head.png"
+               alt="ksni88" />
+          <p class="site-author-name" itemprop="name">ksni88</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">14</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">22</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        <div class="links-of-blogroll motion-element">
+          
+            <div class="links-of-blogroll-title">Links</div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://cruise1008.github.io/" target="_blank">海神</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://moonfacex.github.io/blog/" target="_blank">杭城梦少</a>
+                </li>
+              
+            </ul>
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Hadoop2OnLinuxCluster"><span class="nav-number">1.</span> <span class="nav-text">Hadoop2OnLinuxCluster</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#环境说明"><span class="nav-number">1.1.</span> <span class="nav-text">环境说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-同步时间"><span class="nav-number">1.2.</span> <span class="nav-text">1. 同步时间</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-关闭防火墙"><span class="nav-number">1.3.</span> <span class="nav-text">2. 关闭防火墙</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-配置Host文件"><span class="nav-number">1.4.</span> <span class="nav-text">3. 配置Host文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-配置SSH互信"><span class="nav-number">1.5.</span> <span class="nav-text">4. 配置SSH互信</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-安装JDK和Hadoop"><span class="nav-number">1.6.</span> <span class="nav-text">5. 安装JDK和Hadoop</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-修改Hadoop配置文件"><span class="nav-number">1.7.</span> <span class="nav-text">6. 修改Hadoop配置文件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#6-1-配置slave文件"><span class="nav-number">1.7.1.</span> <span class="nav-text">6.1 配置slave文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-2-配置hadoop-env-sh"><span class="nav-number">1.7.2.</span> <span class="nav-text">6.2 配置hadoop-env.sh</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-3-配置core-site-xml"><span class="nav-number">1.7.3.</span> <span class="nav-text">6.3 配置core-site.xml</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-4-配置hdfs-site-xml"><span class="nav-number">1.7.4.</span> <span class="nav-text">6.4 配置hdfs-site.xml</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-5-配置mapred-site-xml"><span class="nav-number">1.7.5.</span> <span class="nav-text">6.5 配置mapred-site.xml</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-6-配置yarn-site-xml"><span class="nav-number">1.7.6.</span> <span class="nav-text">6.6 配置yarn-site.xml</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-配置其他节点"><span class="nav-number">1.8.</span> <span class="nav-text">7. 配置其他节点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-启动验证"><span class="nav-number">1.9.</span> <span class="nav-text">8. 启动验证</span></a></li></ol></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ksni88</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+
+  
+
+
+
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=0.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=0.5.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=0.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=0.5.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=0.5.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=0.5.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=0.5.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"ksni88"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+      <script src="/vendors/ua-parser-js/dist/ua-parser.min.js"></script>
+      <script src="/js/src/hook-duoshuo.js"></script>
+    
+  
+
+
+
+
+
+  
+  
+  
+
+  
+
+  
+
+</body>
+</html>
