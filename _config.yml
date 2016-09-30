@@ -70,7 +70,7 @@ theme: next
 ## Docs: https://hexo.io/docs/deployment.html
 deploy: 
   type: git
-  repository: https://github.com/ksni88/ksni88.github.io.git
+  repository: ssh://git@github.com/ksni88/ksni88.github.io.git
   branch: master
 
 # 头像设置
@@ -79,11 +79,8 @@ avatar: /uploads/head.png
 # 多说评论
 duoshuo_shortname: ksni88
 
+# 多说分享服务
+duoshuo_share: true
+
 # 百度站点统计
 baidu_analytics: dc8c3422caa41521411bcb96984a10f6
-
-# LeanCloud文章阅读统计
-leancloud_visitors:
-	enable: true
-	app_id: b38RmiaSpwBaKOyPSSBcp00X-gzGzoHsz
-	app_key: htcRl0jD0R9hd316NCRIrBLf

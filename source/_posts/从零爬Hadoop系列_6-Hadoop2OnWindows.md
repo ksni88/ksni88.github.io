@@ -43,7 +43,7 @@ Requirements:
 
 ### Windows SDK安装错误
 如果你和我一样，在安装Windows SDK 7.1时出现如下图的错误：  
-![image](http://cevxd.img48.wal8.com/img48/542077_20160404152451/146994994572.png)  
+![Windows_SDK_install_error](http://obd791hyv.bkt.clouddn.com/hexo/hadoop/WindowsSDK%E5%AE%89%E8%A3%85%E9%94%99%E8%AF%AF.PNG)  
 具体错误原因我也没查到，我的解决方法是：
 1. 卸载当前系统中非4.0的`.Net`
 2. 下载安装`.Net 4.0`
@@ -62,13 +62,13 @@ Requirements:
 4. 如果是64位系统，执行命令：`set Platform=x64`(注意大小写)
 5. 然后执行命令：`mvn package -Pdist,native-win -DskipTests -Dtar`  
 
-![image](http://cevxd.img48.wal8.com/img48/542077_20160404152451/146994994661.png)  
+![mvn_package](http://obd791hyv.bkt.clouddn.com/hexo/hadoop/mvn_package.PNG)  
 然后就等着编译和下载需要的依赖包吧（`-DskipTests`是为了省去对Test的编译）。
 
 ### 编译错误
 1. 如果编译失败，首先检查上边说的环境是否都配好了，都已经写进PATH环境变量；其次检查命令参数，注意不要想当然的把Win32写成x32，或者把x64写成Win64，set Platform要一字不差，大小写也不能错
 2. 如果在编译期间出现如下图的错误，这是因为没有准备Protocol Buffers环境，下载加进`PATH`即可解决（记得重新打开`Windows SDK command prompt`命令行，不然不会使用新的`PATH`变量）。  
-![image](http://cevxd.img48.wal8.com/img48/542077_20160404152451/146994994625.png)  
+![protoc_error](http://obd791hyv.bkt.clouddn.com/hexo/hadoop/mvn_protoc%E9%94%99%E8%AF%AF.PNG)  
 3. 还有一种错误，当时没有截图，记得是在编译hadoop-common包时出现的，具体错误信息不记得了，原因是因为CMake版本太低，重新下载最新版本配好环境即可解决
 
 ### 免编译走捷径

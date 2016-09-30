@@ -27,7 +27,7 @@ tags:
     * 运维成本低：管理员成本和硬件成本；
     * 数据共享：减小数据移动带来的成本；
 5. 一个框架一个集群 到 多个框架共享集群：
-![共享集群](http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936452783.jpg)
+![共享集群](http://obd791hyv.bkt.clouddn.com/hexo/hadoop/%E9%9B%86%E7%BE%A4%E5%85%B1%E4%BA%AB%E8%B5%84%E6%BA%90.JPG)
 
 ## YARN的组成结构和流程
 1. YARN基本组成结构：
@@ -53,7 +53,7 @@ tags:
     * 步骤7：各个任务通过某个RPC协议向AM汇报自己的状态和进度，以便AM随时掌握各个任务的运行状态，从而可以在任务失败时重启任务；
     * 步骤9：应用程序运行完成后，AM向RM注销并关闭自己；
     * 如下图：
-![YARN工作流程](http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936452735.png)
+![YARN工作流程](http://obd791hyv.bkt.clouddn.com/hexo/hadoop/YARN%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B.PNG)
 3. YARN的理解角度：
     * 多线程并行编程：
         * YARN：云操作系统，为应用程序启动AM；

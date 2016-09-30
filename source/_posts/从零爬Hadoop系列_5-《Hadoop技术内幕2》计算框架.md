@@ -19,7 +19,7 @@ tags:
 
 看过前边的应该记得，YARN是由MRv1进化而来的，所以YARN天生支持MR，即提供了可以直接使用的AM：MRAppMaster，为了更好的理解，可以先来看一下两者的异同：  
 
-![MRV12异同](http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936512189.png)  
+![MRV12异同](http://obd791hyv.bkt.clouddn.com/hexo/hadoop/MRV12%E5%BC%82%E5%90%8C.PNG)  
 
 即只有原来负责资源调度和任务管理的运行时环境发生了替换，其他还是原来的代码。
 
@@ -68,11 +68,11 @@ tags:
     * `Job`：一个MR作业（应用程序），负责整个job即各个task的监控和管理
     * `Task`：作业内部的任务，此处有MT和RT，负责下面各个taskAttemp的监控和管理
     * `TaskAttempt`：task真正的运行实例，负责真正的任务计算工作，在YARN中，任务实例是运行在Container中的
-![作业表示方式](http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936512323.png)
+![作业表示方式](http://obd791hyv.bkt.clouddn.com/hexo/hadoop/%E4%BD%9C%E4%B8%9A%E8%A1%A8%E7%A4%BA%E6%96%B9%E5%BC%8F.png)
 5. MR作业生命周期：  
     * 三种状态机：`Job状态机`、`Task状态机`、`TaskAttempt状态机`，属于层级包含关系
     * 状态机内部即基于事件驱动的状态转移，详情请翻书
-![作业声明周期](http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936512238.png)
+![作业声明周期](http://obd791hyv.bkt.clouddn.com/hexo/hadoop/MR%E4%BD%9C%E4%B8%9A%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F.png)
 6. 资源申请和再分配（ContainerAllocator）：  
     * 当用户提交作业之后，MRAppMaster会为之初始化，并创建一系列MT和RT，并为它们申请资源
     * 资源请求是通过getResource()函数向RM发送心跳信息完成的：  
@@ -158,7 +158,7 @@ tags:
         RecordReader<KEYIN,VALUEIN>  createRecordReader(in split：InputSplit, in context：TaskAttemptContext)
 ```
 2. 如下图所示，所有基于文件的基类都是FileInputFormat，由公共基类统一对各种输入文件进行切分，即第一个功能，然后由各个派生类自己提供机制进一步解析InputSplit，即第二个功能
-	![InputFormat继承树](http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936512078.png)
+	![InputFormat继承树](http://obd791hyv.bkt.clouddn.com/hexo/hadoop/inputformat.png)
 3. 举例说明：对于TextInputFormat，每一行内容即为value，该行在整个文件中的偏移量即为key，对应为Mapper中map()方法参数中的`key/value`，所以实现的map()方法，即可将value视为文件中的一行进行进一步数据处理
 ### Mapper
 ```java
@@ -192,7 +192,7 @@ void reduce(in key：KEYIN, in values：Iterable<VALUEIN>, in context：Reducer.
 2. Collect过程分析（详情请翻书）：  
 	* 首先通过Partitioner获取记录的分片号，组成三元组<key，value，partitionNum>，然后交给collect()函数写入环形缓冲区；
 	* 环形缓冲区内部使用两级索引结构
-	![MapOutputBuffer两级索引结构](http://cevxd.img48.wal8.com/img48/542077_20160404152451/146979038031.png)
+	![MapOutputBuffer两级索引结构](http://obd791hyv.bkt.clouddn.com/hexo/hadoop/MapTask%E4%B8%A4%E7%BA%A7%E7%B4%A2%E5%BC%95%E7%BB%93%E6%9E%84.png)
 	* 之所以适用环形缓冲区，是为了当缓冲区满了以后，Collect阶段和Spill阶段可以并行进行读写，类似于生产者消费者模型；
 3. Spill过程分析：  
     * 步骤1：利用快排对缓冲区内溢出（默认参数80%）的数据进行排序，排序方式是：先按照分区编号partition排序，然后按照key排序，经过排序后，数据以分区为单位聚集在一起，同一分区内所有数据按照Key有序

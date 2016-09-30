@@ -38,7 +38,7 @@ tags:
     * Capacity Scheduler
     * Fair Scheduler
 2. YARN的资源调度器本质上是一个事件处理器，共需要处理来自外部的6种事件类型，并做不同的相应处理，其中NODE_UPDATE是最重要的事件，它会触发资源调度器最核心的资源分配机制；如下图：
-![资源调度器事件处理](http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936469148.png)
+![资源调度器事件处理](http://obd791hyv.bkt.clouddn.com/hexo/hadoop/%E8%B5%84%E6%BA%90%E7%AE%A1%E7%90%86%E5%99%A8.png)
 
 3. 资源表示模型：
     * 抽象为Container，目前仅支持虚拟CPU和物理内存
@@ -87,7 +87,7 @@ tags:
 
 ### 层级队列管理机制：
 YARN以树状层次的结构组织多个队列，其中用户只能把应用程序提交到最底层的叶子队列，非叶子队列的属性即下边所有叶子队列的属性和。
-![层级队列](http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936469103.png)
+![层级队列](http://obd791hyv.bkt.clouddn.com/hexo/hadoop/%E5%B1%82%E7%BA%A7%E9%98%9F%E5%88%97.png)
 1. 特点：
     * 子队列；
     * 最小容量：

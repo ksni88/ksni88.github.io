@@ -235,16 +235,15 @@ facebook_sdk:
 # Show number of visitors to each article.
 # You can visit https://leancloud.cn get AppID and AppKey.
 leancloud_visitors:
-  enable: false
-  app_id: #<app_id>
-  app_key: #<app_key>
-
+  enable: true
+  app_id: 2IN9jr7Wg2TWgry1Dys2qOq0-gzGzoHsz
+  app_key: ibL4S5KUnasuORygQBQjchTA
 
 # Tencent analytics ID
 # tencent_analytics:
 
 # Enable baidu push so that the blog will push the url to baidu automatically which is very helpful for SEO
-baidu_push: false
+baidu_push: true
 
 
 

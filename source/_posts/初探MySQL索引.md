@@ -17,7 +17,7 @@ tags:
 
 ## 索引实践
 先贴出进行实践的数据表结构，非常简单。
-![表结构](http://cevxd.img47.wal8.com/img47/542077_20160404152451/146139846939.jpg)
+![表结构](http://obd791hyv.bkt.clouddn.com/hexo/mysql_index/news%E8%A1%A8%E7%BB%93%E6%9E%84.JPG)
 
 ### 建立索引
 先找到需要使用索引的SQL，功能很简单，就是分页获取指定类别的最新新闻的id和title，具体做法是按照date对指定category_id的新闻进行排序，然后按照分页参数选取数据，下面是具体的示例代码。
@@ -34,10 +34,10 @@ limit 1000,10
 我在该表上建立了联合索引category_id_date=(category_id, date)，这句话是相当精简正确的，但我当时注意力全放在怎么建索引了，没有在意最后一句话，这也造成了后面一些困惑，先且接着往下看。
 ### 造大量假数据
 建立完索引，就需要造大量假数据进行测试了，我找到去年开发时的news表，里边存有5000多条数据，然后通过存储过程把该表数据循环添加到另一张结构一样的news_copy表中，循环100次，下图是添加后的数据量。
-![数据量](http://cevxd.img47.wal8.com/img47/542077_20160404152451/146139846866.jpg)
+![数据量](http://obd791hyv.bkt.clouddn.com/hexo/mysql_index/news_copy%E8%A1%A8%E6%95%B0%E6%8D%AE%E9%87%8F.JPG)
 可以看到有近60W条数据，下边分别是建索引前后的效果图：
-![建索引前](http://cevxd.img47.wal8.com/img47/542077_20160404152451/146139847119.jpg)
-![建索引后](http://cevxd.img47.wal8.com/img47/542077_20160404152451/146139847069.jpg)
+![建索引前](http://obd791hyv.bkt.clouddn.com/hexo/mysql_index/%E5%BB%BA%E7%B4%A2%E5%BC%95%E5%89%8D.JPG)
+![建索引后](http://obd791hyv.bkt.clouddn.com/hexo/mysql_index/%E5%BB%BA%E7%B4%A2%E5%BC%95%E5%90%8E.JPG)
 可以看到效率相差10倍，而且这个差距肯定会随着数据量的增加而变大。然而，虽然建立索引大大增加了查询效率，但建索引后的查询效率还是不能让我们满意。这时我们就该回头关注SQL本身了，能不能进行优化呢？
 ### SQL优化
 依然是病急乱投医(不过通过实践遇到问题就解决是最快的学习途径，只是不够系统全面)，查了一通SQL优化以后，在繁杂的搜索结果里有一篇*[博文](http://www.111cn.net/database/mysql/46425.htm)*让我相见恨晚，像是捡了宝一样赶紧按照他说的改了一下SQL：
@@ -51,7 +51,7 @@ limit 1000,10) t
 on n.id=t.id
 ```
 执行结果如下：
-![SQL优化后](http://cevxd.img47.wal8.com/img47/542077_20160404152451/146139847016.jpg)
+![SQL优化后](http://obd791hyv.bkt.clouddn.com/hexo/mysql_index/SQL%E4%BC%98%E5%8C%96%E5%90%8E.JPG)
 是不是惊到了？竟然相差近百倍。这又是为什么呢？这里就要引出另外一个概念了：覆盖索引。
 ### 覆盖索引
 索引一般用来快速定位想要查询的数据的位置，然后据此精确读取，所以有两步读取操作，第一步读索引，第二步根据索引读数据并返回。换句话说，索引只是用来定位数据，而不是直接返回数据。然而覆盖索引就是一个特例，下面是覆盖索引的概念：
@@ -98,8 +98,8 @@ SQL执行的开始是FROM语句，查看目标表是否有可用索引（见上�
 
 ### explain & show profile
 在写这篇博文时，我也想知道我的SQL到底有没有用覆盖索引，网上查了一下发现可以使用explain命令来查看，使用简单方便，可以看下图：
-![explain优化前](http://cevxd.img47.wal8.com/img47/542077_20160404152451/146139846823.jpg)
-![explain优化后](http://cevxd.img47.wal8.com/img47/542077_20160404152451/146139846775.jpg)
+![explain优化前](http://obd791hyv.bkt.clouddn.com/hexo/mysql_index/explain%E4%BC%98%E5%8C%96%E5%89%8D.JPG)
+![explain优化后](http://obd791hyv.bkt.clouddn.com/hexo/mysql_index/explain%E4%BC%98%E5%8C%96%E5%90%8E.JPG)
 可以看到输出有很多参数列，其中如果使用了覆盖索引，在最后的Extra列中就会显示“Using index”，否则不会。这里可以清楚的看到优化后的子查询使用到了覆盖索引。其中rows列表示查询可能读取的记录行数，也可以清楚的看到，优化后的SQL在子查询中有5W多行，即5W多个id，然后外查询只有1020行。而优化前的SQL涉及5W多行，不止id，而是所有字段。所以通过explain命令，我们可以大概知道我们的SQL会涉及多大的数据量，会不会使用覆盖索引等信息，其实explain还可以提供给我们更多的信息，前提是你对explain命令的输出足够熟悉，这里不再过多介绍，感兴趣可以看*[explain命令说明](http://dev.mysql.com/doc/refman/5.6/en/explain.html)*和*[explain命令输出参数说明](http://dev.mysql.com/doc/refman/5.6/en/explain-output.html)*。
 
 另外，如果你还想知道SQL在执行的各个阶段的耗时，比如CPU、IO等详细信息，可以看一下*[show profile](http://dev.mysql.com/doc/refman/5.6/en/show-profile.html)*命令，但该命令在版本5.6.7中被弃用了，转而被*[Performance Schema](http://dev.mysql.com/doc/refman/5.6/en/performance-schema-query-profiling.html)*替代。

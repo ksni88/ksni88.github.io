@@ -39,7 +39,7 @@ NM是YARN中单个节点上的代理，负责管理Hadoop集群中单个计算�
     * ApplicationACLsManager：确保访问NM的用户的合法性，比如Web UI访问，该组件为每个应用程序维护了一个ACL列表
     * ContainerTokenSecretManager：检查收到的各种访问请求的合法性，确保这些请求操作已被RM授权
 6. WebServer：通过Web界面展示该节点上所有应用程序运行状态、健康状况、日志等信息
-![NM内部架构图](http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936491468.png)
+![NM内部架构图](http://obd791hyv.bkt.clouddn.com/hexo/hadoop/NM.png)
 
 ## 健康节点状况监测
 1. 自定义Shell脚本：  
@@ -76,7 +76,7 @@ NM是YARN中单个节点上的代理，负责管理Hadoop集群中单个计算�
 
 ## 目录结构管理
 1. 由于同一个NM上不同的Container往往并行向本地磁盘写数据，为了避免占用大量IO资源造成相互干扰，尽量提高写数据的可靠性和并发写性能，YARN允许NM配置多个挂在不同磁盘的目录作为中间结果存放目录，对于任意一个应用程序，YARN会在每个磁盘中创建相同的目录结构，然后采用轮询策略使用这些目录
-![NM目录结构](http://cevxd.img48.wal8.com/img48/542077_20160404152451/146936491521.png)
+![NM目录结构](http://obd791hyv.bkt.clouddn.com/hexo/hadoop/%E7%9B%AE%E5%BD%95.png)
 2. 目录分类：  
     * 数据目录：存放Container运行所需和中间数据
     * 日志目录：运行时输出的日志
